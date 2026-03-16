@@ -1,0 +1,37 @@
+import 'package:yaml/yaml.dart';
+
+import '../core/predicates/annotation_predicate.dart';
+import '../core/entities/rule.dart';
+import 'architecture_preset.dart';
+
+/// Preset: `annotation/must-have`
+///
+/// All classes in the configured folders must carry the specified annotation.
+///
+/// ```yaml
+/// - preset: annotation/must-have
+///   severity: error
+///   annotation: injectable
+///   folders:
+///     - lib/data/repository
+///   exceptions: []
+/// ```
+class AnnotationMustHavePreset extends ArchitecturePreset {
+  @override
+  String get presetId => 'annotation/must-have';
+
+  @override
+  List<Rule> expand(YamlMap config) {
+    final sev = severity(config);
+    final annotation = config['annotation'] as String;
+    return folders(config).map((folder) {
+      return Rule(
+        id: 'PRESET_annotation_must_have_${annotation}_${safeId(folder)}',
+        description: 'Classes in "$folder" must be annotated with @$annotation',
+        severity: sev,
+        selector: classSelector(config, folder),
+        predicate: AnnotatedWithPredicate(annotation),
+      );
+    }).toList();
+  }
+}

@@ -1,0 +1,14 @@
+import '../../analyzer/context/analysis_context.dart';
+import '../selector/selector.dart';
+import '../entities/predicate.dart';
+
+class NameEndsWithPredicate extends Predicate {
+  final String suffix;
+  const NameEndsWithPredicate(this.suffix);
+
+  @override
+  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+    if (subject.name.endsWith(suffix)) return const PredicateResult.pass();
+    return PredicateResult.fail('${subject.name} must end with "$suffix"');
+  }
+}
