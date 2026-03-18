@@ -1,5 +1,5 @@
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 /// Passes if the subject's class carries the given [annotation].
@@ -9,7 +9,6 @@ import '../entities/predicate.dart';
 /// AnnotatedWithPredicate('immutable')
 /// ```
 class AnnotatedWithPredicate extends Predicate {
-
   /// The annotation name to check for (without the leading `@`).
   final String annotation;
 

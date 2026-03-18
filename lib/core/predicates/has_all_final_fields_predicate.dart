@@ -1,5 +1,5 @@
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 class HasAllFinalFieldsPredicate extends Predicate {
@@ -13,6 +13,7 @@ class HasAllFinalFieldsPredicate extends Predicate {
         .toList();
     if (mutableFields.isEmpty) return const PredicateResult.pass();
     final names = mutableFields.map((f) => f.name).join(', ');
-    return PredicateResult.fail('${cls.name} has mutable instance fields: $names');
+    return PredicateResult.fail(
+        '${cls.name} has mutable instance fields: $names');
   }
 }

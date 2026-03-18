@@ -2,7 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../core/predicates/name_ends_with_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `naming/folder-name-suffix`
 ///
@@ -18,7 +18,7 @@ import 'architecture_preset.dart';
 ///   exceptions:
 ///     - BaseService
 /// ```
-class NamingFolderSuffixPreset extends ArchitecturePreset {
+class NamingFolderSuffixPreset extends Preset {
   @override
   String get presetId => 'naming/folder-name-suffix';
 

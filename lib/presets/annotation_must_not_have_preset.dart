@@ -1,8 +1,7 @@
 import 'package:yaml/yaml.dart';
-
 import '../core/predicates/not_annotated_with_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `annotation/must-not-have`
 ///
@@ -16,7 +15,7 @@ import 'architecture_preset.dart';
 ///     - lib/ui
 ///   exceptions: []
 /// ```
-class AnnotationMustNotHavePreset extends ArchitecturePreset {
+class AnnotationMustNotHavePreset extends Preset {
   @override
   String get presetId => 'annotation/must-not-have';
 

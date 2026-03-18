@@ -2,7 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../core/predicates/only_depend_on_folders_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `layer/can-only-depend-on`
 ///
@@ -18,7 +18,7 @@ import 'architecture_preset.dart';
 ///     - lib/shared
 ///   exceptions: []
 /// ```
-class LayerCanOnlyDependOnPreset extends ArchitecturePreset {
+class LayerCanOnlyDependOnPreset extends Preset {
   @override
   String get presetId => 'layer/can-only-depend-on';
 

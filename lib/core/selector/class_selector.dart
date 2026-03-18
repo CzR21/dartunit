@@ -1,5 +1,6 @@
+import '../../core/entities/selector.dart';
+import '../../core/entities/subject.dart';
 import '../../analyzer/context/analysis_context.dart';
-import 'selector.dart';
 
 /// Selects classes based on a configurable set of criteria.
 ///

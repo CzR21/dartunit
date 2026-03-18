@@ -1,5 +1,5 @@
 import '../../../analyzer/context/analysis_context.dart';
-import '../../selector/selector.dart';
+import '../../entities/subject.dart';
 import '../../entities/predicate.dart';
 
 /// Passes when AT LEAST ONE inner predicate passes (logical OR).

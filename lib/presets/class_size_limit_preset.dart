@@ -3,7 +3,7 @@ import 'package:yaml/yaml.dart';
 import '../core/predicates/max_fields_predicate.dart';
 import '../core/predicates/max_methods_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `metrics/class-size-limit`
 ///
@@ -19,7 +19,7 @@ import 'architecture_preset.dart';
 ///     - lib
 ///   exceptions: []
 /// ```
-class ClassSizeLimitPreset extends ArchitecturePreset {
+class ClassSizeLimitPreset extends Preset {
   @override
   String get presetId => 'metrics/class-size-limit';
 

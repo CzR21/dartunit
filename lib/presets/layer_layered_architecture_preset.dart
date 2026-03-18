@@ -4,7 +4,7 @@ import '../core/predicates/composite/not_predicate.dart';
 import '../core/predicates/depend_on_folder_predicate.dart';
 import '../core/entities/rule.dart';
 import '../core/selector/class_selector.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `layer/layered-architecture`
 ///
@@ -27,7 +27,7 @@ import 'architecture_preset.dart';
 ///       folder: lib/domain
 ///       can_access: []
 /// ```
-class LayerLayeredArchitecturePreset extends ArchitecturePreset {
+class LayerLayeredPreset extends Preset {
   @override
   String get presetId => 'layer/layered-architecture';
 

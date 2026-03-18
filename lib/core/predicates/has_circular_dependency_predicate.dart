@@ -1,5 +1,5 @@
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 class HasCircularDependencyPredicate extends Predicate {
@@ -9,7 +9,8 @@ class HasCircularDependencyPredicate extends Predicate {
   PredicateResult evaluate(Subject subject, AnalysisContext context) {
     final cycles = context.dependencyGraph.detectCycles();
     final subjectPath = subject.filePath.replaceAll('\\', '/');
-    final involvedCycles = cycles.where((cycle) => cycle.contains(subjectPath)).toList();
+    final involvedCycles =
+        cycles.where((cycle) => cycle.contains(subjectPath)).toList();
     if (involvedCycles.isEmpty) return const PredicateResult.pass();
     return PredicateResult.fail(
       '${subject.name} is part of a circular dependency: ${involvedCycles.first.join(' -> ')}',

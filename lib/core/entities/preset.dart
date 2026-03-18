@@ -1,26 +1,21 @@
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
-import '../core/enums/rule_severity.dart';
-import '../core/entities/rule.dart';
-import '../core/selector/class_selector.dart';
+import 'rule.dart';
+import '../enums/rule_severity.dart';
+import '../selector/class_selector.dart';
 
 /// Base class for all built-in presets.
 ///
 /// Provides shared helper methods so each concrete preset only needs to
 /// implement [presetId] and [expand].
-abstract class ArchitecturePreset {
+abstract class Preset {
   /// The YAML key that identifies this preset (e.g. `'naming/folder-name-suffix'`).
   String get presetId;
 
   /// Expands the preset configuration into one or more [Rule]s.
   List<Rule> expand(YamlMap config);
 
-  // ---------------------------------------------------------------------------
-  // Shared helpers
-  // ---------------------------------------------------------------------------
-
-  RuleSeverity severity(YamlMap cfg) =>
-      RuleSeverity.fromString(cfg['severity'] as String? ?? 'error');
+  RuleSeverity severity(YamlMap cfg) => RuleSeverity.fromString(cfg['severity'] as String? ?? 'error');
 
   List<String> exceptions(YamlMap cfg) => toList(cfg['exceptions']);
 
@@ -44,9 +39,9 @@ abstract class ArchitecturePreset {
 
   /// Shorthand for building a [ClassSelector] with the exception list applied.
   ClassSelector classSelector(YamlMap cfg, String folder) => ClassSelector(
-        folder: folder.isEmpty ? null : folder,
-        excludeNames: exceptions(cfg),
-      );
+    folder: folder.isEmpty ? null : folder,
+    excludeNames: exceptions(cfg),
+  );
 
   /// Extracts the last path segment of [folder] (e.g. `'lib/service'` → `'service'`).
   String folderBasename(String folder) => p.basename(folder);

@@ -1,5 +1,6 @@
 import '../../analyzer/context/analysis_context.dart';
-import 'selector.dart';
+import '../../core/entities/selector.dart';
+import '../../core/entities/subject.dart';
 
 /// Selects all classes belonging to a named architectural layer.
 ///

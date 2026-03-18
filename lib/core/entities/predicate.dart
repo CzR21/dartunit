@@ -1,23 +1,5 @@
+import 'subject.dart';
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
-
-/// The result of evaluating a predicate against a subject.
-///
-/// Both pass and fail results carry a [message]:
-/// - For **fail**: the violation message shown in the report.
-/// - For **pass**: a condition description that [NotPredicate] can reuse
-///   as a violation message when inverting the result.
-class PredicateResult {
-  final bool passed;
-  final String message;
-
-  /// Creates a passing result, optionally with a description of the satisfied
-  /// condition (used by [NotPredicate] to produce informative violations).
-  const PredicateResult.pass([this.message = '']) : passed = true;
-
-  /// Creates a failing result with a [message] describing the violation.
-  const PredicateResult.fail(this.message) : passed = false;
-}
 
 /// Base interface for all rule predicates.
 ///
@@ -43,6 +25,24 @@ abstract class Predicate {
 
   /// Convenience factory: OR composition.
   Predicate or(Predicate other) => _OrPredicate([this, other]);
+}
+
+/// The result of evaluating a predicate against a subject.
+///
+/// Both pass and fail results carry a [message]:
+/// - For **fail**: the violation message shown in the report.
+/// - For **pass**: a condition description that [NotPredicate] can reuse
+///   as a violation message when inverting the result.
+class PredicateResult {
+  final bool passed;
+  final String message;
+
+  /// Creates a passing result, optionally with a description of the satisfied
+  /// condition (used by [NotPredicate] to produce informative violations).
+  const PredicateResult.pass([this.message = '']) : passed = true;
+
+  /// Creates a failing result with a [message] describing the violation.
+  const PredicateResult.fail(this.message) : passed = false;
 }
 
 class _NotPredicate extends Predicate {

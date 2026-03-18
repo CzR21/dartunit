@@ -2,7 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../core/predicates/is_abstract_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `structure/must-be-abstract`
 ///
@@ -17,7 +17,7 @@ import 'architecture_preset.dart';
 ///     - lib/domain/repository
 ///   exceptions: []
 /// ```
-class MustBeAbstractPreset extends ArchitecturePreset {
+class MustBeAbstractPreset extends Preset {
   @override
   String get presetId => 'structure/must-be-abstract';
 

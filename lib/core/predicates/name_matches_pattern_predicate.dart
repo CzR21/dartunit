@@ -1,5 +1,5 @@
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 class NameMatchesPatternPredicate extends Predicate {
@@ -13,6 +13,7 @@ class NameMatchesPatternPredicate extends Predicate {
   @override
   PredicateResult evaluate(Subject subject, AnalysisContext context) {
     if (_regex.hasMatch(subject.name)) return const PredicateResult.pass();
-    return PredicateResult.fail('${subject.name} must match pattern "$pattern"');
+    return PredicateResult.fail(
+        '${subject.name} must match pattern "$pattern"');
   }
 }

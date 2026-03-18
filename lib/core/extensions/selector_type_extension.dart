@@ -3,7 +3,7 @@ import 'package:yaml/yaml.dart';
 import '../selector/class_selector.dart';
 import '../selector/file_selector.dart';
 import '../selector/layer_selector.dart';
-import '../selector/selector.dart' show Selector;
+import '../entities/selector.dart' show Selector;
 
 extension SelectorTypeBuilder on SelectorType {
 

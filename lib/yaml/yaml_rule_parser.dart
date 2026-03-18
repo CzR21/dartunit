@@ -6,7 +6,7 @@ import '../core/entities/predicate.dart';
 import '../core/predicates/composite/and_predicate.dart';
 import '../core/predicates/composite/or_predicate.dart';
 import '../core/predicates/composite/not_predicate.dart';
-import '../core/selector/selector.dart' show Selector;
+import '../core/entities/selector.dart' show Selector;
 import '../core/enums/predicate_type.dart';
 import '../core/enums/selector_type.dart';
 import '../core/extensions/predicate_type_extension.dart';

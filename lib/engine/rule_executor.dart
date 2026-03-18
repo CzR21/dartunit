@@ -1,10 +1,3 @@
-// rule_executor.dart
-//
-// Thin wrapper around [ArchitectureRule.evaluate] that provides isolation:
-// any exception thrown during a single rule's evaluation is caught and
-// converted into a synthetic violation so that the rest of the analysis
-// can continue unaffected.
-
 import '../analyzer/context/analysis_context.dart';
 import '../core/entities/rule.dart';
 import '../core/entities/violation.dart';

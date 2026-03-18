@@ -1,3 +1,4 @@
+import 'package:dartunit/core/entities/subject.dart';
 import 'package:test/test.dart';
 import 'package:dartunit/dartunit.dart';
 

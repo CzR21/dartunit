@@ -1,5 +1,5 @@
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 class HasNoPublicFieldsPredicate extends Predicate {
@@ -13,6 +13,7 @@ class HasNoPublicFieldsPredicate extends Predicate {
         .toList();
     if (publicFields.isEmpty) return const PredicateResult.pass();
     final names = publicFields.map((f) => f.name).join(', ');
-    return PredicateResult.fail('${cls.name} exposes public instance fields: $names');
+    return PredicateResult.fail(
+        '${cls.name} exposes public instance fields: $names');
   }
 }

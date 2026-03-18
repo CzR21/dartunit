@@ -1,8 +1,8 @@
 import '../enums/rule_severity.dart';
 import 'violation.dart';
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
 import 'predicate.dart';
+import 'selector.dart';
 
 /// Represents a declared architecture rule.
 ///

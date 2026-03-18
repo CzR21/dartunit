@@ -3,7 +3,7 @@ import 'package:yaml/yaml.dart';
 import '../core/predicates/has_circular_dependency_predicate.dart';
 import '../core/entities/rule.dart';
 import '../core/selector/class_selector.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `structure/no-circular-dependencies`
 ///
@@ -14,7 +14,7 @@ import 'architecture_preset.dart';
 /// - preset: structure/no-circular-dependencies
 ///   severity: error
 /// ```
-class NoCircularDependenciesPreset extends ArchitecturePreset {
+class NoCircularDependenciesPreset extends Preset {
   @override
   String get presetId => 'structure/no-circular-dependencies';
 

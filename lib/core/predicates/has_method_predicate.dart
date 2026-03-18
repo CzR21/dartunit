@@ -1,5 +1,5 @@
 import '../../analyzer/context/analysis_context.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 class HasMethodPredicate extends Predicate {
@@ -9,7 +9,9 @@ class HasMethodPredicate extends Predicate {
   @override
   PredicateResult evaluate(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
-    if (cls.methods.any((m) => m.name == methodName)) return const PredicateResult.pass();
-    return PredicateResult.fail('${cls.name} must declare a method named "$methodName"');
+    if (cls.methods.any((m) => m.name == methodName))
+      return const PredicateResult.pass();
+    return PredicateResult.fail(
+        '${cls.name} must declare a method named "$methodName"');
   }
 }

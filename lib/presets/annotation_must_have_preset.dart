@@ -2,7 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../core/predicates/annotation_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `annotation/must-have`
 ///
@@ -16,7 +16,7 @@ import 'architecture_preset.dart';
 ///     - lib/data/repository
 ///   exceptions: []
 /// ```
-class AnnotationMustHavePreset extends ArchitecturePreset {
+class AnnotationMustHavePreset extends Preset {
   @override
   String get presetId => 'annotation/must-have';
 

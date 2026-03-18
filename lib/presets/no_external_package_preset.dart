@@ -3,7 +3,7 @@ import 'package:yaml/yaml.dart';
 import '../core/predicates/composite/not_predicate.dart';
 import '../core/predicates/depend_on_package_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `dependency/no-external-package`
 ///
@@ -20,7 +20,7 @@ import 'architecture_preset.dart';
 ///     - lib/domain
 ///   exceptions: []
 /// ```
-class NoExternalPackagePreset extends ArchitecturePreset {
+class NoExternalPackagePreset extends Preset {
   @override
   String get presetId => 'dependency/no-external-package';
 

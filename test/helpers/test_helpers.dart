@@ -1,3 +1,4 @@
+import 'package:dartunit/core/entities/subject.dart';
 import 'package:dartunit/dartunit.dart';
 
 /// Creates a [Subject] wrapping an [AnalyzedClass] for use in predicate tests.

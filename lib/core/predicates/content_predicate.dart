@@ -2,7 +2,7 @@ import 'dart:io';
 
 import '../../analyzer/context/analysis_context.dart';
 import '../../analyzer/models/analyzed_file.dart';
-import '../selector/selector.dart';
+import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
 /// Passes if the file's raw source content matches [pattern].

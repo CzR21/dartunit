@@ -2,7 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../core/predicates/has_no_public_fields_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `structure/no-public-fields`
 ///
@@ -17,7 +17,7 @@ import 'architecture_preset.dart';
 ///     - lib/domain
 ///   exceptions: []
 /// ```
-class NoPublicFieldsPreset extends ArchitecturePreset {
+class NoPublicFieldsPreset extends Preset {
   @override
   String get presetId => 'structure/no-public-fields';
 

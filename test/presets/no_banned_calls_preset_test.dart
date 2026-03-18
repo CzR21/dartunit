@@ -1,3 +1,4 @@
+import 'package:dartunit/core/entities/subject.dart';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

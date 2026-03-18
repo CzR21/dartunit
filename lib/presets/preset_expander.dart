@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:yaml/yaml.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 import 'annotation_must_have_preset.dart';
 import 'annotation_must_not_have_preset.dart';
 import 'class_size_limit_preset.dart';
@@ -18,20 +18,20 @@ import 'no_external_package_preset.dart';
 import 'no_public_fields_preset.dart';
 
 /// Reads a `presets:` YAML list and expands each entry into concrete
-/// [Rule] objects by dispatching to the matching [ArchitecturePreset].
+/// [Rule] objects by dispatching to the matching [Preset].
 ///
 /// Unknown preset IDs produce a stderr warning and are skipped without throwing.
 class PresetExpander {
-  static final Map<String, ArchitecturePreset> _registry = {
+  static final Map<String, Preset> _registry = {
     for (final preset in _all) preset.presetId: preset,
   };
 
-  static final List<ArchitecturePreset> _all = [
+  static final List<Preset> _all = [
     NamingFolderSuffixPreset(),
     NamingNamePatternPreset(),
     LayerCannotDependOnPreset(),
     LayerCanOnlyDependOnPreset(),
-    LayerLayeredArchitecturePreset(),
+    LayerLayeredPreset(),
     NoCircularDependenciesPreset(),
     ClassSizeLimitPreset(),
     MustBeAbstractPreset(),

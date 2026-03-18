@@ -2,7 +2,7 @@ import 'package:yaml/yaml.dart';
 
 import '../core/predicates/name_matches_pattern_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `naming/name-pattern`
 ///
@@ -16,7 +16,7 @@ import 'architecture_preset.dart';
 ///     - lib/bloc
 ///   exceptions: []
 /// ```
-class NamingNamePatternPreset extends ArchitecturePreset {
+class NamingNamePatternPreset extends Preset {
   @override
   String get presetId => 'naming/name-pattern';
 

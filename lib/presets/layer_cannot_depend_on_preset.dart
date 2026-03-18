@@ -3,7 +3,7 @@ import 'package:yaml/yaml.dart';
 import '../core/predicates/composite/not_predicate.dart';
 import '../core/predicates/depend_on_folder_predicate.dart';
 import '../core/entities/rule.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `layer/cannot-depend-on`
 ///
@@ -19,7 +19,7 @@ import 'architecture_preset.dart';
 ///     - lib/ui
 ///   exceptions: []
 /// ```
-class LayerCannotDependOnPreset extends ArchitecturePreset {
+class LayerCannotDependOnPreset extends Preset {
   @override
   String get presetId => 'layer/cannot-depend-on';
 

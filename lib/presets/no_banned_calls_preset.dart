@@ -4,7 +4,7 @@ import '../core/predicates/composite/not_predicate.dart';
 import '../core/predicates/content_predicate.dart';
 import '../core/entities/rule.dart';
 import '../core/selector/file_selector.dart';
-import 'architecture_preset.dart';
+import '../core/entities/preset.dart';
 
 /// Preset: `quality/no-banned-calls`
 ///
@@ -23,7 +23,7 @@ import 'architecture_preset.dart';
 ///   exclude_folders:
 ///     - test
 /// ```
-class NoBannedCallsPreset extends ArchitecturePreset {
+class NoBannedCallsPreset extends Preset {
   @override
   String get presetId => 'quality/no-banned-calls';
 
