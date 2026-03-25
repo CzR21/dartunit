@@ -21,7 +21,6 @@ class NoCircularDependenciesPreset extends Preset {
   @override
   List<Rule> expand(YamlMap config) => [
         Rule(
-          id: 'PRESET_no_circular_dependencies',
           description: 'No circular dependencies allowed',
           severity: severity(config),
           selector: const ClassSelector(),

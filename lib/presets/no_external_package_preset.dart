@@ -33,7 +33,6 @@ class NoExternalPackagePreset extends Preset {
     for (final folder in folders(config)) {
       for (final pkg in packages) {
         rules.add(Rule(
-          id: 'PRESET_no_ext_pkg_${safeId(folder)}_$pkg',
           description: 'Classes in "$folder" must not import package "$pkg"',
           severity: sev,
           selector: classSelector(config, folder),

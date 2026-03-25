@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when field count exceeds the minimum', () {
-      final result = MinFieldsPredicate(2).evaluate(
+      final result = MinFieldsPredicate(2).analyze(
         classSubject('User', fields: [
           finalField('id'),
           finalField('name'),
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('passes when field count equals the minimum exactly', () {
-      final result = MinFieldsPredicate(2).evaluate(
+      final result = MinFieldsPredicate(2).analyze(
         classSubject('Point', fields: [finalField('x'), finalField('y')]),
         emptyCtx(),
       );
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes with minimum of zero and no fields', () {
-      final result = MinFieldsPredicate(0).evaluate(
+      final result = MinFieldsPredicate(0).analyze(
         classSubject('Empty'),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
     // Fail cases
 
     test('fails when field count is below the minimum', () {
-      final result = MinFieldsPredicate(3).evaluate(
+      final result = MinFieldsPredicate(3).analyze(
         classSubject('Sparse', fields: [finalField('id')]),
         emptyCtx(),
       );
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('fails for a class with no fields when minimum is 1', () {
-      final result = MinFieldsPredicate(1).evaluate(
+      final result = MinFieldsPredicate(1).analyze(
         classSubject('Empty'),
         emptyCtx(),
       );
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('fail message includes actual count and minimum required', () {
-      final result = MinFieldsPredicate(5).evaluate(
+      final result = MinFieldsPredicate(5).analyze(
         classSubject('Cls', fields: [finalField('a')]),
         emptyCtx(),
       );

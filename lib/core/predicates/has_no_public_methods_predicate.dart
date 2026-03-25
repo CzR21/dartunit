@@ -6,7 +6,7 @@ class HasNoPublicMethodsPredicate extends Predicate {
   const HasNoPublicMethodsPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final publicMethods =
         cls.methods.where((m) => !m.name.startsWith('_')).toList();

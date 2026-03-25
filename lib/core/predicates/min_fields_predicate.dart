@@ -7,7 +7,7 @@ class MinFieldsPredicate extends Predicate {
   const MinFieldsPredicate(this.minFields);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final count = cls.fields.length;
     if (count >= minFields) return const PredicateResult.pass();

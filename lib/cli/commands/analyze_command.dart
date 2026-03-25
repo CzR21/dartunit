@@ -1,15 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
-import '../../analyzer/project_analyzer.dart';
-import '../../engine/rule_engine.dart';
-import '../../engine/custom_rule_loader.dart';
+import '../../core/entities/violation.dart';
+import '../../core/enums/rule_severity.dart';
+import '../../engine/analysis_logger.dart';
 import '../../helpers/ansi_helper.dart';
 import '../../helpers/banner_helper.dart';
 import '../../reporter/console_reporter.dart';
-import '../../yaml/yaml_rule_parser.dart';
+import '../../reporter/html_reporter.dart';
 import '../animations/spinner.dart';
 import '../../core/enums/exit_code.dart';
 
@@ -19,7 +20,7 @@ class AnalyzeCommand extends Command<ExitCode> {
 
   @override
   final String description =
-      'Analyze the project source code against architecture rules.';
+      'Analyze the project source code against architecture rules in arch_test/.';
 
   AnalyzeCommand() {
     argParser
@@ -28,11 +29,6 @@ class AnalyzeCommand extends Command<ExitCode> {
         abbr: 'p',
         help: 'Path to the target project (defaults to current directory).',
         defaultsTo: '.',
-      )
-      ..addOption(
-        'config',
-        abbr: 'c',
-        help: 'Path to dartunit.yaml (defaults to .dartunit/dartunit.yaml).',
       )
       ..addFlag(
         'no-color',
@@ -46,9 +42,7 @@ class AnalyzeCommand extends Command<ExitCode> {
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
     final useColor = !(argResults!['no-color'] as bool);
     final reporter = ConsoleReporter(useColor: useColor);
-
-    final configPath = argResults!['config'] as String? ??
-        p.join(projectRoot, '.dartunit', 'dartunit.yaml');
+    final archTestDir = p.join(projectRoot, 'arch_test');
 
     BannerHelper.printBanner(useColor);
 
@@ -56,40 +50,123 @@ class AnalyzeCommand extends Command<ExitCode> {
     stdout.writeln(ANSIHelper.dim('  ${'─' * 64}', useColor));
     stdout.writeln();
 
-    if (!File(configPath).existsSync()) {
-      stdout.writeln('  ${ANSIHelper.red('✗', useColor)} Config not found: $configPath');
+    if (!Directory(archTestDir).existsSync()) {
+      stdout.writeln(
+          '  ${ANSIHelper.red('✗', useColor)} arch_test/ not found in $projectRoot');
       stdout.writeln(ANSIHelper.dim(
-          '  Run  dartunit init  to create the configuration.', useColor));
+          '  Run  dartunit init  to create the arch_test/ folder.', useColor));
       stdout.writeln();
       return ExitCode.error;
     }
 
-    final rulesSpinner = Spinner('Loading rules...', useColor: useColor)..start();
-    final rules = YamlRuleParser().parse(configPath);
-    rulesSpinner.stop(doneMessage: 'Loaded ${rules.length} rule(s)');
+    final ruleFiles = Directory(archTestDir)
+        .listSync(recursive: false)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('_arch_test.dart'))
+        .map((f) => f.path)
+        .toList()
+      ..sort();
 
-    final customRulesDir = p.join(projectRoot, '.dartunit', 'custom_rules');
-    final customFiles = CustomRuleLoader(customRulesDir).discoverRuleFiles();
-    if (customFiles.isNotEmpty) {
+    if (ruleFiles.isEmpty) {
       stdout.writeln(
-          '  ${ANSIHelper.green('✓', useColor)} Found ${customFiles.length} custom rule file(s)');
+          '  ${ANSIHelper.cyan('◆', useColor)} No rule files found in arch_test/');
+      stdout.writeln(ANSIHelper.dim(
+          '  Run  dartunit generate <name>  to scaffold a rule.', useColor));
+      stdout.writeln();
+      return ExitCode.success;
     }
 
-    final analyzeSpinner = Spinner('Analyzing source code...', useColor: useColor)..start();
-    final context = await ProjectAnalyzer(projectRoot).analyze();
-    analyzeSpinner.stop(
-      doneMessage: 'Found ${context.classes.length} class(es) '
-          'in ${context.files.length} file(s)',
-    );
+    final rulesSpinner = Spinner('Loading rules...', useColor: useColor)..start();
+    rulesSpinner.stop(doneMessage: 'Found ${ruleFiles.length} rule file(s)');
 
     final evalSpinner = Spinner('Evaluating rules...', useColor: useColor)..start();
-    final engine = RuleEngine(rules);
-    final violations = engine.evaluate(context);
-    evalSpinner.stop(doneMessage: 'Rules evaluated');
+    final allViolations = <Violation>[];
+
+    for (final ruleFile in ruleFiles) {
+      final result = await Process.run(
+        'dart',
+        ['run', ruleFile, '--path', projectRoot],
+        workingDirectory: projectRoot,
+      );
+
+      if (result.exitCode != 0 && result.stderr.toString().trim().isNotEmpty) {
+        final fileName = p.basename(ruleFile);
+        stdout.writeln(
+          '\n  ${ANSIHelper.red('✗', useColor)} Error in $fileName:\n'
+          '  ${result.stderr.toString().trim()}',
+        );
+        continue;
+      }
+
+      for (final line in result.stdout.toString().split('\n')) {
+        final trimmed = line.trim();
+        if (!trimmed.startsWith('DARTUNIT_RESULT:')) continue;
+        try {
+          final json =
+              jsonDecode(trimmed.substring('DARTUNIT_RESULT:'.length)) as Map<String, dynamic>;
+          final violations =
+              (json['violations'] as List).cast<Map<String, dynamic>>();
+          for (final v in violations) {
+            allViolations.add(Violation(
+              ruleDescription: v['ruleDescription'] as String,
+              message: v['message'] as String,
+              filePath: v['filePath'] as String,
+              severity: RuleSeverity.fromString(v['severity'] as String),
+              line: v['line'] as int?,
+            ));
+          }
+        } catch (_) {
+          // Malformed output from rule file — skip this line.
+        }
+      }
+    }
+
+    evalSpinner.stop(doneMessage: 'Rules analyzed');
 
     stdout.writeln();
-    reporter.report(violations);
+    reporter.report(allViolations);
 
-    return engine.hasFailures(violations) ? ExitCode.violations : ExitCode.success;
+    final now = DateTime.now();
+    AnalysisLogger(projectRoot).save(allViolations, rulesCount: ruleFiles.length);
+
+    final htmlPath = _saveHtmlReport(
+      projectRoot: projectRoot,
+      violations: allViolations,
+      rulesCount: ruleFiles.length,
+      timestamp: now,
+    );
+    if (htmlPath != null) {
+      final fileUri = 'file:///${htmlPath.replaceAll('\\', '/')}';
+      stdout.writeln(
+        '  ${ANSIHelper.dim('Full report', useColor)}  $fileUri',
+      );
+      stdout.writeln();
+    }
+
+    final hasFailures = allViolations.any((v) => v.severity.isFailure);
+    return hasFailures ? ExitCode.violations : ExitCode.success;
+  }
+
+  String? _saveHtmlReport({
+    required String projectRoot,
+    required List<Violation> violations,
+    required int rulesCount,
+    required DateTime timestamp,
+  }) {
+    try {
+      final html = HtmlReporter().generate(
+        violations,
+        rulesCount: rulesCount,
+        timestamp: timestamp,
+        projectRoot: projectRoot,
+      );
+      final reportDir = p.join(projectRoot, '.dartunit');
+      Directory(reportDir).createSync(recursive: true);
+      final reportPath = p.join(reportDir, 'report.html');
+      File(reportPath).writeAsStringSync(html);
+      return p.normalize(p.absolute(reportPath));
+    } catch (_) {
+      return null;
+    }
   }
 }

@@ -7,7 +7,7 @@ class DependOnPackagePredicate extends Predicate {
   const DependOnPackagePredicate(this.packageName);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final prefix = 'package:$packageName/';
     final matching =

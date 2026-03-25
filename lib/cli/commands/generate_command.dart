@@ -14,7 +14,7 @@ class GenerateCommand extends Command<ExitCode> {
 
   @override
   final String description =
-      'Generate a new custom rule scaffold and update dartunit.yaml.';
+      'Generate a new architecture rule scaffold in arch_test/.';
 
   @override
   String get invocation => 'dartunit generate <rule_name>';
@@ -40,35 +40,25 @@ class GenerateCommand extends Command<ExitCode> {
 
     final ruleName = rest.first;
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
-    final dartunitDir = p.join(projectRoot, '.dartunit');
-    final customRulesDir = p.join(dartunitDir, 'custom_rules');
-    final configPath = p.join(dartunitDir, 'dartunit.yaml');
+    final archTestDir = p.join(projectRoot, 'arch_test');
 
     BannerHelper.printBanner();
 
-    if (!Directory(dartunitDir).existsSync()) {
-      stdout.writeln('  ${ANSIHelper.red('✗')} ${generateMissingDartunit(projectRoot)}');
+    if (!Directory(archTestDir).existsSync()) {
+      stdout.writeln('  ${ANSIHelper.red('✗')} ${generateMissingArchTest(projectRoot)}');
       stdout.writeln();
       return ExitCode.error;
     }
 
-    final className = '${_toPascalCase(ruleName)}Rule';
-    final fileName = '${ruleName}_rule.dart';
-    final ruleId = 'CUSTOM_${ruleName.toUpperCase()}';
-    final outputPath = p.join(customRulesDir, fileName);
+    final fileName = '${ruleName}_arch_test.dart';
+    final outputPath = p.join(archTestDir, fileName);
 
-    stdout.writeln('  ${ANSIHelper.dim('Rule')}     $className');
-    stdout.writeln('  ${ANSIHelper.dim('ID')}       $ruleId');
     stdout.writeln('  ${ANSIHelper.dim('Project')}  $projectRoot');
     stdout.writeln(ANSIHelper.dim('  ${'─' * 48}'));
     stdout.writeln();
 
-    Directory(customRulesDir).createSync(recursive: true);
-    File(outputPath).writeAsStringSync(ruleTemplate(className, ruleName, ruleId));
+    File(outputPath).writeAsStringSync(ruleTemplate(ruleName));
     stdout.writeln('  ${ANSIHelper.green('✓')} ${generateCreatedFile(fileName)}');
-
-    _appendToConfig(configPath, ruleId, fileName, className);
-    stdout.writeln('  ${ANSIHelper.green('✓')} $generateUpdatedConfig');
 
     stdout.writeln();
     _printNextSteps(generateNextSteps(fileName));
@@ -83,19 +73,5 @@ class GenerateCommand extends Command<ExitCode> {
       stdout.writeln('  ${ANSIHelper.dim('${i + 1}.')} ${steps[i]}');
     }
     stdout.writeln();
-  }
-
-  String _toPascalCase(String input) {
-    return input
-        .split(RegExp(r'[_\-\s]+'))
-        .map((word) => word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1))
-        .join();
-  }
-
-  void _appendToConfig(String configPath, String ruleId, String fileName, String className) {
-    final file = File(configPath);
-    var content = file.existsSync() ? file.readAsStringSync() : '';
-    if (content.trimRight().isEmpty) content = 'rules:\n';
-    file.writeAsStringSync(content + yamlEntry(ruleId, fileName, className));
   }
 }

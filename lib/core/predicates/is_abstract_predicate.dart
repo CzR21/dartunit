@@ -6,7 +6,7 @@ class IsAbstractPredicate extends Predicate {
   const IsAbstractPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.isAbstract) return const PredicateResult.pass();
     return PredicateResult.fail('${cls.name} must be abstract');

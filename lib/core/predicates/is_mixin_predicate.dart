@@ -6,7 +6,7 @@ class IsMixinPredicate extends Predicate {
   const IsMixinPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.isMixin) return const PredicateResult.pass();
     return PredicateResult.fail('${cls.name} must be declared as a mixin');

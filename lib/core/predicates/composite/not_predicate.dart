@@ -13,8 +13,8 @@ class NotPredicate extends Predicate {
   const NotPredicate(this.inner);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
-    final result = inner.evaluate(subject, context);
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
+    final result = inner.analyze(subject, context);
     if (!result.passed) {
       return const PredicateResult.pass();
     }

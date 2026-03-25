@@ -6,7 +6,7 @@ class IsExtensionPredicate extends Predicate {
   const IsExtensionPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.isExtension) return const PredicateResult.pass();
     return PredicateResult.fail('${cls.name} must be declared as an extension');

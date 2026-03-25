@@ -60,7 +60,7 @@ folders:
           filePath: '/p/lib/bloc/cart_bloc.dart',
           packagePath: 'pkg:app/cart_bloc.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('generated rule fails for non-matching class name', () {
@@ -70,7 +70,7 @@ folders:
           filePath: '/p/lib/bloc/cart_page.dart',
           packagePath: 'pkg:app/cart_page.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('exceptions are excluded from selector', () {

@@ -8,19 +8,19 @@ void main() {
 
     test('passes when name ends with the required suffix', () {
       final result = NameEndsWithPredicate('Repository')
-          .evaluate(classSubject('UserRepository'), emptyCtx());
+          .analyze(classSubject('UserRepository'), emptyCtx());
       expect(result.passed, isTrue);
     });
 
     test('passes when suffix is Bloc', () {
       final result = NameEndsWithPredicate('Bloc')
-          .evaluate(classSubject('CartBloc'), emptyCtx());
+          .analyze(classSubject('CartBloc'), emptyCtx());
       expect(result.passed, isTrue);
     });
 
     test('passes when name equals suffix exactly', () {
       final result = NameEndsWithPredicate('Service')
-          .evaluate(classSubject('Service'), emptyCtx());
+          .analyze(classSubject('Service'), emptyCtx());
       expect(result.passed, isTrue);
     });
 
@@ -28,19 +28,19 @@ void main() {
 
     test('fails when name does not end with suffix', () {
       final result = NameEndsWithPredicate('Repository')
-          .evaluate(classSubject('UserService'), emptyCtx());
+          .analyze(classSubject('UserService'), emptyCtx());
       expect(result.passed, isFalse);
     });
 
     test('fail message includes the expected suffix', () {
       final result = NameEndsWithPredicate('UseCase')
-          .evaluate(classSubject('GetUser'), emptyCtx());
+          .analyze(classSubject('GetUser'), emptyCtx());
       expect(result.message, contains('UseCase'));
     });
 
     test('fails when suffix is partial match at wrong position', () {
       final result = NameEndsWithPredicate('Service')
-          .evaluate(classSubject('ServiceHelper'), emptyCtx());
+          .analyze(classSubject('ServiceHelper'), emptyCtx());
       expect(result.passed, isFalse);
     });
   });

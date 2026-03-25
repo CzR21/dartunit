@@ -3,11 +3,11 @@
 /// Each value carries its terminal [width] in visible characters and the
 /// [header] label used in the table header row.
 enum ReportColumn {
-  severity(width: 12, header: ' Severity'),
-  rule(width: 9, header: ' Rule'),
+  severity(width: 4, header: ''),
+  description(width: 30, header: ' Description'),
   file(width: 38, header: ' File'),
   line(width: 6, header: ' Line'),
-  message(width: 100,  header: ' Message');
+  message(width: 40,  header: ' Message');
 
   const ReportColumn({required this.width, required this.header});
 

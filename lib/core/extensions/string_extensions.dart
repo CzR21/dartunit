@@ -3,14 +3,16 @@ extension StringTableFormat on String {
 
   /// Truncates the string to [maxLen] visible characters, appending [ellipsis]
   /// if the string is longer. Returns the string unchanged if within limit.
-  String truncate(int maxLen, {String ellipsis = '…'}) {
+  String truncate(int maxLen, {String ellipsis = '...'}) {
     if (length <= maxLen) return this;
     return '${substring(0, maxLen - ellipsis.length)}$ellipsis';
   }
 
-  /// Pads the string to exactly [width] characters using [padRight], or
-  /// hard-truncates it if already longer. Suitable for fixed-width table cells.
-  String padEndToWidth(int width) => length >= width ? substring(0, width) : padRight(width);
+  /// Pads the string to exactly [width] code-unit characters using [padRight],
+  /// or hard-truncates it if already longer. Suitable for fixed-width table cells
+  /// whose labels have already been sized to account for multi-code-unit emoji.
+  String padEndToWidth(int width) =>
+      length >= width ? substring(0, width) : padRight(width);
 
   /// Shortens a file path for display inside a report column of [maxLen] chars.
   ///

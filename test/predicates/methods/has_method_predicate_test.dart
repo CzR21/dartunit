@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when class declares the required method', () {
-      final result = HasMethodPredicate('execute').evaluate(
+      final result = HasMethodPredicate('execute').analyze(
         classSubject('GetUserUseCase', methods: [method('execute')]),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes when required method is among many', () {
-      final result = HasMethodPredicate('call').evaluate(
+      final result = HasMethodPredicate('call').analyze(
         classSubject('UseCase', methods: [
           method('init'),
           method('call'),
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes when method name is a private override', () {
-      final result = HasMethodPredicate('_buildQuery').evaluate(
+      final result = HasMethodPredicate('_buildQuery').analyze(
         classSubject('QueryBuilder', methods: [method('_buildQuery')]),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
     // Fail cases
 
     test('fails when class has no methods', () {
-      final result = HasMethodPredicate('execute').evaluate(
+      final result = HasMethodPredicate('execute').analyze(
         classSubject('EmptyClass'),
         emptyCtx(),
       );
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('fails when class has different methods', () {
-      final result = HasMethodPredicate('execute').evaluate(
+      final result = HasMethodPredicate('execute').analyze(
         classSubject('MyClass', methods: [method('run'), method('start')]),
         emptyCtx(),
       );
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('fail message contains the expected method name', () {
-      final result = HasMethodPredicate('dispose').evaluate(
+      final result = HasMethodPredicate('dispose').analyze(
         classSubject('Controller', methods: [method('init')]),
         emptyCtx(),
       );

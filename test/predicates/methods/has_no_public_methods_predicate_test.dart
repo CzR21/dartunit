@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when all methods are private', () {
-      final result = const HasNoPublicMethodsPredicate().evaluate(
+      final result = const HasNoPublicMethodsPredicate().analyze(
         classSubject('InternalHelper', methods: [
           method('_compute'),
           method('_validate'),
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('passes when class has no methods', () {
-      final result = const HasNoPublicMethodsPredicate().evaluate(
+      final result = const HasNoPublicMethodsPredicate().analyze(
         classSubject('DataHolder'),
         emptyCtx(),
       );
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('passes with only one private method', () {
-      final result = const HasNoPublicMethodsPredicate().evaluate(
+      final result = const HasNoPublicMethodsPredicate().analyze(
         classSubject('Singleton', methods: [method('_getInstance')]),
         emptyCtx(),
       );
@@ -36,7 +36,7 @@ void main() {
     // Fail cases
 
     test('fails when class has a public method', () {
-      final result = const HasNoPublicMethodsPredicate().evaluate(
+      final result = const HasNoPublicMethodsPredicate().analyze(
         classSubject('Service', methods: [method('execute')]),
         emptyCtx(),
       );
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('fail message lists the public method names', () {
-      final result = const HasNoPublicMethodsPredicate().evaluate(
+      final result = const HasNoPublicMethodsPredicate().analyze(
         classSubject('Repo', methods: [
           method('findById'),
           method('save'),
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('fails for a single public method', () {
-      final result = const HasNoPublicMethodsPredicate().evaluate(
+      final result = const HasNoPublicMethodsPredicate().analyze(
         classSubject('Validator', methods: [method('validate')]),
         emptyCtx(),
       );

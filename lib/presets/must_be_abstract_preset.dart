@@ -26,7 +26,6 @@ class MustBeAbstractPreset extends Preset {
     final sev = severity(config);
     return folders(config).map((folder) {
       return Rule(
-        id: 'PRESET_must_be_abstract_${safeId(folder)}',
         description: 'Classes in "$folder" must be abstract',
         severity: sev,
         selector: classSelector(config, folder),

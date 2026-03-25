@@ -7,7 +7,7 @@ class OnlyDependOnFoldersPredicate extends Predicate {
   const OnlyDependOnFoldersPredicate(this.allowedFolders);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final normalized = allowedFolders.map((f) => f.replaceAll('\\', '/')).toList();
     final forbidden = cls.imports

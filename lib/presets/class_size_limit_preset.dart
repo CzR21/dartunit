@@ -39,7 +39,6 @@ class ClassSizeLimitPreset extends Preset {
 
       if (maxMethods != null) {
         rules.add(Rule(
-          id: 'PRESET_max_methods_$label',
           description: '$scope must have at most $maxMethods methods',
           severity: sev,
           selector: sel,
@@ -49,7 +48,6 @@ class ClassSizeLimitPreset extends Preset {
 
       if (maxFields != null) {
         rules.add(Rule(
-          id: 'PRESET_max_fields_$label',
           description: '$scope must have at most $maxFields fields',
           severity: sev,
           selector: sel,

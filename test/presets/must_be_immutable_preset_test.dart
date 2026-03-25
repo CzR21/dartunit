@@ -59,7 +59,7 @@ void main() {
             const AnalyzedField(name: 'name', type: 'String', isFinal: true),
           ]);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails when a mutable field is present', () {
@@ -72,7 +72,7 @@ void main() {
             const AnalyzedField(name: 'count', type: 'int'),
           ]);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message contains mutable field name', () {
@@ -83,7 +83,7 @@ void main() {
           packagePath: 'pkg:app/cls.dart',
           fields: [const AnalyzedField(name: 'total', type: 'double')]);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).message,
+      expect(rules.first.predicate.analyze(s, _ctx()).message,
           contains('total'));
     });
   });

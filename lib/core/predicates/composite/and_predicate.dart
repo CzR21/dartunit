@@ -5,7 +5,7 @@ import '../../entities/predicate.dart';
 /// Passes only when ALL inner predicates pass (logical AND).
 ///
 /// Evaluation is short-circuited: if any predicate fails, the remaining
-/// predicates are not evaluated and that failure result is returned.
+/// predicates are not analyzed and that failure result is returned.
 ///
 /// Example — class must end with `Repository` AND live in `lib/data`:
 /// ```dart
@@ -21,10 +21,10 @@ class AndPredicate extends Predicate {
   const AndPredicate(this.predicates);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     // Short-circuit: return the first failing result.
     for (final p in predicates) {
-      final result = p.evaluate(subject, context);
+      final result = p.analyze(subject, context);
       if (!result.passed) return result;
     }
     return const PredicateResult.pass();

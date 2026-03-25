@@ -25,7 +25,6 @@ class AnnotationMustNotHavePreset extends Preset {
     final annotation = config['annotation'] as String;
     return folders(config).map((folder) {
       return Rule(
-        id: 'PRESET_annotation_must_not_have_${annotation}_${safeId(folder)}',
         description:
             'Classes in "$folder" must NOT be annotated with @$annotation',
         severity: sev,

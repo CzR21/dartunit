@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when imports contain the target folder path', () {
-      final result = DependOnFolderPredicate('lib/data').evaluate(
+      final result = DependOnFolderPredicate('lib/data').analyze(
         classSubject('UserBloc',
             imports: ['/project/lib/data/user_repository.dart']),
         emptyCtx(),
@@ -16,7 +16,7 @@ void main() {
     });
 
     test('passes when one of multiple imports matches the folder', () {
-      final result = DependOnFolderPredicate('lib/domain').evaluate(
+      final result = DependOnFolderPredicate('lib/domain').analyze(
         classSubject('DataRepo', imports: [
           '/project/lib/data/datasource.dart',
           '/project/lib/domain/user.dart',
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes message includes folder and matching imports', () {
-      final result = DependOnFolderPredicate('lib/data').evaluate(
+      final result = DependOnFolderPredicate('lib/data').analyze(
         classSubject('Bloc', imports: ['/project/lib/data/repo.dart']),
         emptyCtx(),
       );
@@ -38,7 +38,7 @@ void main() {
     // Fail cases
 
     test('fails when no imports match the folder', () {
-      final result = DependOnFolderPredicate('lib/data').evaluate(
+      final result = DependOnFolderPredicate('lib/data').analyze(
         classSubject('UserBloc', imports: ['/project/lib/domain/user.dart']),
         emptyCtx(),
       );
@@ -46,7 +46,7 @@ void main() {
     });
 
     test('fails when imports list is empty', () {
-      final result = DependOnFolderPredicate('lib/data').evaluate(
+      final result = DependOnFolderPredicate('lib/data').analyze(
         classSubject('UserBloc'),
         emptyCtx(),
       );
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('fail message contains the folder name', () {
-      final result = DependOnFolderPredicate('lib/ui').evaluate(
+      final result = DependOnFolderPredicate('lib/ui').analyze(
         classSubject('DomainClass',
             imports: ['/project/lib/domain/entity.dart']),
         emptyCtx(),

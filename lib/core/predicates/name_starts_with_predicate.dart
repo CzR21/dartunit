@@ -7,7 +7,7 @@ class NameStartsWithPredicate extends Predicate {
   const NameStartsWithPredicate(this.prefix);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     if (subject.name.startsWith(prefix)) return const PredicateResult.pass();
     return PredicateResult.fail('${subject.name} must start with "$prefix"');
   }

@@ -33,7 +33,7 @@ class FileContentMatchesPredicate extends Predicate {
   }
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final file = subject.element as AnalyzedFile;
 
     String content;

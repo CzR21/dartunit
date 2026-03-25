@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when declaration is an enum', () {
-      final result = const IsEnumPredicate().evaluate(
+      final result = const IsEnumPredicate().analyze(
         classSubject('OrderStatus', isEnum: true),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes for PaymentMethod enum', () {
-      final result = const IsEnumPredicate().evaluate(
+      final result = const IsEnumPredicate().analyze(
         classSubject('PaymentMethod', isEnum: true),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes for single-value enum', () {
-      final result = const IsEnumPredicate().evaluate(
+      final result = const IsEnumPredicate().analyze(
         classSubject('Singleton', isEnum: true),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails for a regular class', () {
-      final result = const IsEnumPredicate().evaluate(
+      final result = const IsEnumPredicate().analyze(
         classSubject('OrderStatus'),
         emptyCtx(),
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('fails for an abstract class', () {
-      final result = const IsEnumPredicate().evaluate(
+      final result = const IsEnumPredicate().analyze(
         classSubject('OrderStatus', isAbstract: true),
         emptyCtx(),
       );
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message contains class name', () {
-      final result = const IsEnumPredicate().evaluate(
+      final result = const IsEnumPredicate().analyze(
         classSubject('NotAnEnum'),
         emptyCtx(),
       );

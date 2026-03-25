@@ -5,7 +5,7 @@ import '../../entities/predicate.dart';
 /// Passes when AT LEAST ONE inner predicate passes (logical OR).
 ///
 /// Evaluation is short-circuited: if any predicate passes, the remaining
-/// predicates are not evaluated.  If all predicates fail, the returned
+/// predicates are not analyzed.  If all predicates fail, the returned
 /// message combines all individual failure reasons.
 ///
 /// Example — class must end with `Bloc` OR `Cubit`:
@@ -22,12 +22,12 @@ class OrPredicate extends Predicate {
   const OrPredicate(this.predicates);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final failures = <String>[];
 
     // Short-circuit: return pass as soon as one predicate succeeds.
     for (final p in predicates) {
-      final result = p.evaluate(subject, context);
+      final result = p.analyze(subject, context);
       if (result.passed) return const PredicateResult.pass();
       failures.add(result.message);
     }

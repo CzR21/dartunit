@@ -39,7 +39,7 @@ void main() {
 
   group('HasCircularDependencyPredicate — passes (no cycle)', () {
     test('passes when subject file has no dependencies at all', () {
-      final result = pred.evaluate(
+      final result = pred.analyze(
         _subject('/p/lib/clean.dart'),
         _ctx(DependencyGraph()),
       );
@@ -51,7 +51,7 @@ void main() {
         ('/p/a.dart', '/p/b.dart'),
         ('/p/b.dart', '/p/c.dart'),
       ]);
-      expect(pred.evaluate(_subject('/p/a.dart'), _ctx(graph)).passed, isTrue);
+      expect(pred.analyze(_subject('/p/a.dart'), _ctx(graph)).passed, isTrue);
     });
 
     test('passes for a file not involved in a cycle that exists elsewhere', () {
@@ -60,7 +60,7 @@ void main() {
         ('/p/b.dart', '/p/c.dart'),
         ('/p/c.dart', '/p/b.dart'),
       ]);
-      expect(pred.evaluate(_subject('/p/a.dart'), _ctx(graph)).passed, isTrue);
+      expect(pred.analyze(_subject('/p/a.dart'), _ctx(graph)).passed, isTrue);
     });
   });
 
@@ -72,7 +72,7 @@ void main() {
         ('/p/a.dart', '/p/b.dart'),
         ('/p/b.dart', '/p/a.dart'),
       ]);
-      expect(pred.evaluate(_subject('/p/a.dart'), _ctx(graph)).passed, isFalse);
+      expect(pred.analyze(_subject('/p/a.dart'), _ctx(graph)).passed, isFalse);
     });
 
     test('fails when subject file is in a three-node cycle (A→B→C→A)', () {
@@ -81,7 +81,7 @@ void main() {
         ('/p/b.dart', '/p/c.dart'),
         ('/p/c.dart', '/p/a.dart'),
       ]);
-      expect(pred.evaluate(_subject('/p/c.dart'), _ctx(graph)).passed, isFalse);
+      expect(pred.analyze(_subject('/p/c.dart'), _ctx(graph)).passed, isFalse);
     });
 
     test('fail message contains the file path involved in the cycle', () {
@@ -89,7 +89,7 @@ void main() {
         ('/p/x.dart', '/p/y.dart'),
         ('/p/y.dart', '/p/x.dart'),
       ]);
-      final result = pred.evaluate(_subject('/p/x.dart'), _ctx(graph));
+      final result = pred.analyze(_subject('/p/x.dart'), _ctx(graph));
       expect(result.passed, isFalse);
       expect(result.message, contains('/p/x.dart'));
     });

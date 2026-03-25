@@ -26,7 +26,6 @@ class NamingNamePatternPreset extends Preset {
     final pattern = config['pattern'] as String;
     return folders(config).map((folder) {
       return Rule(
-        id: 'PRESET_naming_pattern_${safeId(folder)}',
         description: 'Classes in "$folder" must match pattern "$pattern"',
         severity: sev,
         selector: classSelector(config, folder),

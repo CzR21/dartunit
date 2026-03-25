@@ -7,14 +7,14 @@ class DependOnFolderPredicate extends Predicate {
   const DependOnFolderPredicate(this.folder);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final normalized = folder.replaceAll('\\', '/');
     final matchingImports =
         cls.imports.where((imp) => imp.contains(normalized)).toList();
     if (matchingImports.isNotEmpty) {
       return PredicateResult.pass(
-        '${cls.name} imports from "$folder":\n  ${matchingImports.join('\n  ')}',
+        '${cls.name} imports from "$folder": ${matchingImports.join(', ')}',
       );
     }
     return PredicateResult.fail('${cls.name} does not depend on "$folder"');

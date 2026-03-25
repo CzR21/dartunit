@@ -4,7 +4,7 @@ import '../../analyzer/context/analysis_context.dart';
 /// Base interface for all rule predicates.
 ///
 /// A predicate defines the **positive condition** that a subject satisfies.
-/// When the condition IS met, [evaluate] returns [PredicateResult.pass].
+/// When the condition IS met, [analyze] returns [PredicateResult.pass].
 /// When the condition is NOT met, it returns [PredicateResult.fail].
 ///
 /// Rules typically use [NotPredicate] to enforce that the condition is absent:
@@ -15,7 +15,7 @@ import '../../analyzer/context/analysis_context.dart';
 abstract class Predicate {
   const Predicate();
 
-  PredicateResult evaluate(Subject subject, AnalysisContext context);
+  PredicateResult analyze(Subject subject, AnalysisContext context);
 
   /// Convenience factory: negate this predicate.
   Predicate not() => _NotPredicate(this);
@@ -50,8 +50,8 @@ class _NotPredicate extends Predicate {
   const _NotPredicate(this._inner);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
-    final result = _inner.evaluate(subject, context);
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
+    final result = _inner.analyze(subject, context);
     if (!result.passed) {
       // Inner condition was NOT met → negation passes (no violation).
       return const PredicateResult.pass();
@@ -70,9 +70,9 @@ class _AndPredicate extends Predicate {
   const _AndPredicate(this._predicates);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     for (final p in _predicates) {
-      final result = p.evaluate(subject, context);
+      final result = p.analyze(subject, context);
       if (!result.passed) return result;
     }
     return const PredicateResult.pass();
@@ -84,10 +84,10 @@ class _OrPredicate extends Predicate {
   const _OrPredicate(this._predicates);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final failures = <String>[];
     for (final p in _predicates) {
-      final result = p.evaluate(subject, context);
+      final result = p.analyze(subject, context);
       if (result.passed) return const PredicateResult.pass();
       failures.add(result.message);
     }

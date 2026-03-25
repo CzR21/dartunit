@@ -68,7 +68,7 @@ void main() {
       final subject = Subject(name: cls.name, filePath: cls.filePath, element: cls);
       final ctx = AnalysisContext(
           classes: [], files: [], dependencyGraph: DependencyGraph(), projectRoot: '/project');
-      final result = rules.first.predicate.evaluate(subject, ctx);
+      final result = rules.first.predicate.analyze(subject, ctx);
       expect(result.passed, isTrue);
     });
 
@@ -82,7 +82,7 @@ void main() {
       final subject = Subject(name: cls.name, filePath: cls.filePath, element: cls);
       final ctx = AnalysisContext(
           classes: [], files: [], dependencyGraph: DependencyGraph(), projectRoot: '/project');
-      final result = rules.first.predicate.evaluate(subject, ctx);
+      final result = rules.first.predicate.analyze(subject, ctx);
       expect(result.passed, isFalse);
     });
 

@@ -7,7 +7,7 @@ class ImplementsPredicate extends Predicate {
   const ImplementsPredicate(this.typeName);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.implementedTypes.contains(typeName))
       return const PredicateResult.pass();

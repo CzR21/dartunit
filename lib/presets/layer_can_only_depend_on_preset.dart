@@ -28,7 +28,6 @@ class LayerCanOnlyDependOnPreset extends Preset {
     final allowed = toList(config['allowed']);
     return [
       Rule(
-        id: 'PRESET_can_only_depend_${safeId(layer)}',
         description: '"$layer" can only depend on: ${allowed.join(', ')}',
         severity: severity(config),
         selector: classSelector(config, layer),

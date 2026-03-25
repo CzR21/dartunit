@@ -8,7 +8,7 @@ void main() {
 
     test('passes when inner predicate fails (negation of fails = pass)', () {
       // ExtendsPredicate fails → NotPredicate passes
-      final result = NotPredicate(ExtendsPredicate('Bloc')).evaluate(
+      final result = NotPredicate(ExtendsPredicate('Bloc')).analyze(
         classSubject('UserEntity'), // does not extend Bloc
         emptyCtx(),
       );
@@ -17,7 +17,7 @@ void main() {
 
     test('passes: domain class does not depend on data layer', () {
       final result =
-          NotPredicate(DependOnFolderPredicate('lib/data')).evaluate(
+          NotPredicate(DependOnFolderPredicate('lib/data')).analyze(
         classSubject('UserEntity',
             imports: ['/project/lib/domain/value_object.dart']),
         emptyCtx(),
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('passes when inner AnnotatedWith fails (no annotation present)', () {
-      final result = NotPredicate(AnnotatedWithPredicate('deprecated')).evaluate(
+      final result = NotPredicate(AnnotatedWithPredicate('deprecated')).analyze(
         classSubject('ActiveService', annotations: []),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
 
     test('fails when inner predicate passes (negation of pass = fail)', () {
       // ExtendsPredicate passes → NotPredicate fails
-      final result = NotPredicate(ExtendsPredicate('Bloc')).evaluate(
+      final result = NotPredicate(ExtendsPredicate('Bloc')).analyze(
         classSubject('CartBloc', extendedType: 'Bloc'),
         emptyCtx(),
       );
@@ -46,7 +46,7 @@ void main() {
 
     test('fails: domain class depends on data layer (forbidden)', () {
       final result =
-          NotPredicate(DependOnFolderPredicate('lib/data')).evaluate(
+          NotPredicate(DependOnFolderPredicate('lib/data')).analyze(
         classSubject('DirtyEntity',
             imports: ['/project/lib/data/repo.dart']),
         emptyCtx(),
@@ -56,7 +56,7 @@ void main() {
 
     test('fail message reuses the inner pass message', () {
       final result =
-          NotPredicate(DependOnFolderPredicate('lib/data')).evaluate(
+          NotPredicate(DependOnFolderPredicate('lib/data')).analyze(
         classSubject('BadClass',
             imports: ['/project/lib/data/source.dart']),
         emptyCtx(),

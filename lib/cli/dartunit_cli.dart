@@ -3,6 +3,7 @@ import 'package:args/command_runner.dart';
 import 'commands/analyze_command.dart';
 import 'commands/generate_command.dart';
 import 'commands/init_command.dart';
+import 'commands/log_command.dart';
 import '../core/enums/exit_code.dart';
 
 /// The root command runner for the dartunit CLI.
@@ -17,7 +18,8 @@ class DartunitCli {
     )
       ..addCommand(InitCommand())
       ..addCommand(AnalyzeCommand())
-      ..addCommand(GenerateCommand());
+      ..addCommand(GenerateCommand())
+      ..addCommand(LogCommand());
   }
 
   /// Runs the CLI with the given [arguments].

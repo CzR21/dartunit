@@ -15,7 +15,7 @@ class AnnotatedWithPredicate extends Predicate {
   const AnnotatedWithPredicate(this.annotation);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.annotations.contains(annotation)) {
       return const PredicateResult.pass();

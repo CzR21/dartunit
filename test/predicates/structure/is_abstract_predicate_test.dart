@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when class is abstract', () {
-      final result = const IsAbstractPredicate().evaluate(
+      final result = const IsAbstractPredicate().analyze(
         classSubject('AbstractRepository', isAbstract: true),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes for abstract use case base', () {
-      final result = const IsAbstractPredicate().evaluate(
+      final result = const IsAbstractPredicate().analyze(
         classSubject('UseCase', isAbstract: true),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes for abstract widget', () {
-      final result = const IsAbstractPredicate().evaluate(
+      final result = const IsAbstractPredicate().analyze(
         classSubject('BaseScreen', isAbstract: true),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails when class is concrete', () {
-      final result = const IsAbstractPredicate().evaluate(
+      final result = const IsAbstractPredicate().analyze(
         classSubject('UserRepositoryImpl', isAbstract: false),
         emptyCtx(),
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('fails when class is an enum', () {
-      final result = const IsAbstractPredicate().evaluate(
+      final result = const IsAbstractPredicate().analyze(
         classSubject('Status', isEnum: true),
         emptyCtx(),
       );
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message contains class name', () {
-      final result = const IsAbstractPredicate().evaluate(
+      final result = const IsAbstractPredicate().analyze(
         classSubject('ConcreteService'),
         emptyCtx(),
       );

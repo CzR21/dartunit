@@ -37,7 +37,6 @@ class NoBannedCallsPreset extends Preset {
     for (var i = 0; i < patterns.length; i++) {
       final pattern = patterns[i];
       rules.add(Rule(
-        id: 'PRESET_no_banned_calls_$i',
         description: 'Files must not contain banned pattern: $pattern',
         severity: sev,
         selector: FileSelector(excludeFolders: excludeFolders),

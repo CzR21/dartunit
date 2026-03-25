@@ -4,16 +4,37 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:dartunit/cli/dartunit_cli.dart';
 
-void _writeConfig(Directory dir, String yaml) {
-  final du = Directory(p.join(dir.path, '.dartunit'))
+/// Writes a rule file to arch_test/ that outputs the given violations as JSON.
+///
+/// Rule files in tests use only dart:io and dart:convert so they run without
+/// needing a pubspec.yaml / package_config.json in the temp directory.
+void _writeRuleFile(Directory dir, String fileName, List<Map<String, dynamic>> violations) {
+  final archTestDir = Directory(p.join(dir.path, 'arch_test'))
     ..createSync(recursive: true);
-  File(p.join(du.path, 'dartunit.yaml')).writeAsStringSync(yaml);
+  final violationsJson = violations
+      .map((v) => '      ${_encodeMap(v)}')
+      .join(',\n');
+  File(p.join(archTestDir.path, fileName)).writeAsStringSync('''
+import 'dart:convert';
+import 'dart:io';
+void main(List<String> args) {
+  final data = {
+    'ruleDescription': 'Test rule',
+    'severity': 'error',
+    'violations': [
+$violationsJson
+    ],
+  };
+  stdout.writeln('DARTUNIT_RESULT:\${jsonEncode(data)}');
+}
+''');
 }
 
-void _writeDartFile(Directory dir, String relPath, String content) {
-  final file = File(p.join(dir.path, relPath));
-  file.parent.createSync(recursive: true);
-  file.writeAsStringSync(content);
+String _encodeMap(Map<String, dynamic> m) {
+  final entries = m.entries
+      .map((e) => "'${e.key}': '${e.value}'")
+      .join(', ');
+  return '{$entries}';
 }
 
 void main() {
@@ -23,127 +44,79 @@ void main() {
   tearDown(() => tempDir.deleteSync(recursive: true));
 
   group('analyze — exit codes', () {
-    test('returns 2 when config file does not exist', () async {
+    test('returns 2 when arch_test/ does not exist', () async {
       final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(2));
     });
 
-    test('returns 0 when rules match no classes', () async {
-      _writeConfig(tempDir, '''
-rules:
-  - id: R001
-    description: Nothing to match
-    severity: error
-    selector:
-      type: class
-      where:
-        folder: lib/nonexistent
-    predicate:
-      type: nameEndsWith
-      value: Repository
-''');
+    test('returns 0 when arch_test/ is empty', () async {
+      Directory(p.join(tempDir.path, 'arch_test')).createSync();
+      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      expect(code, equals(0));
+    });
+
+    test('returns 0 when rule produces no violations', () async {
+      _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
       final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
     test('returns 1 when error-level violations are found', () async {
-      _writeDartFile(tempDir, 'lib/domain/bad.dart', '''
-import '../data/repo.dart';
-class Bad {}
-''');
-      _writeConfig(tempDir, '''
-rules:
-  - id: R001
-    description: Domain must not depend on Data
-    severity: error
-    selector:
-      type: class
-      where:
-        folder: lib/domain
-    predicate:
-      not:
-        type: dependOnFolder
-        value: lib/data
-''');
+      _writeRuleFile(tempDir, 'has_violations_arch_test.dart', [
+        {
+          'ruleDescription': 'Domain must not depend on Data',
+          'message': 'Bad depends on lib/data',
+          'filePath': 'lib/domain/bad.dart',
+          'severity': 'error',
+        },
+      ]);
       final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(1));
     });
 
     test('returns 0 when only warnings are found', () async {
-      _writeDartFile(tempDir, 'lib/service/big.dart', '''
-class BigClass {
-  void a() {} void b() {}
-}
-''');
-      _writeConfig(tempDir, '''
-rules:
-  - id: R001
-    description: At most 0 methods
-    severity: warning
-    selector:
-      type: class
-      where:
-        folder: lib/service
-    predicate:
-      type: maxMethods
-      value: 0
-''');
+      _writeRuleFile(tempDir, 'warnings_arch_test.dart', [
+        {
+          'ruleDescription': 'God-class check',
+          'message': 'BigClass has too many methods',
+          'filePath': 'lib/service/big.dart',
+          'severity': 'warning',
+        },
+      ]);
       final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
   });
 
-  group('analyze — flags and options', () {
+  group('analyze — flags', () {
     test('--no-color flag is accepted without error', () async {
-      _writeConfig(tempDir, '''
-rules:
-  - id: R001
-    description: Test
-    severity: error
-    selector:
-      type: class
-      where:
-        folder: lib/nonexistent
-    predicate:
-      type: nameEndsWith
-      value: Service
-''');
+      _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
       final code = await DartunitCli()
           .run(['analyze', '--path', tempDir.path, '--no-color']);
       expect(code, equals(0));
     });
+  });
 
-    test('--config flag points to custom yaml path', () async {
-      final custom = File(p.join(tempDir.path, 'custom_rules.yaml'))
-        ..writeAsStringSync('''
-rules:
-  - id: R001
-    description: Test
-    severity: error
-    selector:
-      type: class
-      where:
-        folder: lib/nonexistent
-    predicate:
-      type: nameEndsWith
-      value: Repository
-''');
-      final code = await DartunitCli().run([
-        'analyze',
-        '--path', tempDir.path,
-        '--config', custom.path,
+  group('analyze — multiple rule files', () {
+    test('collects violations from multiple rule files', () async {
+      _writeRuleFile(tempDir, 'rule_a_arch_test.dart', [
+        {
+          'ruleDescription': 'Rule A',
+          'message': 'Violation A',
+          'filePath': 'lib/a.dart',
+          'severity': 'error',
+        },
       ]);
-      expect(code, equals(0));
-    });
-
-    test('returns 0 when only presets are configured and no violations', () async {
-      _writeConfig(tempDir, '''
-presets:
-  - preset: structure/no-circular-dependencies
-    severity: error
-''');
+      _writeRuleFile(tempDir, 'rule_b_arch_test.dart', [
+        {
+          'ruleDescription': 'Rule B',
+          'message': 'Violation B',
+          'filePath': 'lib/b.dart',
+          'severity': 'error',
+        },
+      ]);
       final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
-      expect(code, equals(0));
+      expect(code, equals(1));
     });
   });
 }

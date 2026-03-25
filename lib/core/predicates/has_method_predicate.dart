@@ -7,7 +7,7 @@ class HasMethodPredicate extends Predicate {
   const HasMethodPredicate(this.methodName);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.methods.any((m) => m.name == methodName))
       return const PredicateResult.pass();

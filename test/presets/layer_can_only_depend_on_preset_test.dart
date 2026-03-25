@@ -23,10 +23,10 @@ void main() {
       expect(rules, hasLength(1));
     });
 
-    test('rule id contains the layer name', () {
+    test('rule description contains the layer name', () {
       final rules = preset.expand(
           _cfg('layer: lib/domain\nallowed: [lib/domain]'));
-      expect(rules.first.id, contains('domain'));
+      expect(rules.first.description, contains('domain'));
     });
   });
 
@@ -61,7 +61,7 @@ void main() {
           packagePath: 'pkg:app/use_case.dart',
           imports: ['/p/lib/domain/user.dart', '/p/lib/shared/utils.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails when an import is from a forbidden folder', () {
@@ -73,7 +73,7 @@ void main() {
           packagePath: 'pkg:app/use_case.dart',
           imports: ['/p/lib/data/repo.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message names the forbidden import path', () {
@@ -85,7 +85,7 @@ void main() {
           packagePath: 'pkg:app/cls.dart',
           imports: ['/p/lib/ui/page.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).message,
+      expect(rules.first.predicate.analyze(s, _ctx()).message,
           contains('lib/ui/page.dart'));
     });
   });
