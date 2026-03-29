@@ -5,7 +5,7 @@ String generateCreatedFile(String fileName) => 'Created  arch_test/$fileName';
 
 List<String> generateNextSteps(String fileName) => [
       'Open    arch_test/$fileName',
-      'Implement the rule inside the  archTest()  call.',
+      'Implement the rule inside the  testArch()  call.',
       'Run     dartunit analyze',
     ];
 
@@ -15,8 +15,11 @@ import 'package:dartunit/dartunit.dart';
 /// ${_toDescription(ruleName)}
 ///
 /// TODO: Describe what this rule enforces and why.
-void main(List<String> args) => archTest(
-      args,
+///
+/// Run with:
+///   flutter test arch_test/${ruleName}_arch_test.dart
+///   dartunit analyze
+void main() => testArch(
       ArchitectureRule(
         description: '${_toDescription(ruleName)}',
         severity: RuleSeverity.error, // TODO: choose appropriate severity

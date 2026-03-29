@@ -80,45 +80,54 @@ class AnalyzeCommand extends Command<ExitCode> {
     rulesSpinner.stop(doneMessage: 'Found ${ruleFiles.length} rule file(s)');
 
     final evalSpinner = Spinner('Evaluating rules...', useColor: useColor)..start();
+
+    final result = await Process.run(
+      'dart',
+      ['test', 'arch_test', '--reporter', 'json', '--no-color'],
+      workingDirectory: projectRoot,
+    );
+
     final allViolations = <Violation>[];
+    int parsedRules = 0;
 
-    for (final ruleFile in ruleFiles) {
-      final result = await Process.run(
-        'dart',
-        ['run', ruleFile, '--path', projectRoot],
-        workingDirectory: projectRoot,
-      );
+    for (final line in (result.stdout as String).split('\n')) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+      try {
+        final event = jsonDecode(trimmed) as Map<String, dynamic>;
+        if (event['type'] != 'print') continue;
 
-      if (result.exitCode != 0 && result.stderr.toString().trim().isNotEmpty) {
-        final fileName = p.basename(ruleFile);
-        stdout.writeln(
-          '\n  ${ANSIHelper.red('✗', useColor)} Error in $fileName:\n'
-          '  ${result.stderr.toString().trim()}',
-        );
-        continue;
-      }
+        final message = event['message'] as String? ?? '';
+        if (!message.startsWith('DARTUNIT_RESULT:')) continue;
 
-      for (final line in result.stdout.toString().split('\n')) {
-        final trimmed = line.trim();
-        if (!trimmed.startsWith('DARTUNIT_RESULT:')) continue;
-        try {
-          final json =
-              jsonDecode(trimmed.substring('DARTUNIT_RESULT:'.length)) as Map<String, dynamic>;
-          final violations =
-              (json['violations'] as List).cast<Map<String, dynamic>>();
-          for (final v in violations) {
-            allViolations.add(Violation(
-              ruleDescription: v['ruleDescription'] as String,
-              message: v['message'] as String,
-              filePath: v['filePath'] as String,
-              severity: RuleSeverity.fromString(v['severity'] as String),
-              line: v['line'] as int?,
-            ));
-          }
-        } catch (_) {
-          // Malformed output from rule file — skip this line.
+        parsedRules++;
+        final json = jsonDecode(message.substring('DARTUNIT_RESULT:'.length))
+            as Map<String, dynamic>;
+        final violations =
+            (json['violations'] as List).cast<Map<String, dynamic>>();
+        for (final v in violations) {
+          allViolations.add(Violation(
+            ruleDescription: v['ruleDescription'] as String,
+            message: v['message'] as String,
+            filePath: v['filePath'] as String,
+            severity: RuleSeverity.fromString(v['severity'] as String),
+            line: v['line'] as int?,
+          ));
         }
+      } catch (_) {
+        // Malformed JSON line — skip.
       }
+    }
+
+    if (parsedRules == 0 && result.exitCode != 0) {
+      evalSpinner.stop(doneMessage: 'Evaluation failed');
+      final err = (result.stderr as String).trim();
+      if (err.isNotEmpty) {
+        stdout.writeln(
+            '\n  ${ANSIHelper.red('✗', useColor)} dart test error:\n  $err');
+      }
+      stdout.writeln();
+      return ExitCode.error;
     }
 
     evalSpinner.stop(doneMessage: 'Rules analyzed');
@@ -135,6 +144,7 @@ class AnalyzeCommand extends Command<ExitCode> {
       rulesCount: ruleFiles.length,
       timestamp: now,
     );
+
     if (htmlPath != null) {
       final fileUri = 'file:///${htmlPath.replaceAll('\\', '/')}';
       stdout.writeln(

@@ -16,17 +16,18 @@ List<String> initTemplateNextSteps(String templateLabel, int ruleCount) => [
   'Run     dartunit generate <name>      to scaffold additional rules.',
 ];
 
-const String exampleRule = r'''
+const String exampleRule = '''
 // arch_test/example_arch_test.dart
 //
 // Architecture rule: UI layer must not access data layer directly.
-// Run "dartunit analyze" to analyze this rule against your project.
-// Run "dartunit generate <name>" to scaffold additional rules.
+//
+// Run with:
+//   flutter test arch_test/example_arch_test.dart
+//   dartunit analyze
 
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-      args,
+void main() => testArch(
       ArchitectureRule(
         description: 'UI layer must not access the data layer directly',
         severity: RuleSeverity.error,

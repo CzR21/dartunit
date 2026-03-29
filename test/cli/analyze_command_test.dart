@@ -4,60 +4,124 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:dartunit/cli/dartunit_cli.dart';
 
-/// Writes a rule file to arch_test/ that outputs the given violations as JSON.
-///
-/// Rule files in tests use only dart:io and dart:convert so they run without
-/// needing a pubspec.yaml / package_config.json in the temp directory.
-void _writeRuleFile(Directory dir, String fileName, List<Map<String, dynamic>> violations) {
-  final archTestDir = Directory(p.join(dir.path, 'arch_test'))
-    ..createSync(recursive: true);
-  final violationsJson = violations
-      .map((v) => '      ${_encodeMap(v)}')
-      .join(',\n');
-  File(p.join(archTestDir.path, fileName)).writeAsStringSync('''
-import 'dart:convert';
-import 'dart:io';
-void main(List<String> args) {
-  final data = {
-    'ruleDescription': 'Test rule',
-    'severity': 'error',
-    'violations': [
-$violationsJson
-    ],
-  };
-  stdout.writeln('DARTUNIT_RESULT:\${jsonEncode(data)}');
-}
-''');
+/// A shared temp dir that has `dart pub get` run once.
+/// Its `.dart_tool/package_config.json` is copied into each test's temp dir
+/// so that `dart test --reporter json` can resolve `package:test` without
+/// running `dart pub get` for every test.
+late Directory _baseDir;
+
+/// Copies the package resolution artifacts from [_baseDir] into [dest].
+/// `dart test` requires both `pubspec.yaml` AND `.dart_tool/package_config.json`.
+/// The package_config.json uses absolute pub-cache paths, so it is valid
+/// in any directory.
+void _copyPackageConfig(Directory dest) {
+  // pubspec.yaml signals to `dart test` that this is a valid project root.
+  File(p.join(dest.path, 'pubspec.yaml')).writeAsStringSync(
+    File(p.join(_baseDir.path, 'pubspec.yaml')).readAsStringSync(),
+  );
+  final dartTool = Directory(p.join(dest.path, '.dart_tool'))..createSync();
+  File(p.join(dartTool.path, 'package_config.json')).writeAsStringSync(
+    File(p.join(_baseDir.path, '.dart_tool', 'package_config.json'))
+        .readAsStringSync(),
+  );
 }
 
-String _encodeMap(Map<String, dynamic> m) {
-  final entries = m.entries
-      .map((e) => "'${e.key}': '${e.value}'")
-      .join(', ');
-  return '{$entries}';
+/// Writes a rule file to arch_test/ that outputs the given violations as JSON.
+///
+/// The file is a valid `package:test` test so it can be executed by
+/// `dart test --reporter json` (which is what [AnalyzeCommand] now uses).
+void _writeRuleFile(
+    Directory dir, String fileName, List<Map<String, dynamic>> violations) {
+  final archTestDir = Directory(p.join(dir.path, 'arch_test'))
+    ..createSync(recursive: true);
+
+  final violationsLiteral = violations
+      .map((v) {
+        final entries =
+            v.entries.map((e) => "'${e.key}': '${e.value}'").join(', ');
+        return '      {$entries}';
+      })
+      .join(',\n');
+
+  File(p.join(archTestDir.path, fileName)).writeAsStringSync('''
+import 'dart:convert';
+import 'package:test/test.dart';
+
+void main() {
+  test('Test rule', () {
+    final violations = <Map<String, dynamic>>[
+$violationsLiteral
+    ];
+
+    final data = <String, dynamic>{
+      'ruleDescription': 'Test rule',
+      'severity': 'error',
+      'violations': violations,
+    };
+    // Parsed by AnalyzeCommand from the dart-test JSON reporter stream.
+    print('DARTUNIT_RESULT:\${jsonEncode(data)}');
+
+    final failures = violations
+        .where((v) => v['severity'] == 'error' || v['severity'] == 'critical')
+        .toList();
+    expect(failures, isEmpty);
+  });
+}
+''');
 }
 
 void main() {
   late Directory tempDir;
 
-  setUp(() => tempDir = Directory.systemTemp.createTempSync('dartunit_cli_analyze_'));
+  setUpAll(() async {
+    _baseDir =
+        Directory.systemTemp.createTempSync('dartunit_analyze_base_');
+    File(p.join(_baseDir.path, 'pubspec.yaml')).writeAsStringSync('''
+name: test_base
+version: 0.0.1
+environment:
+  sdk: ^3.0.0
+dependencies:
+  test: ^1.24.0
+''');
+    final result = await Process.run(
+      'dart',
+      ['pub', 'get'],
+      workingDirectory: _baseDir.path,
+    );
+    if (result.exitCode != 0) {
+      throw StateError('dart pub get failed: ${result.stderr}');
+    }
+  });
+
+  tearDownAll(() => _baseDir.deleteSync(recursive: true));
+
+  setUp(() {
+    tempDir =
+        Directory.systemTemp.createTempSync('dartunit_cli_analyze_');
+    _copyPackageConfig(tempDir);
+  });
+
   tearDown(() => tempDir.deleteSync(recursive: true));
 
   group('analyze — exit codes', () {
     test('returns 2 when arch_test/ does not exist', () async {
-      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      final code =
+          await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(2));
     });
 
     test('returns 0 when arch_test/ is empty', () async {
       Directory(p.join(tempDir.path, 'arch_test')).createSync();
-      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      final code =
+          await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
     test('returns 0 when rule produces no violations', () async {
       _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
-      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      final code =
+          await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
@@ -70,7 +134,8 @@ void main() {
           'severity': 'error',
         },
       ]);
-      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      final code =
+          await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(1));
     });
 
@@ -83,7 +148,8 @@ void main() {
           'severity': 'warning',
         },
       ]);
-      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      final code =
+          await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
   });
@@ -115,7 +181,8 @@ void main() {
           'severity': 'error',
         },
       ]);
-      final code = await DartunitCli().run(['analyze', '--path', tempDir.path]);
+      final code =
+          await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(1));
     });
   });

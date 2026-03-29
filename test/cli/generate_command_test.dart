@@ -40,7 +40,7 @@ void main() {
       final content =
           File(p.join(tempDir.path, 'arch_test', 'my_rule_arch_test.dart'))
               .readAsStringSync();
-      expect(content, contains('archTest'));
+      expect(content, contains('testArch'));
       expect(content, contains('ArchitectureRule'));
       expect(content, contains('My Rule'));
     });
