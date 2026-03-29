@@ -57,7 +57,7 @@ void main() {
           packagePath: 'pkg:app/user_repository.dart',
           isAbstract: true);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails for concrete class', () {
@@ -68,7 +68,7 @@ void main() {
           packagePath: 'pkg:app/concrete_repo.dart',
           isAbstract: false);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message contains "abstract"', () {
@@ -78,7 +78,7 @@ void main() {
           filePath: '/p/lib/repository/concrete_repo.dart',
           packagePath: 'pkg:app/concrete_repo.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).message,
+      expect(rules.first.predicate.analyze(s, _ctx()).message,
           contains('abstract'));
     });
   });

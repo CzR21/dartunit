@@ -7,7 +7,7 @@ class UsesMixinPredicate extends Predicate {
   const UsesMixinPredicate(this.mixinName);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     if (cls.mixinTypes.contains(mixinName)) return const PredicateResult.pass();
     return PredicateResult.fail('${cls.name} must use mixin $mixinName');

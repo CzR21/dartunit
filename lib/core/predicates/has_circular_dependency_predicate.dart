@@ -6,7 +6,7 @@ class HasCircularDependencyPredicate extends Predicate {
   const HasCircularDependencyPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cycles = context.dependencyGraph.detectCycles();
     final subjectPath = subject.filePath.replaceAll('\\', '/');
     final involvedCycles =

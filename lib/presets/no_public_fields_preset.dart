@@ -26,7 +26,6 @@ class NoPublicFieldsPreset extends Preset {
     final sev = severity(config);
     return folders(config).map((folder) {
       return Rule(
-        id: 'PRESET_no_public_fields_${safeId(folder)}',
         description:
             'Classes in "$folder" must not expose public instance fields',
         severity: sev,

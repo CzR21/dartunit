@@ -1,0 +1,1859 @@
+# =============================================================================
+# dartunit.yaml — Configuração completa de referência
+#
+# Arquitetura Flutter Clean Architecture assumida:
+#   lib/presentation/        → Widgets, Screens, Pages
+#   lib/bloc/                → BLoC, Cubit, Events, States
+#   lib/domain/              → Entities, Use Cases, Repositories (interfaces)
+#   lib/data/                → Repository Impl, Data Sources, Models/DTOs
+#   lib/shared/              → Utils, Extensions, Constants, Design System
+#   lib/core/                → DI, Router, Base classes, Error handling
+# =============================================================================
+
+rules:
+
+  # ===========================================================================
+  # PREDICADO: dependOnFolder
+  # Verifica se uma classe importa de uma determinada pasta
+  # ===========================================================================
+
+  - id: R001
+    description: Domain nao deve importar nada da camada Data
+    severity: critical
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: dependOnFolder
+        value: lib/data
+
+  - id: R002
+    description: Domain nao deve importar nada da camada Presentation
+    severity: critical
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: dependOnFolder
+        value: lib/presentation
+
+  - id: R003
+    description: Domain nao deve importar nada da camada BLoC
+    severity: critical
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: dependOnFolder
+        value: lib/bloc
+
+  - id: R004
+    description: Presentation nao deve importar diretamente da camada Data
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+    predicate:
+      not:
+        type: dependOnFolder
+        value: lib/data
+
+  - id: R005
+    description: BLoC deve depender de Domain (pelo menos um use case deve ser importado)
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Bloc$"
+    predicate:
+      type: dependOnFolder
+      value: lib/domain
+
+  # ===========================================================================
+  # PREDICADO: dependOnPackage
+  # Verifica se uma classe importa de um pacote externo especifico
+  # ===========================================================================
+
+  - id: R006
+    description: Domain nao deve usar dio (infraestrutura HTTP e responsabilidade de Data)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: dependOnPackage
+        value: dio
+
+  - id: R007
+    description: Domain nao deve usar flutter_bloc (state management nao pertence ao dominio)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: dependOnPackage
+        value: flutter_bloc
+
+  - id: R008
+    description: Shared nao deve depender de pacotes de state management
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/shared
+    predicate:
+      not:
+        type: dependOnPackage
+        value: flutter_bloc
+
+  - id: R009
+    description: BLoC pode depender de flutter_bloc (verificacao positiva de dependencia correta)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Bloc$"
+    predicate:
+      type: dependOnPackage
+      value: flutter_bloc
+
+  # ===========================================================================
+  # PREDICADO: onlyDependOnFolders
+  # Verifica se uma classe importa APENAS de pastas permitidas (lista branca)
+  # ===========================================================================
+
+  - id: R010
+    description: Domain so pode importar de si mesmo, shared e core
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      type: onlyDependOnFolders
+      value:
+        - lib/domain
+        - lib/shared
+        - lib/core
+
+  - id: R011
+    description: Shared so pode importar de si mesmo e core (sem dependencias de negocio)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/shared
+    predicate:
+      type: onlyDependOnFolders
+      value:
+        - lib/shared
+        - lib/core
+
+  # ===========================================================================
+  # PREDICADO: maxImports
+  # Verifica se o numero total de imports nao ultrapassa o limite
+  # ===========================================================================
+
+  - id: R012
+    description: Use cases devem ter poucos imports (responsabilidade unica — max 6)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+    predicate:
+      type: maxImports
+      value: 6
+
+  - id: R013
+    description: Entidades de dominio devem ser simples (max 4 imports)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      type: maxImports
+      value: 4
+
+  - id: R014
+    description: Widgets nao devem acumular muitos imports (sinal de componente grande — max 12)
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+        namePattern: ".*Widget$"
+    predicate:
+      type: maxImports
+      value: 12
+
+  # ===========================================================================
+  # PREDICADO: hasCircularDependency
+  # Verifica se a classe participa de ciclo de dependencias
+  # ===========================================================================
+
+  - id: R015
+    description: Nenhuma classe deve participar de dependencias circulares
+    severity: critical
+    selector:
+      type: class
+    predicate:
+      not:
+        type: hasCircularDependency
+
+  - id: R016
+    description: Classes de dominio especificamente nao podem ter ciclos
+    severity: critical
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: hasCircularDependency
+
+  # ===========================================================================
+  # PREDICADO: nameEndsWith
+  # Verifica sufixo do nome da classe
+  # ===========================================================================
+
+  - id: R017
+    description: Use cases devem terminar com UseCase
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+    predicate:
+      type: nameEndsWith
+      value: UseCase
+
+  - id: R018
+    description: Repository implementations devem terminar com RepositoryImpl
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/repositories
+    predicate:
+      type: nameEndsWith
+      value: RepositoryImpl
+
+  - id: R019
+    description: Data Sources devem terminar com DataSource ou DataSourceImpl
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/datasources
+    predicate:
+      or:
+        - type: nameEndsWith
+          value: DataSource
+        - type: nameEndsWith
+          value: DataSourceImpl
+
+  - id: R020
+    description: Modelos de data devem terminar com Model ou Dto
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/models
+    predicate:
+      or:
+        - type: nameEndsWith
+          value: Model
+        - type: nameEndsWith
+          value: Dto
+
+  # ===========================================================================
+  # PREDICADO: nameStartsWith
+  # Verifica prefixo do nome da classe
+  # ===========================================================================
+
+  - id: R021
+    description: Interfaces de repositorio devem comecar com I (convencao de interface)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/repositories
+    predicate:
+      type: nameStartsWith
+      value: I
+
+  - id: R022
+    description: Classes base em core nao devem ser usadas diretamente (devem comecar com Base)
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/core
+        namePattern: "^Base.*"
+    predicate:
+      type: nameStartsWith
+      value: Base
+
+  - id: R023
+    description: Arquivos de test double nao devem estar em lib/ (nao deve comecar com Fake ou Mock)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib
+    predicate:
+      and:
+        - not:
+            type: nameStartsWith
+            value: Fake
+        - not:
+            type: nameStartsWith
+            value: Mock
+        - not:
+            type: nameStartsWith
+            value: Stub
+
+  # ===========================================================================
+  # PREDICADO: nameContains
+  # Verifica se o nome da classe contem uma substring
+  # ===========================================================================
+
+  - id: R024
+    description: Classes de dominio nao devem conter termos de infraestrutura no nome
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      and:
+        - not:
+            type: nameContains
+            value: Http
+        - not:
+            type: nameContains
+            value: Api
+        - not:
+            type: nameContains
+            value: Db
+        - not:
+            type: nameContains
+            value: Cache
+
+  - id: R025
+    description: Classes helper nao devem estar em domain (utilitarios pertencem a shared)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+    predicate:
+      not:
+        type: nameContains
+        value: Helper
+
+  # ===========================================================================
+  # PREDICADO: nameMatchesPattern
+  # Verifica se o nome casa com regex
+  # ===========================================================================
+
+  - id: R026
+    description: Events de BLoC devem seguir padrao PascalCase terminando em Event
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Event$"
+    predicate:
+      type: nameMatchesPattern
+      value: "^[A-Z][a-zA-Z0-9]+Event$"
+
+  - id: R027
+    description: States de BLoC devem seguir padrao PascalCase terminando em State
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*State$"
+    predicate:
+      type: nameMatchesPattern
+      value: "^[A-Z][a-zA-Z0-9]+State$"
+
+  - id: R028
+    description: Entidades de dominio nao devem ter sufixos de infra (Model, Dto, Entity)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      and:
+        - not:
+            type: nameMatchesPattern
+            value: ".*Model$"
+        - not:
+            type: nameMatchesPattern
+            value: ".*Dto$"
+        - not:
+            type: nameMatchesPattern
+            value: ".*Entity$"
+
+  - id: R029
+    description: Cubits devem seguir padrao NomeCubit
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Cubit$"
+    predicate:
+      type: nameMatchesPattern
+      value: "^[A-Z][a-zA-Z0-9]+Cubit$"
+
+  # ===========================================================================
+  # PREDICADO: annotatedWith
+  # Verifica se a classe possui uma anotacao especifica
+  # ===========================================================================
+
+  - id: R030
+    description: Repository implementations devem ser registradas no injetor de dependencias
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/data/repositories
+        namePattern: ".*RepositoryImpl$"
+    predicate:
+      type: annotatedWith
+      value: injectable
+
+  - id: R031
+    description: Use cases devem ser injetaveis
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+    predicate:
+      type: annotatedWith
+      value: injectable
+
+  - id: R032
+    description: Entidades de dominio devem ter anotacao de imutabilidade
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      type: annotatedWith
+      value: immutable
+
+  - id: R033
+    description: Data models devem ter anotacao de serializacao JSON
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/models
+        namePattern: ".*Model$"
+    predicate:
+      type: annotatedWith
+      value: JsonSerializable
+
+  # ===========================================================================
+  # PREDICADO: notAnnotatedWith
+  # Verifica ausencia de uma anotacao
+  # ===========================================================================
+
+  - id: R034
+    description: Entidades de dominio puro nao devem ter serializacao JSON (pertence a Data)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      type: notAnnotatedWith
+      value: JsonSerializable
+
+  - id: R035
+    description: Widgets nao devem ser marcados como singleton no DI
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+    predicate:
+      type: notAnnotatedWith
+      value: singleton
+
+  - id: R036
+    description: BLoCs e Cubits nao devem ser singletons (devem ser scoped)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+    predicate:
+      type: notAnnotatedWith
+      value: singleton
+
+  # ===========================================================================
+  # PREDICADO: extends
+  # Verifica se a classe estende um tipo especifico
+  # ===========================================================================
+
+  - id: R037
+    description: BLoCs devem estender Bloc ou HydratedBloc
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Bloc$"
+    predicate:
+      or:
+        - type: extends
+          value: Bloc
+        - type: extends
+          value: HydratedBloc
+
+  - id: R038
+    description: Cubits devem estender Cubit ou HydratedCubit
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Cubit$"
+    predicate:
+      or:
+        - type: extends
+          value: Cubit
+        - type: extends
+          value: HydratedCubit
+
+  - id: R039
+    description: Paginas e telas devem estender um tipo de Widget valido
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+        namePattern: ".*Page$|.*Screen$"
+    predicate:
+      or:
+        - type: extends
+          value: StatelessWidget
+        - type: extends
+          value: StatefulWidget
+        - type: extends
+          value: ConsumerWidget
+        - type: extends
+          value: HookWidget
+        - type: extends
+          value: HookConsumerWidget
+
+  - id: R040
+    description: Entidades com equatable devem estender Equatable (comparacao por valor)
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+        namePattern: ".*$"
+      excludeNames:
+        - BaseEntity
+    predicate:
+      or:
+        - type: extends
+          value: Equatable
+        - type: usesMixin
+          value: EquatableMixin
+
+  # ===========================================================================
+  # PREDICADO: implements
+  # Verifica se a classe implementa uma interface
+  # ===========================================================================
+
+  - id: R041
+    description: Repository implementations devem implementar a interface de dominio
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/repositories
+        namePattern: ".*RepositoryImpl$"
+    predicate:
+      type: implements
+      value: Repository
+
+  - id: R042
+    description: Data sources remotos devem implementar a interface de data source
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/datasources
+        namePattern: ".*RemoteDataSource$"
+    predicate:
+      type: implements
+      value: DataSource
+
+  - id: R043
+    description: Use cases devem implementar interface padrao ou ter metodo call
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+    predicate:
+      or:
+        - type: implements
+          value: UseCase
+        - type: hasMethod
+          value: call
+
+  # ===========================================================================
+  # PREDICADO: usesMixin
+  # Verifica se a classe usa um mixin
+  # ===========================================================================
+
+  - id: R044
+    description: Widgets com logica de animacao devem usar SingleTickerProviderStateMixin
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+        namePattern: ".*AnimatedWidget$|.*AnimationWidget$"
+    predicate:
+      or:
+        - type: usesMixin
+          value: SingleTickerProviderStateMixin
+        - type: usesMixin
+          value: TickerProviderStateMixin
+
+  - id: R045
+    description: Classes de dominio que precisam de igualdade devem usar EquatableMixin
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/domain/value_objects
+    predicate:
+      or:
+        - type: usesMixin
+          value: EquatableMixin
+        - type: extends
+          value: Equatable
+
+  # ===========================================================================
+  # PREDICADO: isAbstract
+  # Verifica se a classe e declarada como abstrata
+  # ===========================================================================
+
+  - id: R046
+    description: Interfaces de repositorio em domain devem ser abstratas
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/repositories
+    predicate:
+      type: isAbstract
+
+  - id: R047
+    description: Base classes em core devem ser abstratas (nao podem ser instanciadas diretamente)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/core
+        namePattern: "^Base.*"
+    predicate:
+      type: isAbstract
+
+  - id: R048
+    description: Data source interfaces devem ser abstratas
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/datasources
+        namePattern: "^I.*DataSource$|.*DataSource$"
+      excludeNames:
+        - RemoteDataSourceImpl
+        - LocalDataSourceImpl
+    predicate:
+      type: isAbstract
+
+  # ===========================================================================
+  # PREDICADO: isEnum
+  # Verifica se a declaracao e um enum
+  # ===========================================================================
+
+  - id: R049
+    description: Classes com sufixo Status no dominio devem ser enums
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+        namePattern: ".*Status$"
+    predicate:
+      type: isEnum
+
+  - id: R050
+    description: Classes com sufixo Type no dominio devem ser enums
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain
+        namePattern: ".*Type$"
+    predicate:
+      type: isEnum
+
+  # ===========================================================================
+  # PREDICADO: isMixin
+  # Verifica se a declaracao e um mixin
+  # ===========================================================================
+
+  - id: R051
+    description: Classes com sufixo Mixin devem ser declaradas como mixin (nao class)
+    severity: error
+    selector:
+      type: class
+      where:
+        namePattern: ".*Mixin$"
+    predicate:
+      type: isMixin
+
+  # ===========================================================================
+  # PREDICADO: isExtension
+  # Verifica se a declaracao e uma extension
+  # ===========================================================================
+
+  - id: R052
+    description: Classes com sufixo Extension devem ser declaradas como extension
+    severity: error
+    selector:
+      type: class
+      where:
+        namePattern: ".*Extension$"
+    predicate:
+      type: isExtension
+
+  # ===========================================================================
+  # PREDICADO: isConcrete
+  # Verifica se a classe e concreta (nao abstrata)
+  # ===========================================================================
+
+  - id: R053
+    description: Repository implementations devem ser classes concretas (nao abstratas)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/repositories
+        namePattern: ".*RepositoryImpl$"
+    predicate:
+      type: isConcrete
+
+  - id: R054
+    description: Data source implementations devem ser concretas
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/datasources
+        namePattern: ".*DataSourceImpl$"
+    predicate:
+      type: isConcrete
+
+  # ===========================================================================
+  # PREDICADO: maxMethods
+  # Verifica se o numero de metodos nao ultrapassa o limite
+  # ===========================================================================
+
+  - id: R055
+    description: Use cases devem ter responsabilidade unica (max 3 metodos)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+    predicate:
+      type: maxMethods
+      value: 3
+
+  - id: R056
+    description: BLoCs nao devem ser God Classes (max 15 metodos)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Bloc$"
+    predicate:
+      type: maxMethods
+      value: 15
+
+  - id: R057
+    description: Widgets simples devem ser focados (max 8 metodos)
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+        namePattern: ".*Widget$"
+    predicate:
+      type: maxMethods
+      value: 8
+
+  - id: R058
+    description: Repositorios de dominio nao devem virar God Interfaces (max 10 metodos)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/repositories
+    predicate:
+      type: maxMethods
+      value: 10
+
+  # ===========================================================================
+  # PREDICADO: maxFields
+  # Verifica se o numero de campos nao ultrapassa o limite
+  # ===========================================================================
+
+  - id: R059
+    description: Entidades de dominio nao devem acumular muitos campos (max 12)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      type: maxFields
+      value: 12
+
+  - id: R060
+    description: States de BLoC nao devem ser anemic objects com excesso de campos (max 10)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*State$"
+    predicate:
+      type: maxFields
+      value: 10
+
+  - id: R061
+    description: Value objects devem ser simples e focados (max 5 campos)
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/domain/value_objects
+    predicate:
+      type: maxFields
+      value: 5
+
+  # ===========================================================================
+  # PREDICADO: minMethods
+  # Verifica se o numero de metodos e pelo menos o minimo
+  # ===========================================================================
+
+  - id: R062
+    description: Use cases devem ter pelo menos o metodo call implementado
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+        namePattern: ".*UseCase$"
+    predicate:
+      type: minMethods
+      value: 1
+
+  - id: R063
+    description: Interfaces de repositorio devem ter pelo menos um metodo de contrato
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/repositories
+    predicate:
+      type: minMethods
+      value: 1
+
+  # ===========================================================================
+  # PREDICADO: minFields
+  # Verifica se o numero de campos e pelo menos o minimo
+  # ===========================================================================
+
+  - id: R064
+    description: Entidades de dominio devem ter pelo menos um campo identificador
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+      excludeNames:
+        - BaseEntity
+    predicate:
+      type: minFields
+      value: 1
+
+  - id: R065
+    description: States de BLoC devem carregar pelo menos um dado de estado
+    severity: info
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*LoadedState$|.*SuccessState$"
+    predicate:
+      type: minFields
+      value: 1
+
+  # ===========================================================================
+  # PREDICADO: hasAllFinalFields
+  # Verifica se todos os campos de instancia sao final
+  # ===========================================================================
+
+  - id: R066
+    description: Entidades de dominio devem ser completamente imutaveis
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      type: hasAllFinalFields
+
+  - id: R067
+    description: Events de BLoC devem ser imutaveis (imutabilidade garante rastreabilidade)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Event$"
+    predicate:
+      type: hasAllFinalFields
+
+  - id: R068
+    description: States de BLoC devem ser imutaveis (states sao snapshots — nunca mutados)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*State$"
+    predicate:
+      type: hasAllFinalFields
+
+  - id: R069
+    description: Value objects de dominio devem ser imutaveis por definicao
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/value_objects
+    predicate:
+      type: hasAllFinalFields
+
+  # ===========================================================================
+  # PREDICADO: hasNoPublicFields
+  # Verifica que a classe nao expoe campos publicos (sem underscore)
+  # ===========================================================================
+
+  - id: R070
+    description: BLoCs nao devem expor estado interno como campo publico
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+        namePattern: ".*Bloc$"
+    predicate:
+      type: hasNoPublicFields
+
+  - id: R071
+    description: Data sources nao devem expor campos publicos (encapsulamento de infra)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/datasources
+    predicate:
+      type: hasNoPublicFields
+
+  - id: R072
+    description: Repository implementations nao devem ter campos publicos
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/repositories
+    predicate:
+      type: hasNoPublicFields
+
+  # ===========================================================================
+  # PREDICADO: hasMethod
+  # Verifica se a classe possui um metodo com nome especifico
+  # ===========================================================================
+
+  - id: R073
+    description: Use cases devem implementar o operador call (padrao de use case)
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/use_cases
+        namePattern: ".*UseCase$"
+    predicate:
+      type: hasMethod
+      value: call
+
+  - id: R074
+    description: Entidades que estendem Equatable devem implementar props
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+        extends: Equatable
+    predicate:
+      type: hasMethod
+      value: props
+
+  - id: R075
+    description: Data models devem ter factory fromJson
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/models
+        namePattern: ".*Model$"
+    predicate:
+      type: hasMethod
+      value: fromJson
+
+  - id: R076
+    description: Data models devem ter metodo toJson para serializacao
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/models
+        namePattern: ".*Model$"
+    predicate:
+      type: hasMethod
+      value: toJson
+
+  # ===========================================================================
+  # PREDICADO: hasNoPublicMethods
+  # Verifica que a classe nao expoe metodos publicos
+  # ===========================================================================
+
+  - id: R077
+    description: Classes de constantes devem ser apenas containers de valores (sem logica publica)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/shared/constants
+    predicate:
+      type: hasNoPublicMethods
+
+  # ===========================================================================
+  # PREDICADO: fileContentMatches (com FileSelector)
+  # Busca padrao regex no conteudo raw do arquivo
+  # ===========================================================================
+
+  - id: R078
+    description: Proibir print() em codigo de producao (use logger)
+    severity: error
+    selector:
+      type: file
+      where:
+        folder: lib
+    predicate:
+      not:
+        type: fileContentMatches
+        value: "\\bprint\\s*\\("
+
+  - id: R079
+    description: Proibir debugPrint() em producao
+    severity: warning
+    selector:
+      type: file
+      where:
+        folder: lib
+    predicate:
+      not:
+        type: fileContentMatches
+        value: "\\bdebugPrint\\s*\\("
+
+  - id: R080
+    description: Proibir URLs hardcoded em codigo de producao (usar variaveis de ambiente)
+    severity: critical
+    selector:
+      type: file
+      where:
+        folder: lib/data
+    predicate:
+      not:
+        type: fileContentMatches
+        value: "https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+
+  - id: R081
+    description: Proibir importacao de dart:mirrors (incompativel com tree-shaking do Flutter)
+    severity: critical
+    selector:
+      type: file
+      where:
+        folder: lib
+    predicate:
+      not:
+        type: fileContentMatches
+        value: "import 'dart:mirrors'"
+
+  - id: R082
+    description: Proibir TODOs sem referencia a ticket (evitar divida tecnica sem rastreamento)
+    severity: info
+    selector:
+      type: file
+      where:
+        folder: lib
+    predicate:
+      not:
+        type: fileContentMatches
+        value: "// TODO(?!.*#[0-9]+)"
+
+  - id: R083
+    description: Proibir segredos hardcoded em arquivos de configuracao
+    severity: critical
+    selector:
+      type: file
+      where:
+        folder: lib/core
+    predicate:
+      and:
+        - not:
+            type: fileContentMatches
+            value: "api_key\\s*=\\s*['\"][A-Za-z0-9]+"
+        - not:
+            type: fileContentMatches
+            value: "secret\\s*=\\s*['\"][A-Za-z0-9]+"
+        - not:
+            type: fileContentMatches
+            value: "password\\s*=\\s*['\"][A-Za-z0-9]+"
+
+  - id: R084
+    description: Arquivos de data source devem ter bloco try-catch (tratamento de erros de rede)
+    severity: warning
+    selector:
+      type: file
+      where:
+        folder: lib/data/datasources
+    predicate:
+      type: fileContentMatches
+      value: "try\\s*\\{"
+
+  # ===========================================================================
+  # LAYER SELECTOR — verificacoes aplicadas a camadas nomeadas
+  # ===========================================================================
+
+  - id: R085
+    description: Camada Domain como todo organico nao pode depender de Data
+    severity: critical
+    selector:
+      type: layer
+      where:
+        name: Domain
+        folder: lib/domain
+    predicate:
+      not:
+        type: dependOnFolder
+        value: lib/data
+
+  - id: R086
+    description: Camada Shared nao pode depender de nenhuma camada de negocio
+    severity: error
+    selector:
+      type: layer
+      where:
+        name: Shared
+        folder: lib/shared
+    predicate:
+      and:
+        - not:
+            type: dependOnFolder
+            value: lib/domain
+        - not:
+            type: dependOnFolder
+            value: lib/data
+        - not:
+            type: dependOnFolder
+            value: lib/bloc
+
+  - id: R087
+    description: Camada Core nao pode depender de nenhuma outra camada (e base de tudo)
+    severity: critical
+    selector:
+      type: layer
+      where:
+        name: Core
+        folder: lib/core
+    predicate:
+      and:
+        - not:
+            type: dependOnFolder
+            value: lib/domain
+        - not:
+            type: dependOnFolder
+            value: lib/data
+        - not:
+            type: dependOnFolder
+            value: lib/bloc
+        - not:
+            type: dependOnFolder
+            value: lib/presentation
+
+  # ===========================================================================
+  # COMBINACOES COMPLEXAS — AND + OR + NOT aninhados
+  # ===========================================================================
+
+  - id: R088
+    description: |
+      BLoC valido: deve ter nome correto E nao depender de data E
+      nao usar pacotes de HTTP diretamente
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/bloc
+    predicate:
+      and:
+        - not:
+            type: dependOnFolder
+            value: lib/data
+        - not:
+            type: dependOnPackage
+            value: dio
+        - not:
+            type: dependOnPackage
+            value: http
+        - or:
+            - type: nameEndsWith
+              value: Bloc
+            - type: nameEndsWith
+              value: Cubit
+            - type: nameEndsWith
+              value: Event
+            - type: nameEndsWith
+              value: State
+
+  - id: R089
+    description: |
+      Entidade de dominio valida: imutavel + sem infra + sem dependencias externas de dados
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/domain/entities
+    predicate:
+      and:
+        - type: hasAllFinalFields
+        - not:
+            type: annotatedWith
+            value: JsonSerializable
+        - not:
+            type: dependOnPackage
+            value: dio
+        - not:
+            type: dependOnPackage
+            value: hive
+        - not:
+            type: dependOnPackage
+            value: isar
+        - not:
+            type: dependOnFolder
+            value: lib/data
+
+  - id: R090
+    description: |
+      Data model valido: tem serializacao JSON + esta no lugar certo +
+      nao vaza para dominio
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/models
+        namePattern: ".*Model$"
+    predicate:
+      and:
+        - type: annotatedWith
+          value: JsonSerializable
+        - type: hasMethod
+          value: fromJson
+        - type: hasMethod
+          value: toJson
+        - type: isConcrete
+
+  - id: R091
+    description: |
+      Widget de design system deve ser stateless ou ter justificativa no nome
+      (Animated, Form, Interactive indicam estado necessario)
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/shared/widgets
+    predicate:
+      or:
+        - type: extends
+          value: StatelessWidget
+        - type: extends
+          value: ConsumerWidget
+        - and:
+            - type: extends
+              value: StatefulWidget
+            - or:
+                - type: nameContains
+                  value: Animated
+                - type: nameContains
+                  value: Form
+                - type: nameContains
+                  value: Interactive
+                - type: nameContains
+                  value: Draggable
+
+  - id: R092
+    description: |
+      Repository impl valido: concreto + sem campos publicos + injetavel +
+      nao vaza segredos + implementa interface
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/data/repositories
+        namePattern: ".*RepositoryImpl$"
+    predicate:
+      and:
+        - type: isConcrete
+        - type: hasNoPublicFields
+        - type: annotatedWith
+          value: injectable
+        - not:
+            type: maxMethods
+            value: 0
+
+  - id: R093
+    description: |
+      Tela valida de apresentacao: nao acessa Data diretamente, nao executa
+      use cases diretamente, nao usa pacotes de HTTP
+    severity: error
+    selector:
+      type: class
+      where:
+        folder: lib/presentation
+        namePattern: ".*Screen$|.*Page$"
+    predicate:
+      and:
+        - not:
+            type: dependOnFolder
+            value: lib/data
+        - not:
+            type: dependOnFolder
+            value: lib/domain/use_cases
+        - not:
+            type: dependOnPackage
+            value: dio
+        - not:
+            type: dependOnPackage
+            value: http
+
+  - id: R094
+    description: |
+      Shared utils devem ser puro utilitarios: sem estado, sem BLoC,
+      sem dependencias de camadas de negocio
+    severity: warning
+    selector:
+      type: class
+      where:
+        folder: lib/shared/utils
+    predicate:
+      and:
+        - type: hasNoPublicFields
+        - not:
+            type: dependOnPackage
+            value: flutter_bloc
+        - not:
+            type: dependOnFolder
+            value: lib/bloc
+        - not:
+            type: dependOnFolder
+            value: lib/domain
+        - not:
+            type: dependOnFolder
+            value: lib/data
+
+  - id: R095
+    description: |
+      Arquivo de data source valido: tem try-catch E nao tem URL hardcoded
+      E nao depende de domain diretamente
+    severity: error
+    selector:
+      type: file
+      where:
+        folder: lib/data/datasources
+    predicate:
+      and:
+        - type: fileContentMatches
+          value: "try\\s*\\{"
+        - not:
+            type: fileContentMatches
+            value: "https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+
+# =============================================================================
+# PRESETS
+# =============================================================================
+
+presets:
+
+  # ===========================================================================
+  # layer/layered-architecture
+  # Gera automaticamente todas as restricoes entre camadas declaradas
+  # ===========================================================================
+
+  - preset: layer/layered-architecture
+    severity: error
+    exceptions: []
+    layers:
+      - name: Presentation
+        folder: lib/presentation
+        can_access:
+          - lib/bloc
+          - lib/shared
+          - lib/core
+      - name: Bloc
+        folder: lib/bloc
+        can_access:
+          - lib/domain
+          - lib/shared
+          - lib/core
+      - name: Domain
+        folder: lib/domain
+        can_access:
+          - lib/shared
+          - lib/core
+      - name: Data
+        folder: lib/data
+        can_access:
+          - lib/domain
+          - lib/shared
+          - lib/core
+      - name: Shared
+        folder: lib/shared
+        can_access:
+          - lib/core
+      - name: Core
+        folder: lib/core
+        can_access: []
+
+  # ===========================================================================
+  # layer/cannot-depend-on
+  # Restricoes pontuais de dependencia entre camadas
+  # ===========================================================================
+
+  - preset: layer/cannot-depend-on
+    severity: critical
+    from: lib/domain
+    to:
+      - lib/data
+      - lib/presentation
+      - lib/bloc
+    exceptions: []
+
+  - preset: layer/cannot-depend-on
+    severity: error
+    from: lib/presentation
+    to:
+      - lib/data
+    exceptions: []
+
+  - preset: layer/cannot-depend-on
+    severity: error
+    from: lib/shared
+    to:
+      - lib/domain
+      - lib/data
+      - lib/bloc
+      - lib/presentation
+    exceptions: []
+
+  - preset: layer/cannot-depend-on
+    severity: critical
+    from: lib/core
+    to:
+      - lib/domain
+      - lib/data
+      - lib/bloc
+      - lib/presentation
+      - lib/shared
+    exceptions: []
+
+  # ===========================================================================
+  # layer/can-only-depend-on
+  # Lista branca de dependencias permitidas por camada
+  # ===========================================================================
+
+  - preset: layer/can-only-depend-on
+    severity: error
+    layer: lib/domain
+    allowed:
+      - lib/domain
+      - lib/shared
+      - lib/core
+    exceptions: []
+
+  - preset: layer/can-only-depend-on
+    severity: error
+    layer: lib/bloc
+    allowed:
+      - lib/bloc
+      - lib/domain
+      - lib/shared
+      - lib/core
+    exceptions: []
+
+  - preset: layer/can-only-depend-on
+    severity: error
+    layer: lib/shared
+    allowed:
+      - lib/shared
+      - lib/core
+    exceptions: []
+
+  # ===========================================================================
+  # naming/folder-name-suffix
+  # Classes em pasta X devem terminar com o nome da pasta em PascalCase
+  # ===========================================================================
+
+  - preset: naming/folder-name-suffix
+    severity: error
+    folders:
+      - lib/bloc
+      - lib/data/repositories
+      - lib/data/datasources
+    exceptions: []
+
+  # ===========================================================================
+  # naming/name-pattern
+  # Classes em pasta devem casar com regex de nomenclatura
+  # ===========================================================================
+
+  - preset: naming/name-pattern
+    severity: error
+    pattern: "^[A-Z][a-zA-Z0-9]+$"
+    folders:
+      - lib/domain/entities
+      - lib/domain/value_objects
+    exceptions: []
+
+  - preset: naming/name-pattern
+    severity: warning
+    pattern: "^[A-Z][a-zA-Z0-9]+(UseCase)$"
+    folders:
+      - lib/domain/use_cases
+    exceptions: []
+
+  - preset: naming/name-pattern
+    severity: warning
+    pattern: "^[A-Z][a-zA-Z0-9]+(Model|Dto)$"
+    folders:
+      - lib/data/models
+    exceptions: []
+
+  # ===========================================================================
+  # structure/must-be-abstract
+  # Todas as classes em determinadas pastas devem ser abstratas
+  # ===========================================================================
+
+  - preset: structure/must-be-abstract
+    severity: error
+    folders:
+      - lib/domain/repositories
+    exceptions:
+      - BaseRepository
+
+  - preset: structure/must-be-abstract
+    severity: warning
+    folders:
+      - lib/core
+    exceptions:
+      - AppRouter
+      - AppConfig
+      - DependencyInjection
+
+  # ===========================================================================
+  # structure/must-be-immutable
+  # Todos os campos de instancia das classes devem ser final
+  # ===========================================================================
+
+  - preset: structure/must-be-immutable
+    severity: error
+    folders:
+      - lib/domain/entities
+      - lib/domain/value_objects
+    exceptions:
+      - BaseEntity
+
+  - preset: structure/must-be-immutable
+    severity: error
+    folders:
+      - lib/bloc
+    exceptions:
+      - BaseBloc
+      - BaseCubit
+
+  # ===========================================================================
+  # structure/no-circular-dependencies
+  # Nenhum arquivo pode participar de ciclo de dependencias
+  # ===========================================================================
+
+  - preset: structure/no-circular-dependencies
+    severity: critical
+
+  # ===========================================================================
+  # structure/no-public-fields
+  # Classes nao devem expor campos publicos (sem underscore)
+  # ===========================================================================
+
+  - preset: structure/no-public-fields
+    severity: error
+    folders:
+      - lib/bloc
+      - lib/data/repositories
+      - lib/data/datasources
+      - lib/domain/use_cases
+    exceptions: []
+
+  # ===========================================================================
+  # metrics/class-size-limit
+  # Limites de metodos e campos por classe para controle de complexidade
+  # ===========================================================================
+
+  - preset: metrics/class-size-limit
+    severity: warning
+    max_methods: 20
+    max_fields: 15
+    folders:
+      - lib
+    exceptions: []
+
+  - preset: metrics/class-size-limit
+    severity: error
+    max_methods: 3
+    folders:
+      - lib/domain/use_cases
+    exceptions: []
+
+  - preset: metrics/class-size-limit
+    severity: warning
+    max_methods: 5
+    max_fields: 8
+    folders:
+      - lib/domain/entities
+      - lib/domain/value_objects
+    exceptions:
+      - BaseEntity
+
+  - preset: metrics/class-size-limit
+    severity: warning
+    max_methods: 15
+    folders:
+      - lib/bloc
+    exceptions:
+      - BaseBloc
+      - BaseCubit
+
+  # ===========================================================================
+  # annotation/must-have
+  # Classes em determinadas pastas devem ter anotacao especifica
+  # ===========================================================================
+
+  - preset: annotation/must-have
+    severity: warning
+    annotation: injectable
+    folders:
+      - lib/data/repositories
+      - lib/domain/use_cases
+    exceptions: []
+
+  - preset: annotation/must-have
+    severity: error
+    annotation: immutable
+    folders:
+      - lib/domain/entities
+      - lib/domain/value_objects
+    exceptions:
+      - BaseEntity
+
+  - preset: annotation/must-have
+    severity: error
+    annotation: JsonSerializable
+    folders:
+      - lib/data/models
+    exceptions: []
+
+  # ===========================================================================
+  # annotation/must-not-have
+  # Classes em determinadas pastas NAO devem ter anotacao especifica
+  # ===========================================================================
+
+  - preset: annotation/must-not-have
+    severity: error
+    annotation: JsonSerializable
+    folders:
+      - lib/domain/entities
+      - lib/domain/value_objects
+    exceptions: []
+
+  - preset: annotation/must-not-have
+    severity: error
+    annotation: singleton
+    folders:
+      - lib/presentation
+      - lib/bloc
+    exceptions: []
+
+  - preset: annotation/must-not-have
+    severity: warning
+    annotation: visibleForTesting
+    folders:
+      - lib/domain
+      - lib/data
+    exceptions: []
+
+  # ===========================================================================
+  # dependency/no-external-package
+  # Proibe uso de pacotes externos em camadas especificas
+  # ===========================================================================
+
+  - preset: dependency/no-external-package
+    severity: critical
+    packages:
+      - dio
+      - http
+      - retrofit
+      - chopper
+    folders:
+      - lib/domain
+      - lib/presentation
+      - lib/bloc
+    exceptions: []
+
+  - preset: dependency/no-external-package
+    severity: error
+    packages:
+      - flutter_bloc
+      - riverpod
+      - provider
+      - get
+      - mobx
+    folders:
+      - lib/domain
+      - lib/data
+      - lib/shared
+    exceptions: []
+
+  - preset: dependency/no-external-package
+    severity: error
+    packages:
+      - hive
+      - isar
+      - sqflite
+      - drift
+      - floor
+    folders:
+      - lib/domain
+      - lib/presentation
+      - lib/bloc
+    exceptions: []
+
+  - preset: dependency/no-external-package
+    severity: warning
+    packages:
+      - firebase_analytics
+      - firebase_crashlytics
+      - amplitude_flutter
+    folders:
+      - lib/domain
+      - lib/data
+    exceptions: []
+
+  # ===========================================================================
+  # quality/no-banned-calls
+  # Proibe padroes de texto em arquivos (regex aplicado no conteudo raw)
+  # ===========================================================================
+
+  - preset: quality/no-banned-calls
+    severity: error
+    patterns:
+      - 'print\s*\('
+      - 'debugPrint\s*\('
+      - 'debugger\s*\('
+    exclude_folders:
+      - test
+
+  - preset: quality/no-banned-calls
+    severity: critical
+    patterns:
+      - "import 'dart:mirrors'"
+      - "import \"dart:mirrors\""
+    exclude_folders:
+      - test
+
+  - preset: quality/no-banned-calls
+    severity: warning
+    patterns:
+      - 'throw\s+Exception\s*\('
+      - 'throw\s+Error\s*\('
+    exclude_folders:
+      - test
+      - lib/core/errors
+
+  - preset: quality/no-banned-calls
+    severity: info
+    patterns:
+      - '\/\/\s*TODO'
+      - '\/\/\s*FIXME'
+      - '\/\/\s*HACK'
+    exclude_folders:
+      - test

@@ -73,7 +73,7 @@ folders:
           packagePath: 'pkg:app/entity.dart',
           imports: ['package:equatable/equatable.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails when domain class imports forbidden package', () {
@@ -85,7 +85,7 @@ folders:
           packagePath: 'pkg:app/entity.dart',
           imports: ['package:http/http.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message contains the forbidden package name', () {
@@ -97,7 +97,7 @@ folders:
           packagePath: 'pkg:app/entity.dart',
           imports: ['package:dio/dio.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).message,
+      expect(rules.first.predicate.analyze(s, _ctx()).message,
           contains('dio'));
     });
   });

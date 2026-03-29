@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when all instance fields are private (underscore prefix)', () {
-      final result = const HasNoPublicFieldsPredicate().evaluate(
+      final result = const HasNoPublicFieldsPredicate().analyze(
         classSubject('UserService', fields: [
           finalField('_repository'),
           finalField('_logger'),
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('passes when there are no instance fields', () {
-      final result = const HasNoPublicFieldsPredicate().evaluate(
+      final result = const HasNoPublicFieldsPredicate().analyze(
         classSubject('StatelessClass'),
         emptyCtx(),
       );
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('passes when public fields are static (ignored)', () {
-      final result = const HasNoPublicFieldsPredicate().evaluate(
+      final result = const HasNoPublicFieldsPredicate().analyze(
         classSubject('Constants', fields: [
           staticField('baseUrl'),
         ]),
@@ -38,7 +38,7 @@ void main() {
     // Fail cases
 
     test('fails when a public instance field is exposed', () {
-      final result = const HasNoPublicFieldsPredicate().evaluate(
+      final result = const HasNoPublicFieldsPredicate().analyze(
         classSubject('UserModel', fields: [finalField('name')]),
         emptyCtx(),
       );
@@ -46,7 +46,7 @@ void main() {
     });
 
     test('fail message contains the public field name', () {
-      final result = const HasNoPublicFieldsPredicate().evaluate(
+      final result = const HasNoPublicFieldsPredicate().analyze(
         classSubject('CartModel', fields: [
           finalField('id'),
           finalField('total'),
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('fails for a mutable public field', () {
-      final result = const HasNoPublicFieldsPredicate().evaluate(
+      final result = const HasNoPublicFieldsPredicate().analyze(
         classSubject('Counter', fields: [mutableField('count')]),
         emptyCtx(),
       );

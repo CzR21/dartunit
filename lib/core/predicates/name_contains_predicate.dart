@@ -7,7 +7,7 @@ class NameContainsPredicate extends Predicate {
   const NameContainsPredicate(this.substring);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     if (subject.name.contains(substring)) return const PredicateResult.pass();
     return PredicateResult.fail('${subject.name} must contain "$substring"');
   }

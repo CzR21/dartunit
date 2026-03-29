@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when field count is below the limit', () {
-      final result = MaxFieldsPredicate(5).evaluate(
+      final result = MaxFieldsPredicate(5).analyze(
         classSubject('User', fields: [finalField('id'), finalField('name')]),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes when field count equals the limit exactly', () {
-      final result = MaxFieldsPredicate(3).evaluate(
+      final result = MaxFieldsPredicate(3).analyze(
         classSubject('Coords', fields: [
           finalField('x'),
           finalField('y'),
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes for a class with no fields', () {
-      final result = MaxFieldsPredicate(10).evaluate(
+      final result = MaxFieldsPredicate(10).analyze(
         classSubject('EmptyClass'),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
     // Fail cases
 
     test('fails when field count exceeds the limit', () {
-      final result = MaxFieldsPredicate(2).evaluate(
+      final result = MaxFieldsPredicate(2).analyze(
         classSubject('BigClass', fields: [
           finalField('a'),
           finalField('b'),
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message includes actual count and limit', () {
-      final result = MaxFieldsPredicate(1).evaluate(
+      final result = MaxFieldsPredicate(1).analyze(
         classSubject('Cls', fields: [finalField('x'), finalField('y')]),
         emptyCtx(),
       );
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('fails with limit of 0 when any field exists', () {
-      final result = MaxFieldsPredicate(0).evaluate(
+      final result = MaxFieldsPredicate(0).analyze(
         classSubject('Cls', fields: [finalField('id')]),
         emptyCtx(),
       );

@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when import count is below the limit', () {
-      final result = MaxImportsPredicate(5).evaluate(
+      final result = MaxImportsPredicate(5).analyze(
         classSubject('Service', imports: ['lib/a.dart', 'lib/b.dart']),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes when import count equals the limit exactly', () {
-      final result = MaxImportsPredicate(2).evaluate(
+      final result = MaxImportsPredicate(2).analyze(
         classSubject('TwoImports', imports: ['lib/a.dart', 'lib/b.dart']),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes when there are no imports', () {
-      final result = MaxImportsPredicate(10).evaluate(
+      final result = MaxImportsPredicate(10).analyze(
         classSubject('StandaloneClass'),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails when import count exceeds the limit', () {
-      final result = MaxImportsPredicate(2).evaluate(
+      final result = MaxImportsPredicate(2).analyze(
         classSubject('HighlyCoupled', imports: [
           'lib/a.dart',
           'lib/b.dart',
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('fail message includes actual count and limit', () {
-      final result = MaxImportsPredicate(1).evaluate(
+      final result = MaxImportsPredicate(1).analyze(
         classSubject('Cls', imports: ['lib/a.dart', 'lib/b.dart']),
         emptyCtx(),
       );
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('fails with limit 0 when any import exists', () {
-      final result = MaxImportsPredicate(0).evaluate(
+      final result = MaxImportsPredicate(0).analyze(
         classSubject('Cls', imports: ['lib/a.dart']),
         emptyCtx(),
       );

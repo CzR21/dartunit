@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when class implements the required interface', () {
-      final result = ImplementsPredicate('UserRepository').evaluate(
+      final result = ImplementsPredicate('UserRepository').analyze(
         classSubject('UserRepositoryImpl',
             implementedTypes: ['UserRepository']),
         emptyCtx(),
@@ -18,7 +18,7 @@ void main() {
     test(
         'passes when class implements multiple interfaces including the required',
         () {
-      final result = ImplementsPredicate('Serializable').evaluate(
+      final result = ImplementsPredicate('Serializable').analyze(
         classSubject('UserDto',
             implementedTypes: ['Comparable', 'Serializable']),
         emptyCtx(),
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes with a single-word interface', () {
-      final result = ImplementsPredicate('Comparable').evaluate(
+      final result = ImplementsPredicate('Comparable').analyze(
         classSubject('Money', implementedTypes: ['Comparable']),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
     // Fail cases
 
     test('fails when class does not implement any interface', () {
-      final result = ImplementsPredicate('UserRepository').evaluate(
+      final result = ImplementsPredicate('UserRepository').analyze(
         classSubject('UserRepositoryImpl', implementedTypes: []),
         emptyCtx(),
       );
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('fails when class implements different interfaces', () {
-      final result = ImplementsPredicate('UserRepository').evaluate(
+      final result = ImplementsPredicate('UserRepository').analyze(
         classSubject('UserRepositoryImpl',
             implementedTypes: ['CartRepository', 'OrderRepository']),
         emptyCtx(),
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('fail message contains the interface name', () {
-      final result = ImplementsPredicate('PaymentGateway').evaluate(
+      final result = ImplementsPredicate('PaymentGateway').analyze(
         classSubject('StripeService', implementedTypes: []),
         emptyCtx(),
       );

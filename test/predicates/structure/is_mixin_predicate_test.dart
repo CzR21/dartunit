@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when declaration is a mixin', () {
-      final result = const IsMixinPredicate().evaluate(
+      final result = const IsMixinPredicate().analyze(
         classSubject('LoggingMixin', isMixin: true),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes for EquatableMixin', () {
-      final result = const IsMixinPredicate().evaluate(
+      final result = const IsMixinPredicate().analyze(
         classSubject('EquatableMixin', isMixin: true),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes for CachingMixin', () {
-      final result = const IsMixinPredicate().evaluate(
+      final result = const IsMixinPredicate().analyze(
         classSubject('CachingMixin', isMixin: true),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails for a regular class', () {
-      final result = const IsMixinPredicate().evaluate(
+      final result = const IsMixinPredicate().analyze(
         classSubject('Logger'),
         emptyCtx(),
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('fails for an abstract class', () {
-      final result = const IsMixinPredicate().evaluate(
+      final result = const IsMixinPredicate().analyze(
         classSubject('AbstractLogger', isAbstract: true),
         emptyCtx(),
       );
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message contains class name', () {
-      final result = const IsMixinPredicate().evaluate(
+      final result = const IsMixinPredicate().analyze(
         classSubject('NotAMixin'),
         emptyCtx(),
       );

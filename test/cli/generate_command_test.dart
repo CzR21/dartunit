@@ -5,10 +5,7 @@ import 'package:test/test.dart';
 import 'package:dartunit/cli/dartunit_cli.dart';
 
 void _initProject(Directory dir) {
-  Directory(p.join(dir.path, '.dartunit', 'custom_rules'))
-      .createSync(recursive: true);
-  File(p.join(dir.path, '.dartunit', 'dartunit.yaml'))
-      .writeAsStringSync('rules:\n');
+  Directory(p.join(dir.path, 'arch_test')).createSync(recursive: true);
 }
 
 void main() {
@@ -27,44 +24,25 @@ void main() {
       expect(code, equals(0));
     });
 
-    test('creates the rule dart file in custom_rules/', () async {
+    test('creates the rule dart file in arch_test/', () async {
       await DartunitCli()
           .run(['generate', 'no_ui_in_domain', '--path', tempDir.path]);
       expect(
-        File(p.join(tempDir.path, '.dartunit', 'custom_rules',
-                'no_ui_in_domain_rule.dart'))
+        File(p.join(tempDir.path, 'arch_test', 'no_ui_in_domain_arch_test.dart'))
             .existsSync(),
         isTrue,
       );
     });
 
-    test('appends an entry to dartunit.yaml', () async {
+    test('generated file contains archTest and ArchitectureRule', () async {
       await DartunitCli()
           .run(['generate', 'my_rule', '--path', tempDir.path]);
-      final yaml =
-          File(p.join(tempDir.path, '.dartunit', 'dartunit.yaml'))
+      final content =
+          File(p.join(tempDir.path, 'arch_test', 'my_rule_arch_test.dart'))
               .readAsStringSync();
-      expect(yaml, contains('MY_RULE'));
-    });
-  });
-
-  group('generate — PascalCase conversion', () {
-    test('converts snake_case to PascalCase class name', () async {
-      await DartunitCli()
-          .run(['generate', 'no_repo_in_ui', '--path', tempDir.path]);
-      final content = File(p.join(tempDir.path, '.dartunit', 'custom_rules',
-              'no_repo_in_ui_rule.dart'))
-          .readAsStringSync();
-      expect(content, contains('NoRepoInUiRule'));
-    });
-
-    test('single word is properly capitalised', () async {
-      await DartunitCli()
-          .run(['generate', 'myrule', '--path', tempDir.path]);
-      final content = File(p.join(tempDir.path, '.dartunit', 'custom_rules',
-              'myrule_rule.dart'))
-          .readAsStringSync();
-      expect(content, contains('MyruleRule'));
+      expect(content, contains('testArch'));
+      expect(content, contains('ArchitectureRule'));
+      expect(content, contains('My Rule'));
     });
   });
 
@@ -75,9 +53,9 @@ void main() {
       expect(code, equals(2));
     });
 
-    test('returns 2 when .dartunit directory does not exist', () async {
-      final emptyDir = Directory.systemTemp
-          .createTempSync('dartunit_generate_nodir_');
+    test('returns 2 when arch_test/ directory does not exist', () async {
+      final emptyDir =
+          Directory.systemTemp.createTempSync('dartunit_generate_nodir_');
       addTearDown(() => emptyDir.deleteSync(recursive: true));
       final code = await DartunitCli()
           .run(['generate', 'some_rule', '--path', emptyDir.path]);

@@ -7,7 +7,7 @@ class MinMethodsPredicate extends Predicate {
   const MinMethodsPredicate(this.minMethods);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final count = cls.methods.length;
     if (count >= minMethods) return const PredicateResult.pass();

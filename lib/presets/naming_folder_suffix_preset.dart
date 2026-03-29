@@ -28,7 +28,6 @@ class NamingFolderSuffixPreset extends Preset {
     return folders(config).map((folder) {
       final suffix = capitalize(folderBasename(folder));
       return Rule(
-        id: 'PRESET_naming_suffix_${safeId(folder)}',
         description: 'Classes in "$folder" must end with "$suffix"',
         severity: sev,
         selector: classSelector(config, folder),

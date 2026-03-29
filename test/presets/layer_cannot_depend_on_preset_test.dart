@@ -35,10 +35,10 @@ void main() {
       expect(sel.folder, equals('lib/domain'));
     });
 
-    test('rule id encodes from and to', () {
+    test('rule description encodes from and to', () {
       final rules = preset.expand(_cfg('from: lib/domain\nto: lib/data'));
-      expect(rules.first.id, contains('domain'));
-      expect(rules.first.id, contains('data'));
+      expect(rules.first.description, contains('domain'));
+      expect(rules.first.description, contains('data'));
     });
 
     test('severity defaults to error', () {
@@ -69,7 +69,7 @@ void main() {
           packagePath: 'pkg:app/entity.dart',
           imports: ['/p/lib/domain/value_object.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails when domain class imports from data layer', () {
@@ -80,7 +80,7 @@ void main() {
           packagePath: 'pkg:app/entity.dart',
           imports: ['/p/lib/data/repo.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message contains the forbidden folder', () {
@@ -91,7 +91,7 @@ void main() {
           packagePath: 'pkg:app/entity.dart',
           imports: ['/p/lib/data/source.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).message,
+      expect(rules.first.predicate.analyze(s, _ctx()).message,
           contains('lib/data'));
     });
   });

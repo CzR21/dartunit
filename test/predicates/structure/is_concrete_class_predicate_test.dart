@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes for a regular concrete class', () {
-      final result = const IsConcreteClassPredicate().evaluate(
+      final result = const IsConcreteClassPredicate().analyze(
         classSubject('UserRepositoryImpl'),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes for a concrete class with fields', () {
-      final result = const IsConcreteClassPredicate().evaluate(
+      final result = const IsConcreteClassPredicate().analyze(
         classSubject('CartBloc', fields: [finalField('_repository')]),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes for a plain data class', () {
-      final result = const IsConcreteClassPredicate().evaluate(
+      final result = const IsConcreteClassPredicate().analyze(
         classSubject('User', fields: [finalField('id'), finalField('name')]),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails for an abstract class', () {
-      final result = const IsConcreteClassPredicate().evaluate(
+      final result = const IsConcreteClassPredicate().analyze(
         classSubject('AbstractRepository', isAbstract: true),
         emptyCtx(),
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('fails for a mixin', () {
-      final result = const IsConcreteClassPredicate().evaluate(
+      final result = const IsConcreteClassPredicate().analyze(
         classSubject('LoggingMixin', isMixin: true),
         emptyCtx(),
       );
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fails for an enum', () {
-      final result = const IsConcreteClassPredicate().evaluate(
+      final result = const IsConcreteClassPredicate().analyze(
         classSubject('Status', isEnum: true),
         emptyCtx(),
       );

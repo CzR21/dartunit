@@ -38,7 +38,7 @@ void main() {
       final file = File(p.join(tempDir.path, 'a.dart'))
         ..writeAsStringSync('void main() { print("hello"); }');
       final result = FileContentMatchesPredicate(r'print\s*\(')
-          .evaluate(_fileSubject(file.path), _ctx());
+          .analyze(_fileSubject(file.path), _ctx());
       expect(result.passed, isTrue);
     });
 
@@ -46,7 +46,7 @@ void main() {
       final file = File(p.join(tempDir.path, 'b.dart'))
         ..writeAsStringSync('class Foo {\n  void bar() {}\n}');
       final result = FileContentMatchesPredicate(r'class Foo')
-          .evaluate(_fileSubject(file.path), _ctx());
+          .analyze(_fileSubject(file.path), _ctx());
       expect(result.passed, isTrue);
     });
 
@@ -56,7 +56,7 @@ void main() {
       final result = FileContentMatchesPredicate(
         r'debugPrint\s*\(',
         description: 'uses debugPrint()',
-      ).evaluate(_fileSubject(file.path), _ctx());
+      ).analyze(_fileSubject(file.path), _ctx());
       expect(result.passed, isTrue);
       expect(result.message, contains('uses debugPrint()'));
     });
@@ -67,13 +67,13 @@ void main() {
       final file = File(p.join(tempDir.path, 'd.dart'))
         ..writeAsStringSync('class Clean {}');
       final result = FileContentMatchesPredicate(r'print\s*\(')
-          .evaluate(_fileSubject(file.path), _ctx());
+          .analyze(_fileSubject(file.path), _ctx());
       expect(result.passed, isFalse);
     });
 
     test('fails when the file cannot be read', () {
       final result = FileContentMatchesPredicate(r'anything')
-          .evaluate(_fileSubject('/nonexistent/path/file.dart'), _ctx());
+          .analyze(_fileSubject('/nonexistent/path/file.dart'), _ctx());
       expect(result.passed, isFalse);
       expect(result.message, contains('Could not read file'));
     });
@@ -82,7 +82,7 @@ void main() {
       final file = File(p.join(tempDir.path, 'e.dart'))
         ..writeAsStringSync('class Good {}');
       final result = FileContentMatchesPredicate(r'TODO:')
-          .evaluate(_fileSubject(file.path), _ctx());
+          .analyze(_fileSubject(file.path), _ctx());
       expect(result.message, contains('TODO:'));
     });
   });

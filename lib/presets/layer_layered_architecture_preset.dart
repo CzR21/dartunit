@@ -53,7 +53,6 @@ class LayerLayeredPreset extends Preset {
         if (from.folder == to.folder) continue;
         if (from.canAccess.contains(to.folder)) continue;
         rules.add(Rule(
-          id: 'PRESET_layered_${safeId(from.folder)}_no_${safeId(to.folder)}',
           description:
               'Layer "${from.name}" must not depend on layer "${to.name}"',
           severity: sev,

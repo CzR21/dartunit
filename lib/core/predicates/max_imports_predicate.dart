@@ -7,7 +7,7 @@ class MaxImportsPredicate extends Predicate {
   const MaxImportsPredicate(this.maxImports);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final count = cls.imports.length;
     if (count <= maxImports) return const PredicateResult.pass();

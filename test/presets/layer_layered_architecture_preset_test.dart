@@ -41,10 +41,13 @@ void main() {
     test('does not generate a rule forbidding ui accessing bloc (allowed pair)',
         () {
       final rules = preset.expand(_cfg(_threeLayerYaml));
-      // ui can_access bloc → no rule with id pattern "lib_ui_no_lib_bloc"
-      // Rule ID format: PRESET_layered_{from}_no_{to}
-      final ids = rules.map((r) => r.id).toList();
-      expect(ids.where((id) => id.contains('lib_ui_no_lib_bloc')), isEmpty);
+      // ui can_access bloc → no rule saying 'Layer "ui" must not depend on layer "bloc"'
+      final descriptions = rules.map((r) => r.description).toList();
+      expect(
+        descriptions.where((d) =>
+            d.contains('"ui"') && d.contains('must not depend on layer "bloc"')),
+        isEmpty,
+      );
     });
 
     test('generates zero rules when all pairs are allowed', () {
@@ -97,27 +100,27 @@ layers:
     test('domain class passes when it imports nothing from ui', () {
       final rules = preset.expand(_cfg(_threeLayerYaml));
       final domainRule = rules
-          .firstWhere((r) => r.id.contains('domain') && r.id.contains('ui'));
+          .firstWhere((r) => r.description.contains('"domain"') && r.description.contains('"ui"'));
       final cls = AnalyzedClass(
           name: 'PureEntity',
           filePath: '/p/lib/domain/entity.dart',
           packagePath: 'pkg:app/entity.dart',
           imports: []);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(domainRule.predicate.evaluate(s, ctx).passed, isTrue);
+      expect(domainRule.predicate.analyze(s, ctx).passed, isTrue);
     });
 
     test('domain class fails when it imports from ui layer', () {
       final rules = preset.expand(_cfg(_threeLayerYaml));
       final domainRule = rules
-          .firstWhere((r) => r.id.contains('domain') && r.id.contains('ui'));
+          .firstWhere((r) => r.description.contains('"domain"') && r.description.contains('"ui"'));
       final cls = AnalyzedClass(
           name: 'BadEntity',
           filePath: '/p/lib/domain/entity.dart',
           packagePath: 'pkg:app/entity.dart',
           imports: ['/p/lib/ui/page.dart']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(domainRule.predicate.evaluate(s, ctx).passed, isFalse);
+      expect(domainRule.predicate.analyze(s, ctx).passed, isFalse);
     });
 
     test('exceptions are excluded via selector excludeNames', () {

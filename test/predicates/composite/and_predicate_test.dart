@@ -10,7 +10,7 @@ void main() {
       final result = AndPredicate([
         NameEndsWithPredicate('Bloc'),
         ExtendsPredicate('Bloc'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('CartBloc', extendedType: 'Bloc'),
         emptyCtx(),
       );
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('passes for a single-predicate AND', () {
-      final result = AndPredicate([NameEndsWithPredicate('Service')]).evaluate(
+      final result = AndPredicate([NameEndsWithPredicate('Service')]).analyze(
         classSubject('UserService'),
         emptyCtx(),
       );
@@ -30,7 +30,7 @@ void main() {
         NameEndsWithPredicate('Impl'),
         ImplementsPredicate('Repository'),
         NotPredicate(IsAbstractPredicate()),
-      ]).evaluate(
+      ]).analyze(
         classSubject('UserRepositoryImpl',
             implementedTypes: ['Repository'], isAbstract: false),
         emptyCtx(),
@@ -44,7 +44,7 @@ void main() {
       final result = AndPredicate([
         NameEndsWithPredicate('Bloc'),
         ExtendsPredicate('Bloc'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('CartService',
             extendedType: 'Bloc'), // name doesn't end with Bloc
         emptyCtx(),
@@ -56,7 +56,7 @@ void main() {
       final result = AndPredicate([
         NameEndsWithPredicate('Bloc'),
         ExtendsPredicate('Bloc'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('CartBloc',
             extendedType: 'StatefulWidget'), // wrong extends
         emptyCtx(),
@@ -68,7 +68,7 @@ void main() {
       final result = AndPredicate([
         NameEndsWithPredicate('Repository'),
         ExtendsPredicate('Equatable'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('UserRepository'), // doesn't extend Equatable
         emptyCtx(),
       );

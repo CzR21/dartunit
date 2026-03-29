@@ -9,7 +9,7 @@ import 'rule_executor.dart';
 /// concerns (e.g. timing, logging) around individual rule evaluations.
 class RuleEngine {
 
-  /// The ordered list of rules to evaluate.
+  /// The ordered list of rules to analyze.
   final List<Rule> rules;
 
   // Delegates single-rule evaluation; injectable for testability.
@@ -20,9 +20,9 @@ class RuleEngine {
 
   /// Runs all [rules] against [context] and returns every violation found.
   ///
-  /// Rules are evaluated in the order they appear in [rules]. Each rule
+  /// Rules are analyzed in the order they appear in [rules]. Each rule
   /// is isolated: a failure in one rule does not abort the others.
-  List<Violation> evaluate(AnalysisContext context) {
+  List<Violation> analyze(AnalysisContext context) {
     final violations = <Violation>[];
 
     for (final rule in rules) {
@@ -40,11 +40,11 @@ class RuleEngine {
     return violations.any((v) => v.severity.isFailure);
   }
 
-  /// Returns violations grouped by rule ID for structured reporting.
+  /// Returns violations grouped by rule description for structured reporting.
   Map<String, List<Violation>> groupByRule(List<Violation> violations) {
     final grouped = <String, List<Violation>>{};
     for (final v in violations) {
-      grouped.putIfAbsent(v.ruleId, () => []).add(v);
+      grouped.putIfAbsent(v.ruleDescription, () => []).add(v);
     }
     return grouped;
   }

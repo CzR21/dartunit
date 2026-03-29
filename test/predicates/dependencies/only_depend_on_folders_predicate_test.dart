@@ -8,7 +8,7 @@ void main() {
 
     test('passes when all imports are from allowed folders', () {
       final result =
-          OnlyDependOnFoldersPredicate(['lib/domain', 'lib/shared']).evaluate(
+          OnlyDependOnFoldersPredicate(['lib/domain', 'lib/shared']).analyze(
         classSubject('PresentationClass', imports: [
           '/project/lib/domain/user.dart',
           '/project/lib/shared/utils.dart',
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('passes when there are no imports', () {
-      final result = OnlyDependOnFoldersPredicate(['lib/domain']).evaluate(
+      final result = OnlyDependOnFoldersPredicate(['lib/domain']).analyze(
         classSubject('PureEntity'),
         emptyCtx(),
       );
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes when all imports are from a single allowed folder', () {
-      final result = OnlyDependOnFoldersPredicate(['lib/domain']).evaluate(
+      final result = OnlyDependOnFoldersPredicate(['lib/domain']).analyze(
         classSubject('UseCase', imports: [
           '/project/lib/domain/user.dart',
           '/project/lib/domain/order.dart',
@@ -40,7 +40,7 @@ void main() {
     // Fail cases
 
     test('fails when an import comes from a forbidden folder', () {
-      final result = OnlyDependOnFoldersPredicate(['lib/domain']).evaluate(
+      final result = OnlyDependOnFoldersPredicate(['lib/domain']).analyze(
         classSubject('DirtyDomain', imports: [
           '/project/lib/domain/user.dart',
           '/project/lib/data/repo.dart',
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('fail message lists the forbidden import', () {
-      final result = OnlyDependOnFoldersPredicate(['lib/domain']).evaluate(
+      final result = OnlyDependOnFoldersPredicate(['lib/domain']).analyze(
         classSubject('Cls', imports: ['/project/lib/ui/page.dart']),
         emptyCtx(),
       );
@@ -59,7 +59,7 @@ void main() {
     });
 
     test('fails when none of the imports are from allowed folders', () {
-      final result = OnlyDependOnFoldersPredicate(['lib/domain']).evaluate(
+      final result = OnlyDependOnFoldersPredicate(['lib/domain']).analyze(
         classSubject('MixedDeps', imports: [
           '/project/lib/data/a.dart',
           '/project/lib/ui/b.dart',

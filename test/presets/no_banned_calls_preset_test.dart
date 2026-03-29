@@ -69,7 +69,7 @@ patterns:
       final ctx = AnalysisContext(
           classes: [], files: [], dependencyGraph: DependencyGraph(), projectRoot: '/p');
       final s = Subject(name: 'clean.dart', filePath: file.path, element: af);
-      expect(rules.first.predicate.evaluate(s, ctx).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, ctx).passed, isTrue);
     });
 
     test('rule fails when file contains banned pattern', () {
@@ -81,7 +81,7 @@ patterns:
       final ctx = AnalysisContext(
           classes: [], files: [], dependencyGraph: DependencyGraph(), projectRoot: '/p');
       final s = Subject(name: 'dirty.dart', filePath: file.path, element: af);
-      expect(rules.first.predicate.evaluate(s, ctx).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, ctx).passed, isFalse);
     });
 
     test('each pattern gets its own rule with a unique id', () {
@@ -90,7 +90,7 @@ patterns:
   - TODO
   - FIXME
 '''));
-      expect(rules[0].id, isNot(equals(rules[1].id)));
+      expect(rules[0].description, isNot(equals(rules[1].description)));
     });
   });
 }

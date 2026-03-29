@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when declaration is an extension', () {
-      final result = const IsExtensionPredicate().evaluate(
+      final result = const IsExtensionPredicate().analyze(
         classSubject('StringExtension', isExtension: true),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes for DateTimeExtension', () {
-      final result = const IsExtensionPredicate().evaluate(
+      final result = const IsExtensionPredicate().analyze(
         classSubject('DateTimeExtension', isExtension: true),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes for ListExtension', () {
-      final result = const IsExtensionPredicate().evaluate(
+      final result = const IsExtensionPredicate().analyze(
         classSubject('ListExtension', isExtension: true),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails for a regular class', () {
-      final result = const IsExtensionPredicate().evaluate(
+      final result = const IsExtensionPredicate().analyze(
         classSubject('StringHelper'),
         emptyCtx(),
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('fails for a mixin', () {
-      final result = const IsExtensionPredicate().evaluate(
+      final result = const IsExtensionPredicate().analyze(
         classSubject('StringMixin', isMixin: true),
         emptyCtx(),
       );
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message contains class name', () {
-      final result = const IsExtensionPredicate().evaluate(
+      final result = const IsExtensionPredicate().analyze(
         classSubject('NotAnExtension'),
         emptyCtx(),
       );

@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when class uses the required mixin', () {
-      final result = UsesMixinPredicate('EquatableMixin').evaluate(
+      final result = UsesMixinPredicate('EquatableMixin').analyze(
         classSubject('UserState', mixinTypes: ['EquatableMixin']),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes when class uses multiple mixins including the required', () {
-      final result = UsesMixinPredicate('Serializable').evaluate(
+      final result = UsesMixinPredicate('Serializable').analyze(
         classSubject('UserDto', mixinTypes: ['Comparable', 'Serializable']),
         emptyCtx(),
       );
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('passes with a single mixin', () {
-      final result = UsesMixinPredicate('Logging').evaluate(
+      final result = UsesMixinPredicate('Logging').analyze(
         classSubject('CartService', mixinTypes: ['Logging']),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
     // Fail cases
 
     test('fails when class uses no mixins', () {
-      final result = UsesMixinPredicate('EquatableMixin').evaluate(
+      final result = UsesMixinPredicate('EquatableMixin').analyze(
         classSubject('UserState', mixinTypes: []),
         emptyCtx(),
       );
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('fails when class uses different mixins', () {
-      final result = UsesMixinPredicate('Logging').evaluate(
+      final result = UsesMixinPredicate('Logging').analyze(
         classSubject('Service', mixinTypes: ['Caching', 'Retry']),
         emptyCtx(),
       );
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message contains mixin name and class name', () {
-      final result = UsesMixinPredicate('ChangeNotifier').evaluate(
+      final result = UsesMixinPredicate('ChangeNotifier').analyze(
         classSubject('CounterViewModel', mixinTypes: []),
         emptyCtx(),
       );

@@ -59,7 +59,7 @@ void main() {
           packagePath: 'pkg:app/user_repo.dart',
           annotations: ['injectable']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails when class lacks required annotation', () {
@@ -71,7 +71,7 @@ void main() {
           packagePath: 'pkg:app/user_repo.dart',
           annotations: []);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message contains annotation name', () {
@@ -82,7 +82,7 @@ void main() {
           filePath: '/p/lib/service/cls.dart',
           packagePath: 'pkg:app/cls.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).message,
+      expect(rules.first.predicate.analyze(s, _ctx()).message,
           contains('@singleton'));
     });
   });

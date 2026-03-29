@@ -3,7 +3,7 @@ import './subject.dart';
 
 /// Base interface for all selectors.
 ///
-/// A selector determines which elements of the codebase are evaluated
+/// A selector determines which elements of the codebase are analyzed
 /// by a given rule.
 abstract class Selector {
   const Selector();

@@ -10,7 +10,7 @@ void main() {
       final result = OrPredicate([
         NameEndsWithPredicate('Bloc'),
         NameEndsWithPredicate('Event'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('CartBloc'),
         emptyCtx(),
       );
@@ -22,7 +22,7 @@ void main() {
         NameEndsWithPredicate('Bloc'),
         NameEndsWithPredicate('Event'),
         NameEndsWithPredicate('State'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('CartState'),
         emptyCtx(),
       );
@@ -33,7 +33,7 @@ void main() {
       final result = OrPredicate([
         IsAbstractPredicate(),
         NameEndsWithPredicate('Impl'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('UserRepositoryImpl'),
         emptyCtx(),
       );
@@ -46,7 +46,7 @@ void main() {
       final result = OrPredicate([
         NameEndsWithPredicate('Bloc'),
         NameEndsWithPredicate('Event'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('UserRepository'), // ends with neither
         emptyCtx(),
       );
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('fails for single-predicate OR that does not pass', () {
-      final result = OrPredicate([NameEndsWithPredicate('Service')]).evaluate(
+      final result = OrPredicate([NameEndsWithPredicate('Service')]).analyze(
         classSubject('UserRepository'),
         emptyCtx(),
       );
@@ -65,7 +65,7 @@ void main() {
       final result = OrPredicate([
         NameEndsWithPredicate('Bloc'),
         NameEndsWithPredicate('State'),
-      ]).evaluate(
+      ]).analyze(
         classSubject('CartPage'),
         emptyCtx(),
       );

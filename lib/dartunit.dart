@@ -13,6 +13,11 @@ export 'cli/dartunit_cli.dart';
 export 'cli/commands/init_command.dart';
 export 'cli/commands/analyze_command.dart';
 export 'cli/commands/generate_command.dart';
+export 'cli/commands/log_command.dart';
+
+// Templates
+export 'core/enums/arch_template.dart';
+export 'core/enums/arch_template_extension.dart';
 
 // Core — Rule
 export 'core/entities/rule.dart';
@@ -20,7 +25,8 @@ export 'core/entities/violation.dart';
 export 'core/enums/rule_severity.dart';
 
 // Core — Selectors
-export 'core/selector/selector.dart' show Selector, Subject;
+export 'core/entities/selector.dart' show Selector;
+export 'core/entities/subject.dart' show Subject;
 export 'core/selector/class_selector.dart';
 export 'core/selector/file_selector.dart';
 export 'core/selector/layer_selector.dart';
@@ -72,6 +78,9 @@ export 'analyzer/graph/dependency_graph.dart';
 export 'engine/rule_engine.dart';
 export 'engine/rule_executor.dart';
 export 'engine/custom_rule_loader.dart';
+
+// Runner
+export 'runner/arch_flutter_runner.dart' show testArch, testArchGroup;
 
 // YAML
 export 'yaml/yaml_rule_parser.dart';

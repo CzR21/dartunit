@@ -11,7 +11,7 @@ class NameMatchesPatternPredicate extends Predicate {
   }
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     if (_regex.hasMatch(subject.name)) return const PredicateResult.pass();
     return PredicateResult.fail(
         '${subject.name} must match pattern "$pattern"');

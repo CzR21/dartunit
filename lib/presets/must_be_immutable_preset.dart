@@ -26,7 +26,6 @@ class MustBeImmutablePreset extends Preset {
     final sev = severity(config);
     return folders(config).map((folder) {
       return Rule(
-        id: 'PRESET_must_be_immutable_${safeId(folder)}',
         description: 'Classes in "$folder" must have all final fields',
         severity: sev,
         selector: classSelector(config, folder),

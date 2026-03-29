@@ -43,39 +43,45 @@ class YamlRuleParser {
   }
 
   Rule? _parseRule(YamlMap raw) {
-    final id = raw['id'] as String? ?? 'UNKNOWN';
     final description = raw['description'] as String? ?? '';
     final severity =
         RuleSeverity.fromString(raw['severity'] as String? ?? 'error');
+    final exceptions = _parseStringList(raw['exceptions']);
 
     final selectorRaw = raw['selector'] as YamlMap?;
     final predicateRaw = raw['predicate'] as YamlMap?;
 
     if (selectorRaw == null || predicateRaw == null) {
       stderr.writeln(
-          'Warning: Rule $id is missing selector or predicate — skipped.');
+          'Warning: Rule "$description" is missing selector or predicate — skipped.');
       return null;
     }
 
-    final selector = _parseSelector(id, selectorRaw);
+    final selector = _parseSelector(selectorRaw);
     final predicate = _parsePredicate(predicateRaw);
 
     if (selector == null || predicate == null) {
       stderr.writeln(
-          'Warning: Rule $id has an invalid selector or predicate — skipped.');
+          'Warning: Rule "$description" has an invalid selector or predicate — skipped.');
       return null;
     }
 
     return Rule(
-      id: id,
       description: description,
       severity: severity,
       selector: selector,
       predicate: predicate,
+      exceptions: exceptions,
     );
   }
 
-  Selector? _parseSelector(String ruleId, YamlMap raw) {
+  List<String> _parseStringList(dynamic value) {
+    if (value == null) return const [];
+    if (value is String) return [value];
+    return (value as YamlList).map((e) => e as String).toList();
+  }
+
+  Selector? _parseSelector(YamlMap raw) {
     final typeStr = raw['type'] as String? ?? 'class';
     final selectorType = SelectorType.fromString(typeStr);
 

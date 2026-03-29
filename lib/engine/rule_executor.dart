@@ -12,20 +12,19 @@ class RuleExecutor {
 
   /// Evaluates [rule] against [context] and returns all detected violations.
   ///
-  /// If [rule.evaluate] throws, a synthetic [Violation] describing the
+  /// If [rule.analyze] throws, a synthetic [Violation] describing the
   /// error is returned instead, preserving the rule's ID and severity.
   List<Violation> execute(
     Rule rule,
     AnalysisContext context,
   ) {
     try {
-      return rule.evaluate(context);
+      return rule.analyze(context);
     } catch (e) {
       // Prevent a single broken rule from crashing the entire analysis.
       // Return a synthetic violation so the reporter surfaces the problem.
       return [
         Violation(
-          ruleId: rule.id,
           ruleDescription: rule.description,
           message: 'Rule evaluation error: $e',
           filePath: '',

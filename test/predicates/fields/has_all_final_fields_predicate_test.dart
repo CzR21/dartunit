@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when all instance fields are final', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('User', fields: [
           finalField('id'),
           finalField('name'),
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('passes when all fields are const', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('Config', fields: [
           const AnalyzedField(name: 'maxRetries', type: 'int', isConst: true),
           const AnalyzedField(name: 'timeout', type: 'int', isConst: true),
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('passes when mutable fields are static (ignored)', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('Singleton', fields: [
           staticField('_instance'),
           finalField('id'),
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('passes for a class with no fields', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('EmptyClass'),
         emptyCtx(),
       );
@@ -51,7 +51,7 @@ void main() {
     // Fail cases
 
     test('fails when there is a mutable instance field', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('Counter', fields: [mutableField('count', type: 'int')]),
         emptyCtx(),
       );
@@ -59,7 +59,7 @@ void main() {
     });
 
     test('fail message lists the mutable field name', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('Cart', fields: [
           finalField('id'),
           mutableField('total'),
@@ -70,7 +70,7 @@ void main() {
     });
 
     test('fails when multiple mutable fields exist', () {
-      final result = const HasAllFinalFieldsPredicate().evaluate(
+      final result = const HasAllFinalFieldsPredicate().analyze(
         classSubject('State', fields: [
           mutableField('loading'),
           mutableField('error'),

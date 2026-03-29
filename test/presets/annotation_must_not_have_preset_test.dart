@@ -60,7 +60,7 @@ void main() {
           packagePath: 'pkg:app/active.dart',
           annotations: ['injectable']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isTrue);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isTrue);
     });
 
     test('rule fails when class carries the forbidden annotation', () {
@@ -72,7 +72,7 @@ void main() {
           packagePath: 'pkg:app/old.dart',
           annotations: ['deprecated']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rules.first.predicate.evaluate(s, _ctx()).passed, isFalse);
+      expect(rules.first.predicate.analyze(s, _ctx()).passed, isFalse);
     });
 
     test('fail message contains class name and annotation', () {
@@ -84,7 +84,7 @@ void main() {
           packagePath: 'pkg:app/internal.dart',
           annotations: ['internal']);
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      final message = rules.first.predicate.evaluate(s, _ctx()).message;
+      final message = rules.first.predicate.analyze(s, _ctx()).message;
       expect(message, contains('InternalService'));
       expect(message, contains('internal'));
     });

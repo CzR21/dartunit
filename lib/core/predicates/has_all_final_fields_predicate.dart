@@ -6,7 +6,7 @@ class HasAllFinalFieldsPredicate extends Predicate {
   const HasAllFinalFieldsPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final mutableFields = cls.fields
         .where((f) => !f.isStatic && !f.isFinal && !f.isConst)

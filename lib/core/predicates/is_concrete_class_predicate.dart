@@ -6,7 +6,7 @@ class IsConcreteClassPredicate extends Predicate {
   const IsConcreteClassPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final isConcrete =
         !cls.isAbstract && !cls.isMixin && !cls.isEnum && !cls.isExtension;

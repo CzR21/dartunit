@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when method count is below the limit', () {
-      final result = MaxMethodsPredicate(5).evaluate(
+      final result = MaxMethodsPredicate(5).analyze(
         classSubject('Service', methods: [method('a'), method('b')]),
         emptyCtx(),
       );
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('passes when method count equals the limit exactly', () {
-      final result = MaxMethodsPredicate(3).evaluate(
+      final result = MaxMethodsPredicate(3).analyze(
         classSubject('TriMethod', methods: [
           method('a'),
           method('b'),
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes for a class with no methods', () {
-      final result = MaxMethodsPredicate(10).evaluate(
+      final result = MaxMethodsPredicate(10).analyze(
         classSubject('DataHolder'),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
     // Fail cases
 
     test('fails when method count exceeds the limit', () {
-      final result = MaxMethodsPredicate(2).evaluate(
+      final result = MaxMethodsPredicate(2).analyze(
         classSubject('BigClass', methods: [
           method('a'),
           method('b'),
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('fail message includes actual count and limit', () {
-      final result = MaxMethodsPredicate(1).evaluate(
+      final result = MaxMethodsPredicate(1).analyze(
         classSubject('Cls', methods: [
           method('a'),
           method('b'),
@@ -62,7 +62,7 @@ void main() {
     });
 
     test('fails with limit of 0 when any method exists', () {
-      final result = MaxMethodsPredicate(0).evaluate(
+      final result = MaxMethodsPredicate(0).analyze(
         classSubject('Cls', methods: [method('run')]),
         emptyCtx(),
       );

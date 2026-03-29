@@ -7,34 +7,43 @@ import 'selector.dart';
 /// Represents a declared architecture rule.
 ///
 /// A rule selects a set of elements with a [Selector] and then
-/// evaluates a [Predicate] against each of them. Any element that
+/// analyzes a [Predicate] against each of them. Any element that
 /// fails the predicate generates a [Violation].
 class Rule {
 
-  final String id;
   final String description;
   final RuleSeverity severity;
   final Selector selector;
   final Predicate predicate;
 
+  /// File path substrings that are exempt from this rule.
+  ///
+  /// A violation is suppressed when its [Violation.filePath] contains
+  /// any entry in this list. Accepts full paths, partial paths, or
+  /// folder prefixes (e.g. `'lib/legacy/'`, `'generated/models.dart'`).
+  final List<String> exceptions;
+
   const Rule({
-    required this.id,
     required this.description,
-    required this.severity,
+    this.severity = RuleSeverity.error,
     required this.selector,
     required this.predicate,
+    this.exceptions = const [],
   });
 
   /// Evaluates the rule against the given [context] and returns all violations.
-  List<Violation> evaluate(AnalysisContext context) {
+  ///
+  /// Violations whose [Violation.filePath] matches any entry in [exceptions]
+  /// are silently discarded.
+  List<Violation> analyze(AnalysisContext context) {
     final subjects = selector.select(context);
     final violations = <Violation>[];
 
     for (final subject in subjects) {
-      final result = predicate.evaluate(subject, context);
+      if (_isExcepted(subject.filePath)) continue;
+      final result = predicate.analyze(subject, context);
       if (!result.passed) {
         violations.add(Violation(
-          ruleId: id,
           ruleDescription: description,
           message: result.message,
           filePath: subject.filePath,
@@ -47,6 +56,12 @@ class Rule {
     return violations;
   }
 
+  bool _isExcepted(String filePath) =>
+      exceptions.any((e) => filePath.contains(e));
+
   @override
-  String toString() => 'Rule($id: $description)';
+  String toString() => 'Rule($description)';
 }
+
+/// Alias for [Rule] — use this name in arch_test rule files.
+typedef ArchitectureRule = Rule;

@@ -5,25 +5,25 @@
 enum RuleSeverity {
   /// Informational — violation is noted but does not fail the analysis.
   info(
-    label: 'ℹ️ info    ',
+    label: 'ℹ️     ',
     ansiColor: '\x1B[36m',
   ),
 
   /// Warning — violation should be fixed but does not fail the build.
   warning(
-    label: '⚠️ warning ',
+    label: '⚠️  ',
     ansiColor: '\x1B[33m',
   ),
 
   /// Error — violation fails the analysis run.
   error(
-    label: '❌ error   ',
+    label: '❌    ',
     ansiColor: '\x1B[31m',
   ),
 
   /// Critical — violation represents a fundamental architecture breach.
   critical(
-    label: '🚨 critical',
+    label: '🚨 ',
     ansiColor: '\x1B[35m',
   );
 

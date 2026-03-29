@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when method count exceeds the minimum', () {
-      final result = MinMethodsPredicate(2).evaluate(
+      final result = MinMethodsPredicate(2).analyze(
         classSubject('Service', methods: [
           method('a'),
           method('b'),
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('passes when method count equals the minimum exactly', () {
-      final result = MinMethodsPredicate(2).evaluate(
+      final result = MinMethodsPredicate(2).analyze(
         classSubject('Contract', methods: [method('open'), method('close')]),
         emptyCtx(),
       );
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('passes with minimum of 0 and no methods', () {
-      final result = MinMethodsPredicate(0).evaluate(
+      final result = MinMethodsPredicate(0).analyze(
         classSubject('Empty'),
         emptyCtx(),
       );
@@ -37,7 +37,7 @@ void main() {
     // Fail cases
 
     test('fails when method count is below the minimum', () {
-      final result = MinMethodsPredicate(3).evaluate(
+      final result = MinMethodsPredicate(3).analyze(
         classSubject('Sparse', methods: [method('only')]),
         emptyCtx(),
       );
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('fails for a class with no methods when minimum is 1', () {
-      final result = MinMethodsPredicate(1).evaluate(
+      final result = MinMethodsPredicate(1).analyze(
         classSubject('Empty'),
         emptyCtx(),
       );
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('fail message includes actual count and minimum required', () {
-      final result = MinMethodsPredicate(5).evaluate(
+      final result = MinMethodsPredicate(5).analyze(
         classSubject('Cls', methods: [method('run')]),
         emptyCtx(),
       );

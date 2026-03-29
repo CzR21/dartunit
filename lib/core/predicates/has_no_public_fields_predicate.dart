@@ -6,7 +6,7 @@ class HasNoPublicFieldsPredicate extends Predicate {
   const HasNoPublicFieldsPredicate();
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final publicFields = cls.fields
         .where((f) => !f.isStatic && !f.name.startsWith('_'))

@@ -18,9 +18,9 @@ void main() {
       expect(preset.expand(_cfg('{}')), hasLength(1));
     });
 
-    test('rule id is fixed', () {
-      expect(preset.expand(_cfg('{}')).first.id,
-          equals('PRESET_no_circular_dependencies'));
+    test('rule description is fixed', () {
+      expect(preset.expand(_cfg('{}')).first.description,
+          equals('No circular dependencies allowed'));
     });
   });
 
@@ -59,7 +59,7 @@ void main() {
           filePath: '/p/lib/clean.dart',
           packagePath: 'pkg:app/clean.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rule.predicate.evaluate(s, ctx).passed, isTrue);
+      expect(rule.predicate.analyze(s, ctx).passed, isTrue);
     });
 
     test('rule fails (violation) when file is in a cycle', () {
@@ -74,7 +74,7 @@ void main() {
           filePath: '/p/a.dart',
           packagePath: 'pkg:app/a.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      expect(rule.predicate.evaluate(s, ctx).passed, isFalse);
+      expect(rule.predicate.analyze(s, ctx).passed, isFalse);
     });
 
     test('fail message describes the cycle path', () {
@@ -87,7 +87,7 @@ void main() {
       final cls = AnalyzedClass(
           name: 'X', filePath: '/p/x.dart', packagePath: 'pkg:app/x.dart');
       final s = Subject(name: cls.name, filePath: cls.filePath, element: cls);
-      final result = rule.predicate.evaluate(s, ctx);
+      final result = rule.predicate.analyze(s, ctx);
       expect(result.passed, isFalse);
       expect(result.message, contains('/p/x.dart'));
     });

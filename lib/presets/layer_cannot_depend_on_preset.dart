@@ -30,7 +30,6 @@ class LayerCannotDependOnPreset extends Preset {
     final toFolders = toList(config['to']);
     return toFolders.map((to) {
       return Rule(
-        id: 'PRESET_cannot_depend_${safeId(from)}_on_${safeId(to)}',
         description: '"$from" must not depend on "$to"',
         severity: sev,
         selector: classSelector(config, from),

@@ -7,7 +7,7 @@ void main() {
     // Valid cases
 
     test('passes when class carries the required annotation', () {
-      final result = AnnotatedWithPredicate('immutable').evaluate(
+      final result = AnnotatedWithPredicate('immutable').analyze(
         classSubject('UserEntity', annotations: ['immutable']),
         emptyCtx(),
       );
@@ -17,7 +17,7 @@ void main() {
     test(
         'passes when class carries multiple annotations including the required one',
         () {
-      final result = AnnotatedWithPredicate('injectable').evaluate(
+      final result = AnnotatedWithPredicate('injectable').analyze(
         classSubject('UserRepo', annotations: ['singleton', 'injectable']),
         emptyCtx(),
       );
@@ -25,7 +25,7 @@ void main() {
     });
 
     test('passes when annotation is the only one', () {
-      final result = AnnotatedWithPredicate('override').evaluate(
+      final result = AnnotatedWithPredicate('override').analyze(
         classSubject('ConcreteClass', annotations: ['override']),
         emptyCtx(),
       );
@@ -35,7 +35,7 @@ void main() {
     // Fail cases
 
     test('fails when class has no annotations', () {
-      final result = AnnotatedWithPredicate('immutable').evaluate(
+      final result = AnnotatedWithPredicate('immutable').analyze(
         classSubject('UserEntity', annotations: []),
         emptyCtx(),
       );
@@ -43,7 +43,7 @@ void main() {
     });
 
     test('fails when class has different annotations', () {
-      final result = AnnotatedWithPredicate('immutable').evaluate(
+      final result = AnnotatedWithPredicate('immutable').analyze(
         classSubject('UserEntity', annotations: ['injectable', 'singleton']),
         emptyCtx(),
       );
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('fail message contains the annotation name', () {
-      final result = AnnotatedWithPredicate('immutable').evaluate(
+      final result = AnnotatedWithPredicate('immutable').analyze(
         classSubject('MutableEntity'),
         emptyCtx(),
       );

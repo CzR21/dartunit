@@ -7,7 +7,7 @@ class MaxMethodsPredicate extends Predicate {
   const MaxMethodsPredicate(this.maxMethods);
 
   @override
-  PredicateResult evaluate(Subject subject, AnalysisContext context) {
+  PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final count = cls.methods.length;
     if (count <= maxMethods) return const PredicateResult.pass();

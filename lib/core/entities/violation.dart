@@ -7,9 +7,6 @@ import '../enums/rule_severity.dart';
 /// to display a meaningful error message with file location.
 class Violation {
 
-  /// The unique ID of the rule that was violated, e.g. `'R001'`.
-  final String ruleId;
-
   /// The human-readable description of the violated rule.
   final String ruleDescription;
 
@@ -26,7 +23,6 @@ class Violation {
   final RuleSeverity severity;
 
   const Violation({
-    required this.ruleId,
     required this.ruleDescription,
     required this.message,
     required this.filePath,
@@ -36,5 +32,5 @@ class Violation {
 
   @override
   String toString() =>
-      '[$severity] $ruleId: $message in $filePath${line != null ? ':$line' : ''}';
+      '[$severity] $ruleDescription: $message in $filePath${line != null ? ':$line' : ''}';
 }
