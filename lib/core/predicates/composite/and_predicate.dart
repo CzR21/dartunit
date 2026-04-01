@@ -4,7 +4,7 @@ import '../../entities/predicate.dart';
 
 /// Passes only when ALL inner predicates pass (logical AND).
 ///
-/// Evaluation is short-circuited: if any predicate fails, the remaining
+/// Analysis is short-circuited: if any predicate fails, the remaining
 /// predicates are not analyzed and that failure result is returned.
 ///
 /// Example — class must end with `Repository` AND live in `lib/data`:

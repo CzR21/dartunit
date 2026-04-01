@@ -14,7 +14,7 @@ class GenerateCommand extends Command<ExitCode> {
 
   @override
   final String description =
-      'Generate a new architecture rule scaffold in arch_test/.';
+      'Generate a new architecture rule scaffold in test_arch/.';
 
   @override
   String get invocation => 'dartunit generate <rule_name>';
@@ -40,7 +40,7 @@ class GenerateCommand extends Command<ExitCode> {
 
     final ruleName = rest.first;
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
-    final archTestDir = p.join(projectRoot, 'arch_test');
+    final archTestDir = p.join(projectRoot, 'test_arch');
 
     BannerHelper.printBanner();
 

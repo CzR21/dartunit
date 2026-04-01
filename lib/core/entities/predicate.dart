@@ -27,7 +27,7 @@ abstract class Predicate {
   Predicate or(Predicate other) => _OrPredicate([this, other]);
 }
 
-/// The result of evaluating a predicate against a subject.
+/// The result of analyzing a predicate against a subject.
 ///
 /// Both pass and fail results carry a [message]:
 /// - For **fail**: the violation message shown in the report.

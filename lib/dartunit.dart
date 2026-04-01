@@ -4,7 +4,7 @@
 /// - Run the CLI (`DartunitCli`)
 /// - Implement custom rules (`CustomArchitectureRule`)
 /// - Build rules programmatically (`ArchitectureRule`, `RuleEngine`)
-/// - Use selectors and predicates
+/// - Use selectors, predicates, matchers, and presets
 
 library dartunit;
 
@@ -81,9 +81,27 @@ export 'engine/custom_rule_loader.dart';
 
 // Runner
 export 'runner/arch_flutter_runner.dart' show testArch, testArchGroup;
+export 'runner/arch_tester.dart' show ArchTester, ArchSubject;
+export 'runner/arch_matchers.dart';
 
-// YAML
-export 'yaml/yaml_rule_parser.dart';
+// Re-export expect so rule files only need to import dartunit
+export 'package:test/test.dart' show expect;
+
+// Rule presets
+export 'presets/naming_folder_suffix.dart';
+export 'presets/naming_name_pattern.dart';
+export 'presets/must_be_abstract.dart';
+export 'presets/must_be_immutable.dart';
+export 'presets/no_public_fields.dart';
+export 'presets/no_circular_dependencies.dart';
+export 'presets/layer_cannot_depend_on.dart';
+export 'presets/layer_can_only_depend_on.dart';
+export 'presets/layered_architecture.dart';
+export 'presets/annotation_must_have.dart';
+export 'presets/annotation_must_not_have.dart';
+export 'presets/class_size_limit.dart';
+export 'presets/no_external_package.dart';
+export 'presets/no_banned_calls.dart';
 
 // Reporter
 export 'reporter/console_reporter.dart';

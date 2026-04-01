@@ -10,7 +10,7 @@ import '../core/entities/violation.dart';
 class RuleExecutor {
   const RuleExecutor();
 
-  /// Evaluates [rule] against [context] and returns all detected violations.
+  /// Analyzes [rule] against [context] and returns all detected violations.
   ///
   /// If [rule.analyze] throws, a synthetic [Violation] describing the
   /// error is returned instead, preserving the rule's ID and severity.
@@ -26,7 +26,7 @@ class RuleExecutor {
       return [
         Violation(
           ruleDescription: rule.description,
-          message: 'Rule evaluation error: $e',
+          message: 'Rule analysis error: $e',
           filePath: '',
           severity: rule.severity,
         ),

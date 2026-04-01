@@ -4,7 +4,7 @@ import '../../entities/predicate.dart';
 
 /// Passes when AT LEAST ONE inner predicate passes (logical OR).
 ///
-/// Evaluation is short-circuited: if any predicate passes, the remaining
+/// Analysis is short-circuited: if any predicate passes, the remaining
 /// predicates are not analyzed.  If all predicates fail, the returned
 /// message combines all individual failure reasons.
 ///

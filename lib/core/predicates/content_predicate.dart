@@ -8,7 +8,7 @@ import '../entities/predicate.dart';
 /// Passes if the file's raw source content matches [pattern].
 ///
 /// The pattern is compiled once at construction time. The file is read from
-/// disk each time the predicate is evaluated against a new subject.
+/// disk each time the predicate is analyzed against a new subject.
 ///
 /// Designed for use with [FileSelector]. Pair with [NotPredicate] to
 /// enforce that a pattern is absent:

@@ -1,35 +1,31 @@
 String generateMissingArchTest(String projectRoot) =>
-    'arch_test/ not found in $projectRoot — run  dartunit init  first.';
+    'test_arch/ not found in $projectRoot — run  dartunit init  first.';
 
-String generateCreatedFile(String fileName) => 'Created  arch_test/$fileName';
+String generateCreatedFile(String fileName) => 'Created  test_arch/$fileName';
 
 List<String> generateNextSteps(String fileName) => [
-      'Open    arch_test/$fileName',
-      'Implement the rule inside the  testArch()  call.',
+      'Open    test_arch/$fileName',
+      'Add selectors and matchers inside the  testArch()  body.',
       'Run     dartunit analyze',
     ];
 
 String ruleTemplate(String ruleName) => '''
 import 'package:dartunit/dartunit.dart';
+import 'package:test/test.dart';
 
 /// ${_toDescription(ruleName)}
 ///
 /// TODO: Describe what this rule enforces and why.
 ///
 /// Run with:
-///   flutter test arch_test/${ruleName}_arch_test.dart
+///   dart test test_arch/${ruleName}_arch_test.dart
 ///   dartunit analyze
-void main() => testArch(
-      ArchitectureRule(
-        description: '${_toDescription(ruleName)}',
-        severity: RuleSeverity.error, // TODO: choose appropriate severity
-        selector: ClassSelector(
-          folder: 'lib/', // TODO: restrict to the correct folder
-        ),
-        predicate: MaxMethodsPredicate(10), // TODO: replace with actual predicate
-        // exceptions: ['lib/legacy/', 'lib/generated/'], // optional: paths to ignore
-      ),
-    );
+void main() => testArch('${_toDescription(ruleName)}', (arch) {
+  final subject = arch.classes(
+    folder: 'lib/', // TODO: restrict to the correct folder
+  );
+  expect(subject, hasMaxMethods(10)); // TODO: replace with actual matcher
+});
 ''';
 
 String _toDescription(String ruleName) {

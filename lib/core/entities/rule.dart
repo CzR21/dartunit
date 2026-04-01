@@ -31,7 +31,7 @@ class Rule {
     this.exceptions = const [],
   });
 
-  /// Evaluates the rule against the given [context] and returns all violations.
+  /// Analyzes the rule against the given [context] and returns all violations.
   ///
   /// Violations whose [Violation.filePath] matches any entry in [exceptions]
   /// are silently discarded.
@@ -63,5 +63,5 @@ class Rule {
   String toString() => 'Rule($description)';
 }
 
-/// Alias for [Rule] — use this name in arch_test rule files.
+/// Alias for [Rule] — use this name in test_arch rule files.
 typedef ArchitectureRule = Rule;

@@ -1,6 +1,6 @@
 import '../../analyzer/models/analyzed_class.dart';
 
-/// A subject is the unit that a predicate evaluates.
+/// A subject is the unit that a predicate analyzes.
 ///
 /// It wraps any selectable element (class, file) with a common interface.
 class Subject {

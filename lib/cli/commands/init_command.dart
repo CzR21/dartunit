@@ -16,7 +16,7 @@ class InitCommand extends Command<ExitCode> {
 
   @override
   final String description =
-      'Initialise dartunit in the current project by creating the arch_test/ folder.';
+      'Initialise dartunit in the current project by creating the test_arch/ folder.';
 
   InitCommand() {
     argParser
@@ -43,7 +43,7 @@ class InitCommand extends Command<ExitCode> {
   @override
   Future<ExitCode> run() async {
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
-    final archTestDir = p.join(projectRoot, 'arch_test');
+    final archTestDir = p.join(projectRoot, 'test_arch');
     final templateName = argResults!['template'] as String?;
     final template =
         templateName != null ? ArchTemplateExtension.fromString(templateName) : null;
@@ -75,8 +75,8 @@ class InitCommand extends Command<ExitCode> {
       stdout.writeln();
       _printNextSteps(initTemplateNextSteps(template.label, template.ruleFiles.length));
     } else {
-      File(p.join(archTestDir, 'example_arch_test.dart')).writeAsStringSync(exampleRule);
-      _printCreated('example_arch_test.dart');
+      File(p.join(archTestDir, 'example_test_arch.dart')).writeAsStringSync(exampleRule);
+      _printCreated('example_test_arch.dart');
       stdout.writeln();
       stdout.writeln('  ${ANSIHelper.green('✓')} ${ANSIHelper.bold(initSuccess)}');
       stdout.writeln();
@@ -89,7 +89,7 @@ class InitCommand extends Command<ExitCode> {
   void _printCreated(String relativePath) {
     stdout.writeln(
       '  ${ANSIHelper.green('✓')} ${ANSIHelper.dim('Created')}  '
-      '${ANSIHelper.bold('arch_test/')}$relativePath',
+      '${ANSIHelper.bold('test_arch/')}$relativePath',
     );
   }
 

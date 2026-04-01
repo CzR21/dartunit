@@ -1,198 +1,188 @@
 const List<({String fileName, String content})> cleanRuleFiles = [
-  (fileName: 'clean_layer_dependencies_arch_test.dart', content: _layerDependencies),
-  (fileName: 'clean_domain_contracts_arch_test.dart', content: _domainContracts),
-  (fileName: 'clean_immutability_arch_test.dart', content: _immutability),
+  (fileName: 'clean_test_arch.dart', content: _cleanArchTest),
 ];
 
-const String _layerDependencies = r'''
+const String _cleanArchTest = '''
 import 'package:dartunit/dartunit.dart';
 
-/// Clean Architecture — Layer Dependency Rules
+/// Clean Architecture rules.
 /// Reference: https://docs.flutter.dev/app-architecture/guide
 ///
-/// The Dependency Rule: source code dependencies always point inward.
-///   Presentation → Domain ← Data
-///
-/// Domain defines contracts; Data and Presentation depend on Domain.
-/// Domain must never depend on either outer layer.
-///
-/// Adjust folder paths to match your project structure.
-void main() {
-  
-  // Domain is the innermost layer. It defines the business rules, entities,
-  // and repository contracts. It must be completely isolated from infrastructure
-  // concerns (Flutter, HTTP clients, databases, platform APIs).
-  testArchGroup('Domain layer — isolated from all outer layers', [
-    ArchitectureRule(
-      description: 'Domain must not depend on the data layer',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-    ),
-    ArchitectureRule(
-      description: 'Domain must not depend on the presentation layer',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/presentation')),
-    ),
-    ArchitectureRule(
-      description: 'Domain must be Flutter-agnostic — no package:flutter imports',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain'),
-      predicate: NotPredicate(DependOnPackagePredicate('flutter')),
-    ),
-    ArchitectureRule(
-      description: 'Domain must not use HTTP packages (use repository contracts instead)',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain'),
-      predicate: AndPredicate([
-        NotPredicate(DependOnPackagePredicate('dio')),
-        NotPredicate(DependOnPackagePredicate('http')),
-      ]),
-    ),
-  ]);
-
-  
-  // Presentation orchestrates the UI and calls domain use cases.
-  // It must never bypass the domain and reach directly into the data layer.
-  testArchGroup('Presentation layer — must go through domain', [
-    ArchitectureRule(
-      description: 'Presentation must not access the data layer directly',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/presentation'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-    ),
-  ]);
-
-  
-  // Data implements the repository contracts from domain. It must not introduce
-  // reverse dependencies into the presentation layer.
-  testArchGroup('Data layer — must not reach into presentation', [
-    ArchitectureRule(
-      description: 'Data layer must not depend on the presentation layer',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/data'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/presentation')),
-    ),
-  ]);
-}
-''';
-
-const String _domainContracts = r'''
-import 'package:dartunit/dartunit.dart';
-
-/// Clean Architecture — Domain Contracts and Use Case Rules
-///
-/// Repository interfaces live in domain (abstract contracts).
-/// Repository implementations live in data (concrete classes).
-/// Use cases encapsulate one business operation each and must stay pure.
-///
-/// Adjust naming patterns and folder paths to match your project.
+/// Adjust the folder constants below to match your project structure.
 void main() {
 
-  // The domain defines WHAT data operations exist via abstract repository
-  // interfaces. The data layer provides HOW they are performed via concrete
-  // implementations. This inversion of control (DIP) is the core of Clean Arch.
-  testArchGroup('Repository contract — interface in domain, impl in data', [
-    ArchitectureRule(
-      description: 'Repository interfaces in lib/domain must be abstract',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain', namePattern: r'.*Repository$'),
-      predicate: IsAbstractPredicate(),
-    ),
-    ArchitectureRule(
-      description: 'Repository implementations must not be abstract',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(namePattern: r'.*RepositoryImpl$'),
-      predicate: NotPredicate(IsAbstractPredicate()),
-    ),
-    ArchitectureRule(
-      description: 'Repository implementations must not access the presentation layer',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(namePattern: r'.*RepositoryImpl$'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/presentation')),
-    ),
-  ]);
+  const _domain       = 'lib/domain';
+  const _data         = 'lib/data';
+  const _presentation = 'lib/presentation';
+  const _services     = 'lib/services';
 
-  // Each use case represents one user-facing business action (e.g., LoginUseCase,
-  // FetchProductsUseCase). They must remain pure: no Flutter, no data access.
-  // A use case that grows too large is a signal it should be split.
-  testArchGroup('Use cases — single responsibility, pure Dart', [
-    ArchitectureRule(
-      description: 'Use cases must not depend on the data layer',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(namePattern: r'.*UseCase$'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-    ),
-    ArchitectureRule(
-      description: 'Use cases must not depend on the presentation layer',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(namePattern: r'.*UseCase$'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/presentation')),
-    ),
-    ArchitectureRule(
-      description: 'Use cases must be Flutter-agnostic',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(namePattern: r'.*UseCase$'),
-      predicate: NotPredicate(DependOnPackagePredicate('flutter')),
-    ),
-    ArchitectureRule(
-      description: 'Use cases must have at most 3 methods (single responsibility)',
-      severity: RuleSeverity.warning,
-      selector: ClassSelector(namePattern: r'.*UseCase$'),
-      predicate: MaxMethodsPredicate(3),
-    ),
-  ]);
-}
-''';
+  testArchGroup('Domain layer \u2014 isolated from all outer layers', () {
+      testArch('Domain must not depend on the data layer', (arch) {
+        final domainSelector = arch.classes(folder: _domain);
 
-const String _immutability = r'''
-import 'package:dartunit/dartunit.dart';
+        expect(domainSelector, doesNotDependOn(_data));
+      });
 
-/// Clean Architecture — Immutability and Encapsulation Rules
-///
-/// Domain entities and value objects must be immutable: they represent business
-/// facts that do not change after creation. Data models (DTOs) should also be
-/// immutable to prevent bugs from accidental post-deserialization mutation.
-///
-/// Adjust naming patterns and folder paths to match your project.
-void main() {
+      testArch('Domain must not depend on the presentation layer', (arch) {
+        final domainSelector = arch.classes(folder: _domain);
 
-  // Entities are identified by their identity, not their attributes. They must
-  // be immutable so their state cannot be altered outside their own boundary.
-  // Mutable entities lead to subtle bugs when the same object is shared across
-  // multiple BLoCs or widgets.
-  testArchGroup('Domain entities — immutable value objects', [
-    ArchitectureRule(
-      description: 'Domain entities must have all-final fields',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain', namePattern: r'.*Entity$'),
-      predicate: HasAllFinalFieldsPredicate(),
-    ),
-    ArchitectureRule(
-      description: 'Domain entities must not expose public mutable fields',
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/domain', namePattern: r'.*Entity$'),
-      predicate: HasNoPublicFieldsPredicate(),
-    ),
-  ]);
+        expect(domainSelector, doesNotDependOn(_presentation));
+      });
 
-  // Data models are DTOs created from API responses or database rows. Keeping
-  // them immutable ensures that mapping them to domain entities is a pure
-  // transformation with no side effects.
-  testArchGroup('Data models — immutable DTOs', [
-    ArchitectureRule(
-      description: 'Data model classes must have all-final fields',
-      severity: RuleSeverity.warning,
-      selector: ClassSelector(folder: 'lib/data', namePattern: r'.*Model$'),
-      predicate: HasAllFinalFieldsPredicate(),
-    ),
-    ArchitectureRule(
-      description: 'Data models must not expose public mutable fields',
-      severity: RuleSeverity.warning,
-      selector: ClassSelector(folder: 'lib/data', namePattern: r'.*Model$'),
-      predicate: HasNoPublicFieldsPredicate(),
-    ),
-  ]);
+      testArch('Domain must be Flutter-agnostic', (arch) {
+        final domainSelector = arch.classes(folder: _domain);
+
+        expect(domainSelector, doesNotDependOnPackage('flutter'));
+      });
+
+      testArch('Domain must not use HTTP packages directly', (arch) {
+        final domainSelector = arch.classes(folder: _domain);
+
+        expect(domainSelector, doesNotDependOnPackage('dio'));
+        expect(domainSelector, doesNotDependOnPackage('http'));
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Presentation layer \u2014 must go through domain', () {
+      testArch('Presentation must not access the data layer directly', (arch) {
+        final presentationSelector = arch.classes(folder: _presentation);
+
+        expect(presentationSelector, doesNotDependOn(_data));
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Data layer \u2014 must not reach into presentation', () {
+      testArch('Data layer must not depend on the presentation layer', (arch) {
+        final dataSelector = arch.classes(folder: _data);
+
+        expect(dataSelector, doesNotDependOn(_presentation));
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Repository contract \u2014 interface in domain, impl in data', () {
+      testArch('Repository interfaces in domain must be abstract', (arch) {
+        final repositorySelector = arch.classes(folder: _domain, namePattern: r'.*Repository\$');
+
+        expect(repositorySelector, isAbstractClass());
+      });
+
+      testArch('Repository implementations must not be abstract', (arch) {
+        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+
+        expect(repositoryImplSelector, isConcreteClass());
+      });
+
+      testArch('Repository implementations must not access presentation', (arch) {
+        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+
+        expect(repositoryImplSelector, doesNotDependOn(_presentation));
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Use cases \u2014 single responsibility, pure Dart', () {
+      testArch('Use cases must not depend on the data layer', (arch) {
+        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+
+        expect(useCaseSelector, doesNotDependOn(_data));
+      });
+
+      testArch('Use cases must not depend on the presentation layer', (arch) {
+        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+
+        expect(useCaseSelector, doesNotDependOn(_presentation));
+      });
+
+      testArch('Use cases must be Flutter-agnostic', (arch) {
+        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+
+        expect(useCaseSelector, doesNotDependOnPackage('flutter'));
+      });
+
+      testArch('Use cases must have at most 3 methods', (arch) {
+        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+
+        expect(useCaseSelector, hasMaxMethods(3));
+      }, severity: RuleSeverity.warning);
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Domain entities \u2014 immutable value objects', () {
+      testArch('Domain entities must have all-final fields', (arch) {
+        final entitySelector = arch.classes(folder: _domain, namePattern: r'.*Entity\$');
+
+        expect(entitySelector, hasAllFinalFields());
+      });
+
+      testArch('Domain entities must not expose public mutable fields', (arch) {
+        final entitySelector = arch.classes(folder: _domain, namePattern: r'.*Entity\$');
+
+        expect(entitySelector, hasNoPublicFields());
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Repository isolation \u2014 repos must not know each other', () {
+      testArch('Repositories must not depend on other repositories', (arch) {
+        final repositorySelector = arch.classes(namePattern: r'.*Repository\$');
+
+        expect(repositorySelector, doesNotDependOn(_data));
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Services layer \u2014 thin wrappers, no upstream dependencies', () {
+      testArch('Services must not depend on the presentation layer', (arch) {
+        final serviceSelector = arch.classes(folder: _services);
+
+        expect(serviceSelector, doesNotDependOn(_presentation));
+      });
+
+      testArch('Services must not depend on repositories', (arch) {
+        final serviceSelector = arch.classes(folder: _services);
+
+        expect(serviceSelector, doesNotDependOn(_data));
+      });
+
+      testArch('Services must not depend on the domain layer', (arch) {
+        final serviceSelector = arch.classes(folder: _services);
+
+        expect(serviceSelector, doesNotDependOn(_domain));
+      });
+
+      testArch('Service classes must have all-final fields', (arch) {
+        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+
+        expect(serviceSelector, hasAllFinalFields());
+      });
+    },
+    severity: RuleSeverity.error,
+  );
+
+  testArchGroup('Data models \u2014 immutable DTOs', () {
+      testArch('Data model classes must have all-final fields', (arch) {
+        final modelSelector = arch.classes(folder: _data, namePattern: r'.*Model\$');
+
+        expect(modelSelector, hasAllFinalFields());
+      });
+
+      testArch('Data models must not expose public mutable fields', (arch) {
+        final modelSelector = arch.classes(folder: _data, namePattern: r'.*Model\$');
+
+        expect(modelSelector, hasNoPublicFields());
+      });
+    },
+    severity: RuleSeverity.warning,
+  );
 }
 ''';

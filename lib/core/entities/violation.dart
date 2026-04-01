@@ -3,7 +3,7 @@ import '../enums/rule_severity.dart';
 /// Represents a single violation of an architecture rule.
 ///
 /// A violation is produced when a [Subject] fails its [Predicate] check
-/// during rule evaluation. It carries enough context for the reporter
+/// during rule analysis. It carries enough context for the reporter
 /// to display a meaningful error message with file location.
 class Violation {
 

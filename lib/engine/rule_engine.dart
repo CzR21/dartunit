@@ -6,13 +6,13 @@ import 'rule_executor.dart';
 /// The central engine that runs all rules and collects violations.
 ///
 /// Inject a custom [RuleExecutor] for testing or to add cross-cutting
-/// concerns (e.g. timing, logging) around individual rule evaluations.
+/// concerns (e.g. timing, logging) around individual rule analyses.
 class RuleEngine {
 
   /// The ordered list of rules to analyze.
   final List<Rule> rules;
 
-  // Delegates single-rule evaluation; injectable for testability.
+  // Delegates single-rule analysis; injectable for testability.
   final RuleExecutor _executor;
 
   RuleEngine(this.rules, {RuleExecutor? executor})

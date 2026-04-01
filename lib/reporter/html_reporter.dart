@@ -35,7 +35,7 @@ class HtmlReporter {
     if (violations.isEmpty) {
       buf.write(_noViolations());
     } else {
-      buf.write(_table(sorted));
+      buf.write(_table(sorted, projectRoot));
     }
 
     buf.write(_docClose(ts));
@@ -82,7 +82,7 @@ class HtmlReporter {
 </section>
 ''';
 
-  String _table(List<Violation> violations) {
+  String _table(List<Violation> violations, String projectRoot) {
     final buf = StringBuffer();
     buf.writeln('<section class="violations">');
     buf.writeln('<table>');
@@ -95,10 +95,11 @@ class HtmlReporter {
         '</tr></thead>');
     buf.writeln('<tbody>');
     for (final v in violations) {
+      final fileLink = _fileLink(projectRoot, v.filePath, v.line);
       buf.writeln('<tr class="${v.severity.name}">');
       buf.writeln('<td><span class="badge ${v.severity.name}">${v.severity.name}</span></td>');
       buf.writeln('<td class="description">${_esc(v.ruleDescription)}</td>');
-      buf.writeln('<td class="file-path">${_esc(v.filePath)}</td>');
+      buf.writeln('<td class="file-path">$fileLink</td>');
       buf.writeln('<td class="line-num">${v.line?.toString() ?? '&mdash;'}</td>');
       buf.writeln('<td class="message">${_esc(v.message)}</td>');
       buf.writeln('</tr>');
@@ -106,6 +107,24 @@ class HtmlReporter {
     buf.writeln('</tbody></table>');
     buf.writeln('</section>');
     return buf.toString();
+  }
+
+  /// Builds a clickable link that opens the file at [line] in VS Code.
+  /// Falls back to a plain span if the path cannot be resolved.
+  String _fileLink(String projectRoot, String filePath, int? line) {
+    final escaped = _esc(filePath);
+    if (filePath.isEmpty) return '<span>$escaped</span>';
+
+    // Strip leading ./ and normalise separators to forward slashes.
+    final relative = filePath
+        .replaceAll('\\', '/')
+        .replaceFirst(RegExp(r'^\./'), '');
+    final root = projectRoot.replaceAll('\\', '/');
+    final absolute = '$root/$relative';
+    final lineStr = line != null ? ':$line:1' : '';
+    final href = 'vscode://file/$absolute$lineStr';
+
+    return '<a class="file-link" href="${_esc(href)}" title="Open in VS Code">$escaped</a>';
   }
 
   String _docClose(String ts) => '''</main>
@@ -235,6 +254,18 @@ class HtmlReporter {
     .file-path { font-family: monospace; color: #93C5FD; word-break: break-all; }
     .line-num  { font-family: monospace; color: #64748b; white-space: nowrap; text-align: right; }
     .message   { color: #cbd5e1; }
+    .file-link {
+      font-family: monospace;
+      color: #93C5FD;
+      text-decoration: none;
+      word-break: break-all;
+      border-bottom: 1px dashed #3b5998;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .file-link:hover {
+      color: #bfdbfe;
+      border-bottom-color: #93C5FD;
+    }
     
     footer {
       text-align: center;
