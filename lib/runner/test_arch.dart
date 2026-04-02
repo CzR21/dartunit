@@ -24,21 +24,14 @@ void testArch(
   String projectRoot = '.',
   RuleSeverity? severity,
 }) {
-  // Capture severity at registration time — testArchGroup sets
-  // _activeGroupSeverity synchronously before calling body().
-  final effectiveSeverity =
-      severity ?? _activeGroupSeverity ?? RuleSeverity.error;
+  final effectiveSeverity = severity ?? _activeGroupSeverity ?? RuleSeverity.error;
 
   test(description, () async {
-    // Context is read at execution time — setUpAll has already populated the
-    // stack by the time this test body runs.
-    final context =
-        _activeGroupContext ?? await ProjectAnalyzer(projectRoot).analyze();
+
+    final context = _activeGroupContext ?? await ProjectAnalyzer(projectRoot).analyze();
     final tester = ArchTester(context, effectiveSeverity);
     await body(tester);
-    // Violations were already printed by ArchMatcher inside expect().
-    // Call fail() here, outside of expect(), so the test fails without
-    // the Expected/Actual/Which block from package:matcher.
+
     if (tester.failures.isNotEmpty) {
       fail('');
     }

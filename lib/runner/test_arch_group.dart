@@ -26,9 +26,8 @@ void testArchGroup(
   RuleSeverity severity = RuleSeverity.error,
 }) {
   group(groupName, () {
-    // --- Context: managed via stack at execution time ---
     setUpAll(() async {
-      _contextStack.add(await ProjectAnalyzer(projectRoot).analyze());
+      mas .add(await ProjectAnalyzer(projectRoot).analyze());
     });
 
     tearDownAll(() {
