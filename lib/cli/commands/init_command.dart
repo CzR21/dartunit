@@ -4,9 +4,8 @@ import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
 import '../../core/enums/arch_template.dart';
-import '../../core/enums/arch_template_extension.dart';
-import '../../helpers/ansi_helper.dart';
-import '../../helpers/banner_helper.dart';
+import '../../utils/ansi_helper.dart';
+import '../../utils/banner_helper.dart';
 import '../../core/enums/exit_code.dart';
 import '../texts/init_text.dart';
 

@@ -4,8 +4,8 @@ import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
 import '../../engine/analysis_logger.dart';
-import '../../helpers/ansi_helper.dart';
-import '../../helpers/banner_helper.dart';
+import '../../utils/ansi_helper.dart';
+import '../../utils/banner_helper.dart';
 import '../../reporter/console_reporter.dart';
 import '../../core/enums/exit_code.dart';
 import '../texts/log_text.dart';

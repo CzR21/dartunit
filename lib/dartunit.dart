@@ -17,7 +17,6 @@ export 'cli/commands/log_command.dart';
 
 // Templates
 export 'core/enums/arch_template.dart';
-export 'core/enums/arch_template_extension.dart';
 
 // Core — Rule
 export 'core/entities/rule.dart';
@@ -27,9 +26,9 @@ export 'core/enums/rule_severity.dart';
 // Core — Selectors
 export 'core/entities/selector.dart' show Selector;
 export 'core/entities/subject.dart' show Subject;
-export 'core/selector/class_selector.dart';
-export 'core/selector/file_selector.dart';
-export 'core/selector/layer_selector.dart';
+export 'core/selectors/class_selector.dart';
+export 'core/selectors/file_selector.dart';
+export 'core/selectors/layer_selector.dart';
 
 // Core — Predicates
 export 'core/entities/predicate.dart';
@@ -80,7 +79,7 @@ export 'engine/rule_executor.dart';
 export 'engine/custom_rule_loader.dart';
 
 // Runner
-export 'runner/arch_flutter_runner.dart' show testArch, testArchGroup;
+export 'runner/arch_runner.dart' show testArch, testArchGroup;
 export 'runner/arch_tester.dart' show ArchTester, ArchSubject;
 export 'runner/arch_matchers.dart';
 

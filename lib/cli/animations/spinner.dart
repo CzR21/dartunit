@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../../helpers/ansi_helper.dart';
+import '../../utils/ansi_helper.dart';
 
 /// A terminal spinner for indicating progress during async operations.
 class Spinner {

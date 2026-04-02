@@ -4,9 +4,9 @@ import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 import 'context/analysis_context.dart';
 import 'graph/dependency_graph.dart';
-import '../helpers/path_helper.dart';
+import '../utils/path_helper.dart';
 import 'models/analyzed_file.dart';
-import '../helpers/class_parser_helper.dart';
+import '../utils/class_parser_helper.dart';
 import 'parsers/import_parser.dart';
 
 /// Analyzes a Dart/Flutter project and produces an [AnalysisContext].

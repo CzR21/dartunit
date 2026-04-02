@@ -16,60 +16,62 @@ void main() {
       expect(code, equals(0));
     });
 
-    test('creates arch_test/ directory', () async {
+    test('creates test_arch/ directory', () async {
       await DartunitCli().run(['init', '--path', tempDir.path]);
       expect(
-        Directory(p.join(tempDir.path, 'arch_test')).existsSync(),
+        Directory(p.join(tempDir.path, 'test_arch')).existsSync(),
         isTrue,
       );
     });
 
-    test('creates arch_test/example_arch_test.dart', () async {
+    test('creates test_arch/example_test_arch.dart', () async {
       await DartunitCli().run(['init', '--path', tempDir.path]);
       expect(
-        File(p.join(tempDir.path, 'arch_test', 'example_arch_test.dart')).existsSync(),
+        File(p.join(tempDir.path, 'test_arch', 'example_test_arch.dart')).existsSync(),
         isTrue,
       );
     });
 
-    test('example_arch_test.dart contains archTest call', () async {
+    test('example_test_arch.dart uses testArch with arch tester', () async {
       await DartunitCli().run(['init', '--path', tempDir.path]);
       final content =
-          File(p.join(tempDir.path, 'arch_test', 'example_arch_test.dart'))
+          File(p.join(tempDir.path, 'test_arch', 'example_test_arch.dart'))
               .readAsStringSync();
       expect(content, contains('testArch'));
-      expect(content, contains('ArchitectureRule'));
+      expect(content, contains('doesNotDependOn'));
     });
   });
 
   group('init — template', () {
-    test('--template bloc creates all bloc rule files', () async {
+    test('--template bloc creates bloc_test_arch.dart', () async {
       await DartunitCli()
           .run(['init', '--path', tempDir.path, '--template', 'bloc']);
-      final archTestDir = p.join(tempDir.path, 'arch_test');
-      expect(File(p.join(archTestDir, 'bloc_layer_dependencies_arch_test.dart')).existsSync(), isTrue);
-      expect(File(p.join(archTestDir, 'bloc_contracts_arch_test.dart')).existsSync(), isTrue);
-      expect(File(p.join(archTestDir, 'bloc_quality_arch_test.dart')).existsSync(), isTrue);
+      expect(
+        File(p.join(tempDir.path, 'test_arch', 'bloc_test_arch.dart'))
+            .existsSync(),
+        isTrue,
+      );
     });
 
-    test('--template clean does not create example_arch_test.dart', () async {
+    test('--template clean does not create example_test_arch.dart', () async {
       await DartunitCli()
           .run(['init', '--path', tempDir.path, '--template', 'clean']);
       expect(
-        File(p.join(tempDir.path, 'arch_test', 'example_arch_test.dart'))
+        File(p.join(tempDir.path, 'test_arch', 'example_test_arch.dart'))
             .existsSync(),
         isFalse,
       );
     });
 
-    test('template rule files contain testArchGroup and template name', () async {
+    test('template rule file contains inlined architecture rules', () async {
       await DartunitCli()
           .run(['init', '--path', tempDir.path, '--template', 'mvvm']);
-      final content = File(p.join(tempDir.path, 'arch_test',
-              'mvvm_layer_dependencies_arch_test.dart'))
-          .readAsStringSync();
+      final content =
+          File(p.join(tempDir.path, 'test_arch', 'mvvm_test_arch.dart'))
+              .readAsStringSync();
       expect(content, contains('testArchGroup'));
-      expect(content, contains('MVVM'));
+      expect(content, contains('testArch'));
+      expect(content, contains('RuleSeverity'));
     });
 
     test('returns 2 for invalid template value', () async {
@@ -80,20 +82,20 @@ void main() {
   });
 
   group('init — idempotency', () {
-    test('returns 0 when arch_test/ already exists', () async {
+    test('returns 0 when test_arch/ already exists', () async {
       await DartunitCli().run(['init', '--path', tempDir.path]);
       final code = await DartunitCli().run(['init', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
-    test('does not overwrite existing example_arch_test.dart on second run', () async {
+    test('does not overwrite existing example_test_arch.dart on second run', () async {
       await DartunitCli().run(['init', '--path', tempDir.path]);
       final ruleFile =
-          File(p.join(tempDir.path, 'arch_test', 'example_arch_test.dart'));
+          File(p.join(tempDir.path, 'test_arch', 'example_test_arch.dart'));
       ruleFile.writeAsStringSync('// custom content');
 
       await DartunitCli().run(['init', '--path', tempDir.path]);
-      // Second run detects existing arch_test/ — does not overwrite
+      // Second run detects existing test_arch/ — does not overwrite
       expect(ruleFile.readAsStringSync(), equals('// custom content'));
     });
   });

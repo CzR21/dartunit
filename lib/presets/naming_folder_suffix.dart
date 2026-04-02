@@ -2,7 +2,7 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// Classes in each [folder] must end with the capitalised folder basename.

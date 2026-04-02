@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// Classes in each [folder] must not expose public instance fields.
@@ -21,8 +21,7 @@ void noPublicFields({
     'Structure — no public fields',
     () {
       for (final folder in folders) {
-        testArch(
-            'Classes in "$folder" must not expose public instance fields',
+        testArch('Classes in "$folder" must not expose public instance fields',
             (arch) {
           expect(
             arch.classes(folder: folder, exceptions: exceptions),

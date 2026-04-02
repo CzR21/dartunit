@@ -1,4 +1,4 @@
-import '../../helpers/ansi_helper.dart';
+import '../../utils/ansi_helper.dart';
 
 const String logNoHistory =
     'No analysis runs recorded yet. Run  dartunit analyze  first.';

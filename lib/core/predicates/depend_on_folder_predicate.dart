@@ -4,14 +4,25 @@ import '../entities/predicate.dart';
 
 class DependOnFolderPredicate extends Predicate {
   final String folder;
-  const DependOnFolderPredicate(this.folder);
+
+  /// When [transitive] is true, checks the full transitive closure of
+  /// dependencies instead of only direct imports.
+  final bool transitive;
+
+  const DependOnFolderPredicate(this.folder, {this.transitive = false});
 
   @override
   PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
     final normalized = folder.replaceAll('\\', '/');
+    final prefix = normalized.endsWith('/') ? normalized : '$normalized/';
+
+    final imports = transitive
+        ? context.dependencyGraph.transitiveDependenciesOf(cls.filePath)
+        : cls.imports.toSet();
+
     final matchingImports =
-        cls.imports.where((imp) => imp.contains(normalized)).toList();
+        imports.where((imp) => imp.contains(prefix)).toList();
     if (matchingImports.isNotEmpty) {
       return PredicateResult.pass(
         '${cls.name} imports from "$folder": ${matchingImports.join(', ')}',

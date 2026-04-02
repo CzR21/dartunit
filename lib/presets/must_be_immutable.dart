@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// All instance fields of classes in each [folder] must be `final`.

@@ -9,9 +9,12 @@ class OnlyDependOnFoldersPredicate extends Predicate {
   @override
   PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
-    final normalized = allowedFolders.map((f) => f.replaceAll('\\', '/')).toList();
+    final normalized = allowedFolders
+        .map((f) => f.replaceAll('\\', '/'))
+        .map((f) => f.endsWith('/') ? f : '$f/')
+        .toList();
     final forbidden = cls.imports
-        .where((imp) => !normalized.any((allowed) => imp.contains(allowed)))
+        .where((imp) => !normalized.any((prefix) => imp.contains(prefix)))
         .toList();
     if (forbidden.isEmpty) return const PredicateResult.pass();
     return PredicateResult.fail(

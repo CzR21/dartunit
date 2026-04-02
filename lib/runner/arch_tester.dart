@@ -1,9 +1,9 @@
 import '../analyzer/context/analysis_context.dart';
 import '../core/entities/violation.dart';
 import '../core/enums/rule_severity.dart';
-import '../core/selector/class_selector.dart';
-import '../core/selector/file_selector.dart';
-import '../core/selector/layer_selector.dart';
+import '../core/selectors/class_selector.dart';
+import '../core/selectors/file_selector.dart';
+import '../core/selectors/layer_selector.dart';
 import '../core/entities/selector.dart';
 
 /// The object passed to [testArch] and [testArchGroup] callbacks.
@@ -18,6 +18,7 @@ import '../core/entities/selector.dart';
 /// });
 /// ```
 class ArchTester {
+
   final AnalysisContext _context;
   final RuleSeverity defaultSeverity;
 

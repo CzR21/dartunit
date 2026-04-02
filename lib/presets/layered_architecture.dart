@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// Declares all layers with their allowed dependencies and generates
@@ -29,8 +29,7 @@ void layeredArchitecture({
         for (final to in layers) {
           if (from.folder == to.folder) continue;
           if (from.canAccess.contains(to.folder)) continue;
-          testArch(
-              'Layer "${from.name}" must not depend on layer "${to.name}"',
+          testArch('Layer "${from.name}" must not depend on layer "${to.name}"',
               (arch) {
             expect(
               arch.classes(folder: from.folder, exceptions: exceptions),

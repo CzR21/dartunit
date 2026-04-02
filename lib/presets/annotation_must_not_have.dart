@@ -1,7 +1,6 @@
 import 'package:test/test.dart';
-
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// Classes in each [folder] must NOT carry the annotation [@annotation].
@@ -23,8 +22,7 @@ void annotationMustNotHave({
     'Annotation — must NOT have @$annotation',
     () {
       for (final folder in folders) {
-        testArch(
-            'Classes in "$folder" must NOT be annotated with @$annotation',
+        testArch('Classes in "$folder" must NOT be annotated with @$annotation',
             (arch) {
           expect(
             arch.classes(folder: folder, exceptions: exceptions),

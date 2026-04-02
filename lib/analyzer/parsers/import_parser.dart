@@ -1,5 +1,5 @@
 import 'package:path/path.dart' as p;
-import '../../helpers/path_helper.dart';
+import '../../utils/path_helper.dart';
 
 /// Parses and resolves `import` statements from Dart source text.
 class ImportParser {

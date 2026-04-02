@@ -104,5 +104,41 @@ void main() {
       final ctx = ctxWithClasses(['lib/domain/service.dart']);
       expect(rule.analyze(ctx), hasLength(1));
     });
+
+    test('folder exception without trailing slash matches only that folder', () {
+      final rule = Rule(
+        description: 'Test rule',
+        selector: ClassSelector(folder: 'lib/'),
+        predicate: alwaysFail,
+        exceptions: ['lib/legacy'],
+      );
+      final ctx = ctxWithClasses([
+        'lib/domain/service.dart',
+        'lib/legacy/old.dart',
+        'lib/legacy_code/other.dart',
+      ]);
+      final violations = rule.analyze(ctx);
+      expect(violations, hasLength(2));
+      expect(
+        violations.map((v) => v.filePath),
+        containsAll(['lib/domain/service.dart', 'lib/legacy_code/other.dart']),
+      );
+    });
+
+    test('file exception without leading slash matches by suffix', () {
+      final rule = Rule(
+        description: 'Test rule',
+        selector: ClassSelector(folder: 'lib/'),
+        predicate: alwaysFail,
+        exceptions: ['generated/models.dart'],
+      );
+      final ctx = ctxWithClasses([
+        'lib/domain/service.dart',
+        'lib/generated/models.dart',
+      ]);
+      final violations = rule.analyze(ctx);
+      expect(violations, hasLength(1));
+      expect(violations.first.filePath, equals('lib/domain/service.dart'));
+    });
   });
 }

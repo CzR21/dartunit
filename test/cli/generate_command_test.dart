@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 import 'package:dartunit/cli/dartunit_cli.dart';
 
 void _initProject(Directory dir) {
-  Directory(p.join(dir.path, 'arch_test')).createSync(recursive: true);
+  Directory(p.join(dir.path, 'test_arch')).createSync(recursive: true);
 }
 
 void main() {
@@ -24,24 +24,24 @@ void main() {
       expect(code, equals(0));
     });
 
-    test('creates the rule dart file in arch_test/', () async {
+    test('creates the rule dart file in test_arch/', () async {
       await DartunitCli()
           .run(['generate', 'no_ui_in_domain', '--path', tempDir.path]);
       expect(
-        File(p.join(tempDir.path, 'arch_test', 'no_ui_in_domain_arch_test.dart'))
+        File(p.join(tempDir.path, 'test_arch', 'no_ui_in_domain_test_arch.dart'))
             .existsSync(),
         isTrue,
       );
     });
 
-    test('generated file contains archTest and ArchitectureRule', () async {
+    test('generated file uses testArch with arch tester', () async {
       await DartunitCli()
           .run(['generate', 'my_rule', '--path', tempDir.path]);
       final content =
-          File(p.join(tempDir.path, 'arch_test', 'my_rule_arch_test.dart'))
+          File(p.join(tempDir.path, 'test_arch', 'my_rule_test_arch.dart'))
               .readAsStringSync();
       expect(content, contains('testArch'));
-      expect(content, contains('ArchitectureRule'));
+      expect(content, anyOf(contains('doesNotDependOn'), contains('hasMaxMethods')));
       expect(content, contains('My Rule'));
     });
   });
@@ -53,7 +53,7 @@ void main() {
       expect(code, equals(2));
     });
 
-    test('returns 2 when arch_test/ directory does not exist', () async {
+    test('returns 2 when test_arch/ directory does not exist', () async {
       final emptyDir =
           Directory.systemTemp.createTempSync('dartunit_generate_nodir_');
       addTearDown(() => emptyDir.deleteSync(recursive: true));

@@ -16,11 +16,16 @@ class Rule {
   final Selector selector;
   final Predicate predicate;
 
-  /// File path substrings that are exempt from this rule.
+  /// File paths or folder prefixes exempt from this rule.
   ///
-  /// A violation is suppressed when its [Violation.filePath] contains
-  /// any entry in this list. Accepts full paths, partial paths, or
-  /// folder prefixes (e.g. `'lib/legacy/'`, `'generated/models.dart'`).
+  /// A violation is suppressed when its [Violation.filePath] matches any
+  /// entry. Matching is path-segment-aware:
+  ///
+  /// - Entries ending in `.dart` are matched as file suffixes
+  ///   (`'lib/legacy/old.dart'` matches exactly that file).
+  /// - All other entries are treated as folder prefixes: a trailing `/` is
+  ///   added automatically, so `'lib/legacy'` matches `lib/legacy/foo.dart`
+  ///   but NOT `lib/legacy_code/foo.dart`.
   final List<String> exceptions;
 
   const Rule({
@@ -56,8 +61,18 @@ class Rule {
     return violations;
   }
 
-  bool _isExcepted(String filePath) =>
-      exceptions.any((e) => filePath.contains(e));
+  bool _isExcepted(String filePath) {
+    final normalizedPath = filePath.replaceAll('\\', '/');
+    return exceptions.any((e) {
+      final normalized = e.replaceAll('\\', '/');
+      if (normalized.endsWith('.dart')) {
+        return normalizedPath.endsWith(normalized) ||
+            normalizedPath == normalized;
+      }
+      final prefix = normalized.endsWith('/') ? normalized : '$normalized/';
+      return normalizedPath.contains(prefix);
+    });
+  }
 
   @override
   String toString() => 'Rule($description)';

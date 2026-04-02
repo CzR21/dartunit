@@ -42,6 +42,18 @@ Matcher dependsOn(String folder) => ArchMatcher(
       'must depend on "$folder"',
     );
 
+/// Expects that selected classes do NOT transitively depend on [folder].
+Matcher doesNotDependOnTransitive(String folder) => ArchMatcher(
+      NotPredicate(DependOnFolderPredicate(folder, transitive: true)),
+      'must not transitively depend on "$folder"',
+    );
+
+/// Expects that selected classes transitively depend on [folder].
+Matcher dependsOnTransitive(String folder) => ArchMatcher(
+      DependOnFolderPredicate(folder, transitive: true),
+      'must transitively depend on "$folder"',
+    );
+
 /// Expects that selected classes do NOT import from [package].
 Matcher doesNotDependOnPackage(String package) => ArchMatcher(
       NotPredicate(DependOnPackagePredicate(package)),

@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// Limits the number of [maxMethods] and/or [maxFields] per class.
@@ -28,7 +28,9 @@ void classSizeLimit({
     'classSizeLimit: provide at least one of maxMethods or maxFields.',
   );
 
-  final targets = folders.isEmpty ? <String?>[null] : folders.map((f) => f as String?).toList();
+  final targets = folders.isEmpty
+      ? <String?>[null]
+      : folders.map((f) => f as String?).toList();
 
   testArchGroup(
     'Metrics — class size limit',

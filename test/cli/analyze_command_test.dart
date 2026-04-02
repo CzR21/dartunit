@@ -26,13 +26,13 @@ void _copyPackageConfig(Directory dest) {
   );
 }
 
-/// Writes a rule file to arch_test/ that outputs the given violations as JSON.
+/// Writes a rule file to test_arch/ that outputs the given violations as JSON.
 ///
 /// The file is a valid `package:test` test so it can be executed by
 /// `dart test --reporter json` (which is what [AnalyzeCommand] now uses).
 void _writeRuleFile(
     Directory dir, String fileName, List<Map<String, dynamic>> violations) {
-  final archTestDir = Directory(p.join(dir.path, 'arch_test'))
+  final archTestDir = Directory(p.join(dir.path, 'test_arch'))
     ..createSync(recursive: true);
 
   final violationsLiteral = violations
@@ -45,6 +45,7 @@ void _writeRuleFile(
 
   File(p.join(archTestDir.path, fileName)).writeAsStringSync('''
 import 'dart:convert';
+import 'dart:io';
 import 'package:test/test.dart';
 
 void main() {
@@ -58,8 +59,8 @@ $violationsLiteral
       'severity': 'error',
       'violations': violations,
     };
-    // Parsed by AnalyzeCommand from the dart-test JSON reporter stream.
-    print('DARTUNIT_RESULT:\${jsonEncode(data)}');
+    // Parsed by AnalyzeCommand from stderr.
+    stderr.writeln('DARTUNIT_RESULT:\${jsonEncode(data)}');
 
     final failures = violations
         .where((v) => v['severity'] == 'error' || v['severity'] == 'critical')
@@ -105,28 +106,28 @@ dependencies:
   tearDown(() => tempDir.deleteSync(recursive: true));
 
   group('analyze — exit codes', () {
-    test('returns 2 when arch_test/ does not exist', () async {
+    test('returns 2 when test_arch/ does not exist', () async {
       final code =
           await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(2));
     });
 
-    test('returns 0 when arch_test/ is empty', () async {
-      Directory(p.join(tempDir.path, 'arch_test')).createSync();
+    test('returns 0 when test_arch/ is empty', () async {
+      Directory(p.join(tempDir.path, 'test_arch')).createSync();
       final code =
           await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
     test('returns 0 when rule produces no violations', () async {
-      _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
+      _writeRuleFile(tempDir, 'no_violations_test_arch.dart', []);
       final code =
           await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
     test('returns 1 when error-level violations are found', () async {
-      _writeRuleFile(tempDir, 'has_violations_arch_test.dart', [
+      _writeRuleFile(tempDir, 'has_violations_test_arch.dart', [
         {
           'ruleDescription': 'Domain must not depend on Data',
           'message': 'Bad depends on lib/data',
@@ -140,7 +141,7 @@ dependencies:
     });
 
     test('returns 0 when only warnings are found', () async {
-      _writeRuleFile(tempDir, 'warnings_arch_test.dart', [
+      _writeRuleFile(tempDir, 'warnings_test_arch.dart', [
         {
           'ruleDescription': 'God-class check',
           'message': 'BigClass has too many methods',
@@ -156,7 +157,7 @@ dependencies:
 
   group('analyze — flags', () {
     test('--no-color flag is accepted without error', () async {
-      _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
+      _writeRuleFile(tempDir, 'no_violations_test_arch.dart', []);
       final code = await DartunitCli()
           .run(['analyze', '--path', tempDir.path, '--no-color']);
       expect(code, equals(0));
@@ -165,7 +166,7 @@ dependencies:
 
   group('analyze — multiple rule files', () {
     test('collects violations from multiple rule files', () async {
-      _writeRuleFile(tempDir, 'rule_a_arch_test.dart', [
+      _writeRuleFile(tempDir, 'rule_a_test_arch.dart', [
         {
           'ruleDescription': 'Rule A',
           'message': 'Violation A',
@@ -173,7 +174,7 @@ dependencies:
           'severity': 'error',
         },
       ]);
-      _writeRuleFile(tempDir, 'rule_b_arch_test.dart', [
+      _writeRuleFile(tempDir, 'rule_b_test_arch.dart', [
         {
           'ruleDescription': 'Rule B',
           'message': 'Violation B',

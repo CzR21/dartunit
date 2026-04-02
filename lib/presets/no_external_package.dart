@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
-import '../runner/arch_flutter_runner.dart';
+import '../runner/arch_runner.dart';
 import '../runner/arch_matchers.dart';
 
 /// Classes in each [folder] must not import any of the listed [packages].
@@ -24,8 +24,8 @@ void noExternalPackage({
     () {
       for (final folder in folders) {
         for (final pkg in packages) {
-          testArch(
-              'Classes in "$folder" must not import package "$pkg"', (arch) {
+          testArch('Classes in "$folder" must not import package "$pkg"',
+              (arch) {
             expect(
               arch.classes(folder: folder, exceptions: exceptions),
               doesNotDependOnPackage(pkg),

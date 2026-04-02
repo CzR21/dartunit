@@ -1,9 +1,9 @@
 import 'dart:io';
 import '../core/entities/violation.dart';
 import '../core/extensions/violation_list_extension.dart';
-import '../helpers/ansi_helper.dart';
+import '../utils/ansi_helper.dart';
 import '../core/extensions/string_extensions.dart';
-import '../helpers/table_helper.dart';
+import '../utils/table_helper.dart';
 import '../core/enums/report_column.dart';
 import 'violation_summary.dart';
 
