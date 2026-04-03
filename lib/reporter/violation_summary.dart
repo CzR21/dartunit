@@ -34,10 +34,10 @@ class ViolationSummary {
   /// Pre-formatted summary line ready for terminal output.
   String get line =>
       '$total violation(s)'
-      '  ·  🚨  $critical critical(s)'
-      '  ·  ❌  $errors error(s)'
-      '  ·  ⚠️ $warnings warning(s)'
-      '  ·  ℹ️ $infos info';
+      '  ·  ${RuleSeverity.critical.icon}  $critical critical(s)'
+      '  ·  ${RuleSeverity.error.icon}  $errors error(s)'
+      '  ·  ${RuleSeverity.warning.icon} $warnings warning(s)'
+      '  ·  ${RuleSeverity.info.icon} $infos info';
 }
 
 

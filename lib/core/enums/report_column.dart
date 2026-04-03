@@ -3,7 +3,7 @@
 /// Each value carries its terminal [width] in visible characters and the
 /// [header] label used in the table header row.
 enum ReportColumn {
-  severity(width: 4, header: ''),
+  severity(width: 6, header: ''),
   description(width: 30, header: ' Description'),
   file(width: 38, header: ' File'),
   line(width: 6, header: ' Line'),

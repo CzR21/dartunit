@@ -27,7 +27,7 @@ void testArchGroup(
 }) {
   group(groupName, () {
     setUpAll(() async {
-      mas .add(await ProjectAnalyzer(projectRoot).analyze());
+      _contextStack.add(await ProjectAnalyzer(projectRoot).analyze());
     });
 
     tearDownAll(() {

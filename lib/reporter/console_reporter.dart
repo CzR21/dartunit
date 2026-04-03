@@ -41,6 +41,9 @@ class ConsoleReporter {
   String _dataRow(Violation v) {
     final sevPlain = ' ${v.severity.label}'
         .padEndToWidth(ReportColumn.severity.width);
+    final sevCell = useColor
+        ? '${v.severity.ansiColor}$sevPlain${ANSIHelper.reset}'
+        : sevPlain;
     final descPlain = ' ${v.ruleDescription.truncate(ReportColumn.description.width - 2)}'
         .padEndToWidth(ReportColumn.description.width);
     final filePlain = ' ${v.filePath.shortenProjectPath(ReportColumn.file.width - 2)}'
@@ -50,7 +53,7 @@ class ConsoleReporter {
     final msgPlain = ' ${v.message.truncate(ReportColumn.message.width - 2)}'
         .padEndToWidth(ReportColumn.message.width);
 
-    return '│$sevPlain│$descPlain│$filePlain│$linePlain│$msgPlain│';
+    return '│$sevCell│$descPlain│$filePlain│$linePlain│$msgPlain│';
   }
 
   void _renderSummary(ViolationSummary summary) {
