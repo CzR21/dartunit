@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:mason_logger/mason_logger.dart';
 import '../core/entities/violation.dart';
 import '../core/extensions/violation_list_extension.dart';
 import '../utils/ansi_helper.dart';
@@ -10,15 +11,17 @@ import 'violation_summary.dart';
 /// Writes the violations report to stdout as an ASCII table.
 class ConsoleReporter {
 
+  final Logger _logger;
   final bool useColor;
 
-  ConsoleReporter({this.useColor = true});
+  ConsoleReporter({required Logger logger, this.useColor = true})
+      : _logger = logger;
 
   void report(List<Violation> violations) {
     stdout.writeln();
 
     if (violations.isEmpty) {
-      _write('  ✓ No architecture violations found.', ANSIHelper.kGreen);
+      _logger.success('No architecture violations found.');
       stdout.writeln();
       return;
     }
@@ -57,15 +60,11 @@ class ConsoleReporter {
   }
 
   void _renderSummary(ViolationSummary summary) {
-    _write('  ${summary.line}', summary.hasFailures ? ANSIHelper.kRed : ANSIHelper.kYellow,);
-    stdout.writeln();
-  }
-
-  void _write(String text, [String color = '']) {
-    if (color.isNotEmpty && useColor) {
-      stdout.writeln('$color$text${ANSIHelper.reset}');
+    if (summary.hasFailures) {
+      _logger.err(summary.line);
     } else {
-      stdout.writeln(text);
+      _logger.warn(summary.line);
     }
+    stdout.writeln();
   }
 }

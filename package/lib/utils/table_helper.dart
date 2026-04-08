@@ -1,28 +1,38 @@
 import '../core/extensions/string_extensions.dart';
+import 'terminal_helper.dart';
 
-/// Constructs ASCII table borders and rows using box-drawing characters.
+/// Constructs table borders and rows, using Unicode box-drawing characters
+/// on capable terminals and plain ASCII on others.
 class TableHelper {
-
   TableHelper._();
 
-  /// Top border:  ┌───┬───┐
-  static String borderTop(List<int> cols) => '┌${cols.map((w) => '─' * w).join('┬')}┐';
+  static bool get _unicode => TerminalHelper.supportsUnicode;
 
-  /// Middle border: ├───┼───┤
-  static String borderMid(List<int> cols) => '├${cols.map((w) => '─' * w).join('┼')}┤';
+  /// Top border:  ┌───┬───┐  or  +---+---+
+  static String borderTop(List<int> cols) => _unicode
+      ? '┌${cols.map((w) => '─' * w).join('┬')}┐'
+      : '+${cols.map((w) => '-' * w).join('+')}+';
 
-  /// Bottom border: └───┴───┘
-  static String borderBot(List<int> cols) => '└${cols.map((w) => '─' * w).join('┴')}┘';
+  /// Middle border: ├───┼───┤  or  +---+---+
+  static String borderMid(List<int> cols) => _unicode
+      ? '├${cols.map((w) => '─' * w).join('┼')}┤'
+      : '+${cols.map((w) => '-' * w).join('+')}+';
 
-  /// Builds a plain row: │cell│cell│cell│
+  /// Bottom border: └───┴───┘  or  +---+---+
+  static String borderBot(List<int> cols) => _unicode
+      ? '└${cols.map((w) => '─' * w).join('┴')}┘'
+      : '+${cols.map((w) => '-' * w).join('+')}+';
+
+  /// Builds a row: │cell│cell│  or  |cell|cell|
   ///
   /// Each cell is padded / truncated to its column width using
   /// [String.padEndToWidth]. The caller is responsible for pre-formatting
-  /// the cell content (leading spaces, color codes, etc.).
+  /// cell content (leading spaces, color codes, etc.).
   static String row(List<String> cells, List<int> widths) {
-    final buf = StringBuffer('│');
+    final sep = _unicode ? '│' : '|';
+    final buf = StringBuffer(sep);
     for (var i = 0; i < cells.length; i++) {
-      buf.write('${cells[i].padEndToWidth(widths[i])}│');
+      buf.write('${cells[i].padEndToWidth(widths[i])}$sep');
     }
     return buf.toString();
   }

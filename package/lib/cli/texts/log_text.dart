@@ -1,4 +1,4 @@
-import '../../utils/ansi_helper.dart';
+import 'package:mason_logger/mason_logger.dart' hide ExitCode;
 
 const String logNoHistory =
     'No analysis runs recorded yet. Run  dartunit analyze  first.';
@@ -6,18 +6,10 @@ const String logNoHistory =
 String logHeader(int count) =>
     'Last $count analysis run${count == 1 ? '' : 's'}';
 
-String runHeader(int index, DateTime timestamp, int rulesCount, bool useColor) {
+String runHeader(int index, DateTime timestamp, int rulesCount) {
   final ts = _formatTimestamp(timestamp);
   final rules = '$rulesCount rule${rulesCount == 1 ? '' : 's'}';
-  final label = ANSIHelper.bold('Run #$index', useColor);
-  return ANSIHelper.dim(
-    '  ── $label  ·  $ts  ·  $rules ${_pad(64)}',
-    useColor,
-  );
-}
-
-String _pad(int totalWidth) {
-  return '─' * 4;
+  return darkGray.wrap('  ── ${white.wrap('Run #$index')}  ·  $ts  ·  $rules ────') ?? '';
 }
 
 String _formatTimestamp(DateTime dt) {

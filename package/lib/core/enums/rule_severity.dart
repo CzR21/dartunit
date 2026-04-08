@@ -1,3 +1,5 @@
+import '../../utils/terminal_helper.dart';
+
 /// Severity levels for architecture rule violations.
 ///
 /// Each value carries its display [label], emoji [icon], and [ansiColor] so
@@ -20,7 +22,7 @@ enum RuleSeverity {
   /// Error — violation fails the analysis run.
   error(
     label: 'ERR',
-    icon: '❌',
+    icon: '✖',
     ansiColor: '\x1B[31m',
   ),
 
@@ -52,6 +54,15 @@ enum RuleSeverity {
       orElse: () => RuleSeverity.error,
     );
   }
+
+  /// Icon safe for the current terminal: emoji when Unicode is supported,
+  /// plain [label] otherwise (e.g. `INFO`, `WARN`, `ERR`, `CRIT`).
+  String get displayIcon =>
+      TerminalHelper.supportsUnicode ? icon : label;
+
+  /// Terminal column width of [displayIcon]: 1 for [error] (`✖`), 2 for all
+  /// others (emoji icons occupy two columns in Unicode-capable terminals).
+  int get iconDisplayWidth => this == error ? 1 : 2;
 
   /// Returns true if this severity should cause the analysis to fail.
   bool get isFailure => this == error || this == critical;

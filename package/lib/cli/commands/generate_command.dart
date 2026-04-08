@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:mason_logger/mason_logger.dart' hide ExitCode;
 import 'package:path/path.dart' as p;
 
-import '../../utils/ansi_helper.dart';
 import '../../utils/banner_helper.dart';
+import '../../utils/terminal_helper.dart';
 import '../../core/enums/exit_code.dart';
 import '../texts/generate_text.dart';
 
@@ -41,37 +42,40 @@ class GenerateCommand extends Command<ExitCode> {
     final ruleName = rest.first;
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
     final archTestDir = p.join(projectRoot, 'test_arch');
+    final logger = Logger();
 
-    BannerHelper.printBanner();
+    BannerHelper.printBanner(logger);
 
     if (!Directory(archTestDir).existsSync()) {
-      stdout.writeln('  ${ANSIHelper.red('✗')} ${generateMissingArchTest(projectRoot)}');
-      stdout.writeln();
+      logger.err(generateMissingArchTest(projectRoot));
+      logger.info('');
       return ExitCode.error;
     }
 
     final fileName = '${ruleName}_arch_test.dart';
     final outputPath = p.join(archTestDir, fileName);
 
-    stdout.writeln('  ${ANSIHelper.dim('Project')}  $projectRoot');
-    stdout.writeln(ANSIHelper.dim('  ${'─' * 48}'));
-    stdout.writeln();
+    final sep = TerminalHelper.supportsUnicode ? '─' : '-';
+    logger.detail('  Project  $projectRoot');
+    logger.detail('  ${sep * 48}');
+    logger.info('');
 
     File(outputPath).writeAsStringSync(ruleTemplate(ruleName));
-    stdout.writeln('  ${ANSIHelper.green('✓')} ${generateCreatedFile(fileName)}');
+    logger.success(generateCreatedFile(fileName));
 
-    stdout.writeln();
-    _printNextSteps(generateNextSteps(fileName));
+    logger.info('');
+    _printNextSteps(logger, generateNextSteps(fileName));
 
     return ExitCode.success;
   }
 
-  void _printNextSteps(List<String> steps) {
-    stdout.writeln('  ${ANSIHelper.bold('Next steps')}');
-    stdout.writeln(ANSIHelper.dim('  ${'─' * 48}'));
+  void _printNextSteps(Logger logger, List<String> steps) {
+    final sep = TerminalHelper.supportsUnicode ? '─' : '-';
+    logger.info(white.wrap('Next steps') ?? 'Next steps');
+    logger.detail('  ${sep * 48}');
     for (var i = 0; i < steps.length; i++) {
-      stdout.writeln('  ${ANSIHelper.dim('${i + 1}.')} ${steps[i]}');
+      logger.info('  ${darkGray.wrap('${i + 1}.')} ${steps[i]}');
     }
-    stdout.writeln();
+    logger.info('');
   }
 }

@@ -60,3 +60,21 @@ AnalyzedField mutableField(String name, {String type = 'dynamic'}) =>
 /// Creates a `static` [AnalyzedField].
 AnalyzedField staticField(String name, {String type = 'dynamic'}) =>
     AnalyzedField(name: name, type: type, isStatic: true);
+
+/// Creates a [Subject] wrapping an [AnalyzedFile] for use in predicate tests.
+///
+/// [fileName] is the bare file name (e.g. `user_service.dart`).
+/// [folder] is the containing folder path (e.g. `lib/services`).
+Subject fileSubject(
+  String fileName, {
+  String folder = 'lib/src',
+  List<String> imports = const [],
+}) {
+  final filePath = '$folder/$fileName';
+  final file = AnalyzedFile(
+    filePath: filePath,
+    packagePath: 'package:app/$filePath',
+    imports: imports,
+  );
+  return Subject(name: fileName, filePath: filePath, element: file);
+}

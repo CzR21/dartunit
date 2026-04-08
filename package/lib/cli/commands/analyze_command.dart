@@ -1,17 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:args/command_runner.dart';
+import 'package:mason_logger/mason_logger.dart' hide ExitCode;
 import 'package:path/path.dart' as p;
-
 import '../../core/entities/violation.dart';
 import '../../core/enums/rule_severity.dart';
 import '../../engine/analysis_logger.dart';
-import '../../utils/ansi_helper.dart';
 import '../../utils/banner_helper.dart';
+import '../../utils/terminal_helper.dart';
 import '../../reporter/console_reporter.dart';
 import '../../reporter/html_reporter.dart';
-import '../animations/spinner.dart';
 import '../../core/enums/exit_code.dart';
 
 class AnalyzeCommand extends Command<ExitCode> {
@@ -41,21 +39,21 @@ class AnalyzeCommand extends Command<ExitCode> {
   Future<ExitCode> run() async {
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
     final useColor = !(argResults!['no-color'] as bool);
-    final reporter = ConsoleReporter(useColor: useColor);
+    final logger = Logger();
+    final reporter = ConsoleReporter(logger: logger, useColor: useColor);
     final archTestDir = p.join(projectRoot, 'test_arch');
 
-    BannerHelper.printBanner(useColor);
+    BannerHelper.printBanner(logger);
 
-    stdout.writeln('  ${ANSIHelper.dim('Project', useColor)}  $projectRoot');
-    stdout.writeln(ANSIHelper.dim('  ${'─' * 64}', useColor));
-    stdout.writeln();
+    final sep = TerminalHelper.supportsUnicode ? '─' : '-';
+    logger.detail('  Project  $projectRoot');
+    logger.detail('  ${sep * 64}');
+    logger.info('');
 
     if (!Directory(archTestDir).existsSync()) {
-      stdout.writeln(
-          '  ${ANSIHelper.red('✗', useColor)} test_arch/ not found in $projectRoot');
-      stdout.writeln(ANSIHelper.dim(
-          '  Run  dartunit init  to create the test_arch/ folder.', useColor));
-      stdout.writeln();
+      logger.err('test_arch/ not found in $projectRoot');
+      logger.detail('  Run  dartunit init  to create the test_arch/ folder.');
+      logger.info('');
       return ExitCode.error;
     }
 
@@ -68,18 +66,16 @@ class AnalyzeCommand extends Command<ExitCode> {
       ..sort();
 
     if (ruleFiles.isEmpty) {
-      stdout.writeln(
-          '  ${ANSIHelper.cyan('◆', useColor)} No rule files found in test_arch/');
-      stdout.writeln(ANSIHelper.dim(
-          '  Run  dartunit generate <name>  to scaffold a rule.', useColor));
-      stdout.writeln();
+      logger.info('No rule files found in test_arch/');
+      logger.detail('  Run  dartunit generate <name>  to scaffold a rule.');
+      logger.info('');
       return ExitCode.success;
     }
 
-    final rulesSpinner = Spinner('Loading rules...', useColor: useColor)..start();
-    rulesSpinner.stop(doneMessage: 'Found ${ruleFiles.length} rule file(s)');
+    final loadProgress = logger.progress('Loading rules...');
+    loadProgress.complete('Found ${ruleFiles.length} rule file(s)');
 
-    final evalSpinner = Spinner('Analyzing rules...', useColor: useColor)..start();
+    final evalProgress = logger.progress('Analyzing rules...');
 
     final result = await Process.run(
       'dart',
@@ -115,23 +111,21 @@ class AnalyzeCommand extends Command<ExitCode> {
     }
 
     if (parsedRules == 0 && result.exitCode != 0) {
-      evalSpinner.stop(doneMessage: 'Analysis failed');
+      evalProgress.fail('Analysis failed');
       final err = (result.stderr as String)
           .split('\n')
           .where((l) => !l.startsWith('DARTUNIT_RESULT:'))
           .join('\n')
           .trim();
       if (err.isNotEmpty) {
-        stdout.writeln(
-            '\n  ${ANSIHelper.red('✗', useColor)} dart test error:\n  $err');
+        logger.err('dart test error:\n  $err');
       }
-      stdout.writeln();
+      logger.info('');
       return ExitCode.error;
     }
 
-    evalSpinner.stop(doneMessage: 'Rules analyzed');
+    evalProgress.complete('Rules analyzed');
 
-    stdout.writeln();
     reporter.report(allViolations);
 
     final now = DateTime.now();
@@ -146,10 +140,8 @@ class AnalyzeCommand extends Command<ExitCode> {
 
     if (htmlPath != null) {
       final fileUri = 'file:///${htmlPath.replaceAll('\\', '/')}';
-      stdout.writeln(
-        '  ${ANSIHelper.dim('Full report', useColor)}  $fileUri',
-      );
-      stdout.writeln();
+      logger.detail('  Full report  $fileUri');
+      logger.info('');
     }
 
     final hasFailures = allViolations.any((v) => v.severity.isFailure);

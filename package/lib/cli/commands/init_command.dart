@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:mason_logger/mason_logger.dart' hide ExitCode;
 import 'package:path/path.dart' as p;
 
 import '../../core/enums/arch_template.dart';
-import '../../utils/ansi_helper.dart';
 import '../../utils/banner_helper.dart';
+import '../../utils/terminal_helper.dart';
 import '../../core/enums/exit_code.dart';
 import '../texts/init_text.dart';
 
@@ -46,58 +47,57 @@ class InitCommand extends Command<ExitCode> {
     final templateName = argResults!['template'] as String?;
     final template =
         templateName != null ? ArchTemplateExtension.fromString(templateName) : null;
+    final logger = Logger();
 
-    BannerHelper.printBanner();
+    BannerHelper.printBanner(logger);
 
     if (Directory(archTestDir).existsSync()) {
-      stdout.writeln();
-      stdout.writeln('  ${ANSIHelper.cyan('◆')} $initAlreadyExists');
-      stdout.writeln();
+      logger.info('');
+      logger.info(initAlreadyExists);
+      logger.info('');
       return ExitCode.success;
     }
 
-    stdout.writeln('  ${ANSIHelper.dim('Project')}   $projectRoot');
+    logger.detail('  Project   $projectRoot');
     if (template != null) {
-      stdout.writeln('  ${ANSIHelper.dim('Template')}  ${template.label}');
+      logger.detail('  Template  ${template.label}');
     }
-    stdout.writeln();
+    logger.info('');
 
     Directory(archTestDir).createSync(recursive: true);
 
     if (template != null) {
       for (final file in template.ruleFiles) {
         File(p.join(archTestDir, file.fileName)).writeAsStringSync(file.content);
-        _printCreated(file.fileName);
+        _printCreated(logger, file.fileName);
       }
-      stdout.writeln();
-      stdout.writeln('  ${ANSIHelper.green('✓')} ${ANSIHelper.bold(initSuccess)}');
-      stdout.writeln();
-      _printNextSteps(initTemplateNextSteps(template.label, template.ruleFiles.length));
+      logger.info('');
+      logger.success(initSuccess);
+      logger.info('');
+      _printNextSteps(logger, initTemplateNextSteps(template.label, template.ruleFiles.length));
     } else {
       File(p.join(archTestDir, 'example_test_arch.dart')).writeAsStringSync(exampleRule);
-      _printCreated('example_test_arch.dart');
-      stdout.writeln();
-      stdout.writeln('  ${ANSIHelper.green('✓')} ${ANSIHelper.bold(initSuccess)}');
-      stdout.writeln();
-      _printNextSteps(initNextSteps);
+      _printCreated(logger, 'example_test_arch.dart');
+      logger.info('');
+      logger.success(initSuccess);
+      logger.info('');
+      _printNextSteps(logger, initNextSteps);
     }
 
     return ExitCode.success;
   }
 
-  void _printCreated(String relativePath) {
-    stdout.writeln(
-      '  ${ANSIHelper.green('✓')} ${ANSIHelper.dim('Created')}  '
-      '${ANSIHelper.bold('test_arch/')}$relativePath',
-    );
+  void _printCreated(Logger logger, String relativePath) {
+    logger.success('${darkGray.wrap('Created')}  test_arch/$relativePath');
   }
 
-  void _printNextSteps(List<String> steps) {
-    stdout.writeln('  ${ANSIHelper.bold('Next steps')}');
-    stdout.writeln(ANSIHelper.dim('  ${'─' * 48}'));
+  void _printNextSteps(Logger logger, List<String> steps) {
+    final sep = TerminalHelper.supportsUnicode ? '─' : '-';
+    logger.info(white.wrap('Next steps') ?? 'Next steps');
+    logger.detail('  ${sep * 48}');
     for (var i = 0; i < steps.length; i++) {
-      stdout.writeln('  ${ANSIHelper.dim('${i + 1}.')} ${steps[i]}');
+      logger.info('  ${darkGray.wrap('${i + 1}.')} ${steps[i]}');
     }
-    stdout.writeln();
+    logger.info('');
   }
 }
