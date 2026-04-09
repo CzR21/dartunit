@@ -1,5 +1,6 @@
 import '../core/enums/rule_severity.dart';
 import '../core/entities/violation.dart';
+import '../core/extensions/violation_list_extension.dart';
 
 /// Aggregated counts of violations by severity level.
 class ViolationSummary {
@@ -21,10 +22,10 @@ class ViolationSummary {
   factory ViolationSummary.from(List<Violation> violations) {
     return ViolationSummary(
       total: violations.length,
-      critical: violations.where((v) => v.severity == RuleSeverity.critical).length,
-      errors: violations.where((v) => v.severity == RuleSeverity.error).length,
-      warnings: violations.where((v) => v.severity == RuleSeverity.warning).length,
-      infos: violations.where((v) => v.severity == RuleSeverity.info).length,
+      critical: violations.criticalCount,
+      errors: violations.errorCount,
+      warnings: violations.warningCount,
+      infos: violations.infoCount,
     );
   }
 
@@ -39,5 +40,3 @@ class ViolationSummary {
       '  ·  ${RuleSeverity.warning.displayIcon}  $warnings warning(s)'
       '  ·  ${RuleSeverity.info.displayIcon}  $infos info';
 }
-
-

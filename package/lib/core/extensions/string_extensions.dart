@@ -1,6 +1,10 @@
 /// Table formatting and path display extensions on [String].
 extension StringTableFormat on String {
 
+  /// Normalises path separators to forward slashes for cross-platform
+  /// consistency. Equivalent to `replaceAll('\\', '/')`.
+  String get normalized => replaceAll('\\', '/');
+
   /// Returns the display width of this string in terminal columns.
   ///
   /// Accounts for:
@@ -57,7 +61,7 @@ extension StringTableFormat on String {
   ///   2. Otherwise show the last two path segments.
   ///   3. Always truncates to [maxLen] if still too long.
   String shortenProjectPath(int maxLen) {
-    final norm = replaceAll('\\', '/');
+    final norm = normalized;
     final libIdx = norm.indexOf('lib/');
     if (libIdx >= 0) return norm.substring(libIdx).truncate(maxLen);
     final parts = norm.split('/');

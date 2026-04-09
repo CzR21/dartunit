@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:mason_logger/mason_logger.dart';
 import '../core/entities/violation.dart';
 import '../core/extensions/violation_list_extension.dart';
-import '../utils/ansi_helper.dart';
+import '../utils/ansi_formatter.dart';
 import '../core/extensions/string_extensions.dart';
 import '../utils/table_helper.dart';
 import '../core/enums/report_column.dart';
@@ -45,7 +45,7 @@ class ConsoleReporter {
     final sevPlain = ' ${v.severity.label}'
         .padEndToWidth(ReportColumn.severity.width);
     final sevCell = useColor
-        ? '${v.severity.ansiColor}$sevPlain${ANSIHelper.reset}'
+        ? '${v.severity.ansiColor}$sevPlain${ANSIFormatter.reset}'
         : sevPlain;
     final descPlain = ' ${v.ruleDescription.truncate(ReportColumn.description.width - 2)}'
         .padEndToWidth(ReportColumn.description.width);

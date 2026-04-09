@@ -1,11 +1,11 @@
 ---
-title: noBannedCallsPreset
+title: noBannedCalls
 description: Scan file content for forbidden patterns using regex. Ban debug prints, hardcoded URLs, deprecated APIs, or any text pattern that shouldn't exist in production.
 sidebar:
   order: 11
 ---
 
-`noBannedCallsPreset` scans the raw source text of Dart files for forbidden patterns defined as regular expressions. It returns a `List<ArchitectureRule>` — one rule per banned pattern — making it one of the most flexible presets in DartUnit's library.
+`noBannedCalls` scans the raw source text of Dart files for forbidden patterns defined as regular expressions. It returns a `List<ArchitectureRule>` — one rule per banned pattern — making it one of the most flexible presets in DartUnit's library.
 
 Use this preset to enforce code hygiene rules that semantic analyzers and linters cannot catch: debug output left in production, hardcoded environment URLs, deprecated method calls, direct HTTP usage that bypasses the repository layer, or any textual pattern your team has agreed to prohibit.
 
@@ -17,7 +17,7 @@ Production code accumulates debug artifacts over time. A developer adds `print('
 - **Bloat production log output.** If your team monitors Crashlytics, Firebase, or a custom log aggregator, debug prints add noise that obscures real errors. Filtering becomes necessary and error rates become harder to interpret.
 - **Expose internal architecture.** Stack traces and debug messages reveal class names, method signatures, and data structures to anyone with log access on a rooted device.
 
-The `print()` function in Dart writes directly to stdout. `debugPrint()` throttles output but still writes to the debug console. Neither belongs in production code. The `noBannedCallsPreset` can ban both with a single configuration.
+The `print()` function in Dart writes directly to stdout. `debugPrint()` throttles output but still writes to the debug console. Neither belongs in production code. The `noBannedCalls` can ban both with a single configuration.
 
 ## Why Regex on Source Text is Powerful
 
@@ -30,11 +30,11 @@ Regex on raw source text operates at a different level. It does not understand s
 - **Specific argument values:** A regex can find `SharedPreferences.setString('debug_mode', ...)` to catch uses of a specific preference key.
 - **Partial identifiers:** A regex can find `OldApiClient` anywhere it appears, even in variable names, type annotations, or import paths, without needing to resolve symbols.
 
-This makes `noBannedCallsPreset` complementary to — not a replacement for — the Dart analyzer. Use both: the analyzer for semantic rules, `noBannedCallsPreset` for textual hygiene.
+This makes `noBannedCalls` complementary to — not a replacement for — the Dart analyzer. Use both: the analyzer for semantic rules, `noBannedCalls` for textual hygiene.
 
 ## Comparison with Dart Linter Rules
 
-| Aspect | Dart Linter / Analyzer | `noBannedCallsPreset` |
+| Aspect | Dart Linter / Analyzer | `noBannedCalls` |
 |---|---|---|
 | Checks | Semantic, type-aware | Textual, pattern-based |
 | String contents | Cannot inspect | Can inspect |
@@ -46,16 +46,16 @@ This makes `noBannedCallsPreset` complementary to — not a replacement for — 
 
 ## Return Type: `List<ArchitectureRule>`
 
-Unlike most presets that return a single `ArchitectureRule`, `noBannedCallsPreset` returns `List<ArchitectureRule>`. Each entry in the `patterns` map produces one rule. This allows DartUnit to report violations from each banned pattern as separate, independently named rules.
+Unlike most presets that return a single `ArchitectureRule`, `noBannedCalls` returns `List<ArchitectureRule>`. Each entry in the `patterns` map produces one rule. This allows DartUnit to report violations from each banned pattern as separate, independently named rules.
 
 To use a preset returning a list, iterate over it in your rule file:
 
 ```dart
-// arch_test/banned_calls.dart
+// test_arch/banned_calls.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       r'print\(': 'Use a logger instead of print()',
       r'debugPrint\(': 'Remove debugPrint() before committing to main',
@@ -64,7 +64,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -72,11 +72,11 @@ void main(List<String> args) {
 Or use a helper to reduce boilerplate if you have many rule files with list-returning presets:
 
 ```dart
-// arch_test/banned_calls.dart
+// test_arch/banned_calls.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  archTestAll(args, noBannedCallsPreset(
+  archTestAll(args, noBannedCalls(
     patterns: {
       r'print\(': 'Use a logger instead of print()',
       r'debugPrint\(': 'Remove debugPrint() before committing to main',
@@ -88,7 +88,7 @@ void main(List<String> args) {
 ## Function Signature
 
 ```dart
-List<ArchitectureRule> noBannedCallsPreset({
+List<ArchitectureRule> noBannedCalls({
   required Map<String, String> patterns,
   List<String> folders = const [],
   Severity severity = Severity.error,
@@ -143,7 +143,7 @@ Most teams apply different banned patterns to different folders. For example, `p
 File paths (relative to project root) or class names to exclude from all patterns in this preset. Use this for files that legitimately contain some of the banned patterns — for example, a logging utility class that wraps `print()` is the one place where `print()` is allowed.
 
 ```dart
-noBannedCallsPreset(
+noBannedCalls(
   patterns: { r'print\(': 'Use AppLogger instead.' },
   exceptions: ['lib/core/logger.dart'], // The logger wraps print()
 )
@@ -156,11 +156,11 @@ noBannedCallsPreset(
 The most common use case. Any `print()` call in `lib/` (but not in tests) should be replaced with a proper logging solution.
 
 ```dart
-// arch_test/no_print.dart
+// test_arch/no_print.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       r'\bprint\(':
           'print() must not appear in production code. '
@@ -176,7 +176,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -184,7 +184,7 @@ void main(List<String> args) {
 Violation output:
 
 ```
-VIOLATION [error] noBannedCallsPreset[\bprint\(]
+VIOLATION [error] noBannedCalls[\bprint\(]
   File: lib/features/auth/auth_repository.dart
   Line 47: print('Login response: $response');
   Pattern: \bprint\(
@@ -198,11 +198,11 @@ VIOLATION [error] noBannedCallsPreset[\bprint\(]
 Hardcoded environment URLs — especially staging URLs — are a common cause of production incidents. A developer tests against staging, forgets to revert the URL, and commits to main. The production app now calls the staging API.
 
 ```dart
-// arch_test/no_hardcoded_urls.dart
+// test_arch/no_hardcoded_urls.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       r'https?://staging\.':
           'Hardcoded staging URL detected. '
@@ -226,7 +226,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -249,11 +249,11 @@ class ProductRepository {
 `TODO` and `FIXME` comments are common markers during development. They indicate known problems or planned work. A policy of "no `TODO` or `FIXME` in code that reaches `main`" forces developers to either complete the work or convert the comment to a tracked issue.
 
 ```dart
-// arch_test/no_pending_comments.dart
+// test_arch/no_pending_comments.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       r'//\s*TODO':
           'TODO comments are not allowed in production code. '
@@ -273,7 +273,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -282,14 +282,14 @@ This does not prevent `TODO` during development — it only becomes visible when
 
 ### Example 4: Ban Deprecated API Usage
 
-When your team deprecates an internal API and introduces a replacement, you want to ensure all callsites are migrated. Dart's `@deprecated` annotation helps, but if the old method is in a third-party package that hasn't removed it, or if it's a pattern (not just a method name), `noBannedCallsPreset` fills the gap.
+When your team deprecates an internal API and introduces a replacement, you want to ensure all callsites are migrated. Dart's `@deprecated` annotation helps, but if the old method is in a third-party package that hasn't removed it, or if it's a pattern (not just a method name), `noBannedCalls` fills the gap.
 
 ```dart
-// arch_test/no_deprecated_apis.dart
+// test_arch/no_deprecated_apis.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       r'\bOldApiClient\b':
           'OldApiClient is deprecated. Use NewApiClient from package:myapp/core/api_client.dart. '
@@ -310,7 +310,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -322,11 +322,11 @@ The word boundary `\b` in `r'\bOldApiClient\b'` prevents matching `OldApiClientE
 In a well-layered architecture, direct HTTP calls should only appear in the data layer (repositories, remote data sources, API clients). Widget, BLoC, and domain code should never call `http.get()` directly. This rule enforces that boundary:
 
 ```dart
-// arch_test/no_direct_http.dart
+// test_arch/no_direct_http.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       r'\bhttp\.get\(':
           'Direct http.get() calls are not allowed outside the data layer. '
@@ -353,7 +353,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -363,11 +363,11 @@ void main(List<String> args) {
 For a comprehensive code hygiene check, combine all patterns into one preset call. This is the typical production setup:
 
 ```dart
-// arch_test/code_hygiene.dart
+// test_arch/code_hygiene.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: {
       // Debug output
       r'\bprint\(':
@@ -403,7 +403,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -422,7 +422,7 @@ Dart source files are UTF-8 text. Patterns are matched line by line within each 
 
 **Use negative lookahead for exclusions within a pattern.** To match `print(` but not `printer(` or `sprintf(`, use `r'\bprint\s*\('` to require that `print` is followed by optional whitespace and then `(`.
 
-**Test patterns in isolation.** Use a Dart script or an online regex tester to verify your pattern against representative file contents before adding it to `noBannedCallsPreset`.
+**Test patterns in isolation.** Use a Dart script or an online regex tester to verify your pattern against representative file contents before adding it to `noBannedCalls`.
 
 ## The `description` Field in Violation Messages
 
@@ -436,7 +436,7 @@ The value associated with each pattern key is displayed verbatim in the violatio
 A developer encountering a violation for the first time should understand what to do without asking anyone. Invest in clear, actionable descriptions.
 
 ```
-VIOLATION [error] noBannedCallsPreset[\\bprint\\(]
+VIOLATION [error] noBannedCalls[\\bprint\\(]
   File: lib/features/cart/cart_service.dart
   Line 89: print('Cart updated: ${cart.items.length} items, total: ${cart.total}');
   Pattern: \bprint\(
@@ -470,6 +470,6 @@ The exit code of `dart run dartunit analyze` is non-zero when any `Severity.erro
 
 ## Related Presets
 
-- [`noExternalPackagePreset`](/presets/no-external-package) — Prevent importing specific packages in specific layers
-- [`classSizeLimitPreset`](/presets/class-size-limit) — Control class complexity
-- [`noPublicFieldsPreset`](/presets/no-public-fields) — Enforce encapsulation through structural rules rather than textual pattern matching
+- [`noExternalPackage`](/presets/no-external-package) — Prevent importing specific packages in specific layers
+- [`classSizeLimit`](/presets/class-size-limit) — Control class complexity
+- [`noPublicFields`](/presets/no-public-fields) — Enforce encapsulation through structural rules rather than textual pattern matching

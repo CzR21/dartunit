@@ -28,7 +28,7 @@ void main() {
       await DartunitCli()
           .run(['generate', 'no_ui_in_domain', '--path', tempDir.path]);
       expect(
-        File(p.join(tempDir.path, 'test_arch', 'no_ui_in_domain_test_arch.dart'))
+        File(p.join(tempDir.path, 'test_arch', 'no_ui_in_domain_arch_test.dart'))
             .existsSync(),
         isTrue,
       );
@@ -38,7 +38,7 @@ void main() {
       await DartunitCli()
           .run(['generate', 'my_rule', '--path', tempDir.path]);
       final content =
-          File(p.join(tempDir.path, 'test_arch', 'my_rule_test_arch.dart'))
+          File(p.join(tempDir.path, 'test_arch', 'my_rule_arch_test.dart'))
               .readAsStringSync();
       expect(content, contains('testArch'));
       expect(content, anyOf(contains('doesNotDependOn'), contains('hasMaxMethods')));

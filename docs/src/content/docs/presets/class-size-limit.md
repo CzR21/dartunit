@@ -1,11 +1,11 @@
 ---
-title: classSizeLimitPreset
+title: classSizeLimit
 description: Limit the number of methods and/or fields per class. Prevents God classes from accumulating too many responsibilities over time.
 sidebar:
   order: 9
 ---
 
-`classSizeLimitPreset` enforces an upper bound on the number of methods and/or fields a class may declare. It targets one of the most persistent and damaging architectural anti-patterns in any codebase: the God class.
+`classSizeLimit` enforces an upper bound on the number of methods and/or fields a class may declare. It targets one of the most persistent and damaging architectural anti-patterns in any codebase: the God class.
 
 ## What is a God Class?
 
@@ -53,7 +53,7 @@ A sensible starting point for a brownfield project is 20–25 methods. This will
 ## Function Signature
 
 ```dart
-ArchitectureRule classSizeLimitPreset({
+void classSizeLimit({
   int? maxMethods,
   int? maxFields,
   List<String> folders = const [],
@@ -110,11 +110,11 @@ class CheckoutState {
 
 A list of folder paths (relative to the project root) that the rule applies to. When empty, the rule applies to every Dart file in the project.
 
-When specified, only classes found within the given folders (and their subdirectories) are checked. Multiple calls to `classSizeLimitPreset` with different `folders` and different limits allow different thresholds for different layers.
+When specified, only classes found within the given folders (and their subdirectories) are checked. Multiple calls to `classSizeLimit` with different `folders` and different limits allow different thresholds for different layers.
 
 ```dart
 // Only applies to files under lib/blocs/
-classSizeLimitPreset(maxMethods: 8, folders: ['lib/blocs'])
+classSizeLimit(maxMethods: 8, folders: ['lib/blocs'])
 ```
 
 ### `severity`
@@ -134,7 +134,7 @@ Controls how violations are reported:
 A list of class names to exclude from the rule. Useful for known legacy classes that cannot be immediately refactored, or for framework base classes that are intentionally large.
 
 ```dart
-classSizeLimitPreset(
+classSizeLimit(
   maxMethods: 15,
   exceptions: ['LegacyUserService', 'GeneratedRouterBase'],
 )
@@ -144,13 +144,13 @@ classSizeLimitPreset(
 
 ### Setting Up the Rule File
 
-Create a file in the `arch_test/` directory. Each rule file has the following structure:
+Create a file in the `test_arch/` directory. Each rule file has the following structure:
 
 ```dart
-// arch_test/class_size.dart
+// test_arch/class_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(args, classSizeLimitPreset(
+void main() => classSizeLimit(
   maxMethods: 15,
 ));
 ```
@@ -168,12 +168,10 @@ dart run dartunit analyze
 The simplest form: no class in the entire project may exceed 15 methods. This is a good starting point for a project that has never enforced class size limits. It will surface the worst offenders without being overly strict.
 
 ```dart
-// arch_test/global_class_size.dart
+// test_arch/global_class_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 15,
     severity: Severity.warning, // Start as warning during adoption
   ),
@@ -183,13 +181,13 @@ void main(List<String> args) => archTest(
 When run, DartUnit scans every `.dart` file under `lib/` and reports any class with more than 15 declared methods:
 
 ```
-VIOLATION [warning] classSizeLimitPreset
+VIOLATION [warning] classSizeLimit
   File: lib/services/user_service.dart
   Class: UserService
   Methods declared: 23 (max allowed: 15)
   Exceeded by: 8 methods
 
-VIOLATION [warning] classSizeLimitPreset
+VIOLATION [warning] classSizeLimit
   File: lib/features/checkout/checkout_bloc.dart
   Class: CheckoutBloc
   Methods declared: 19 (max allowed: 15)
@@ -201,12 +199,10 @@ VIOLATION [warning] classSizeLimitPreset
 BLoC classes that accumulate too many event handlers are a common Flutter problem. Each `on<Event>` handler is a method, and a BLoC with 20+ handlers is handling too many domain events. Limiting BLoC classes to 10 methods (roughly 7–8 handlers plus a few helpers) forces appropriate domain decomposition.
 
 ```dart
-// arch_test/bloc_size.dart
+// test_arch/bloc_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 10,
     folders: ['lib/blocs', 'lib/cubits', 'lib/features'],
     severity: Severity.error,
@@ -221,12 +217,10 @@ A BLoC that exceeds this limit likely conflates multiple domains. For example, a
 Widgets with many fields are carrying state they shouldn't. A `StatefulWidget` with 10+ fields in its `State` class is managing too much local state — some of it should be lifted to a BLoC or ChangeNotifier, and some of the widget should be extracted into sub-widgets.
 
 ```dart
-// arch_test/widget_size.dart
+// test_arch/widget_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxFields: 7,
     folders: ['lib/ui', 'lib/widgets', 'lib/screens', 'lib/pages'],
     severity: Severity.error,
@@ -255,7 +249,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 The violation message tells you exactly what to fix:
 
 ```
-VIOLATION [error] classSizeLimitPreset
+VIOLATION [error] classSizeLimit
   File: lib/screens/product_detail_screen.dart
   Class: _ProductDetailScreenState
   Fields declared: 9 (max allowed: 7)
@@ -267,12 +261,10 @@ VIOLATION [error] classSizeLimitPreset
 Repositories that handle both remote API calls and local cache management tend to grow large. A limit on repository classes encourages splitting into a remote data source, a local data source, and a thin repository that coordinates them.
 
 ```dart
-// arch_test/repository_size.dart
+// test_arch/repository_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 12,
     maxFields: 5,
     folders: ['lib/data/repositories'],
@@ -288,12 +280,10 @@ Applying both `maxMethods` and `maxFields` simultaneously means a class violates
 Different architectural layers have different natural sizes. Domain entities are tiny; framework integration classes may legitimately be larger. Use multiple rule files to apply layer-appropriate limits:
 
 ```dart
-// arch_test/domain_size.dart
+// test_arch/domain_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 8,
     maxFields: 4,
     folders: ['lib/domain'],
@@ -303,12 +293,10 @@ void main(List<String> args) => archTest(
 ```
 
 ```dart
-// arch_test/application_size.dart
+// test_arch/application_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 15,
     maxFields: 8,
     folders: ['lib/application', 'lib/blocs'],
@@ -318,12 +306,10 @@ void main(List<String> args) => archTest(
 ```
 
 ```dart
-// arch_test/infrastructure_size.dart
+// test_arch/infrastructure_size.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 20,
     folders: ['lib/infrastructure', 'lib/data'],
     severity: Severity.warning, // Infrastructure can be larger
@@ -338,14 +324,12 @@ This layered approach acknowledges reality: infrastructure code (database mapper
 When introducing this preset to a large existing project, start permissively and tighten over time. Begin by excepting known large legacy classes while still flagging new violations:
 
 ```dart
-// arch_test/class_size_phase1.dart
+// test_arch/class_size_phase1.dart
 import 'package:dartunit/dartunit.dart';
 
 // Phase 1: Flag the worst offenders only (>25 methods)
 // Add known legacy classes to exceptions while they are being refactored
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 25,
     severity: Severity.warning,
     exceptions: [
@@ -360,13 +344,11 @@ void main(List<String> args) => archTest(
 After the refactors in the exceptions list are complete, lower the limit and reduce or remove exceptions:
 
 ```dart
-// arch_test/class_size_phase2.dart
+// test_arch/class_size_phase2.dart
 import 'package:dartunit/dartunit.dart';
 
 // Phase 2: Tighter limit, exceptions removed as classes are refactored
-void main(List<String> args) => archTest(
-  args,
-  classSizeLimitPreset(
+void main() => classSizeLimit(
     maxMethods: 15,
     severity: Severity.error, // Now blocking in CI
     exceptions: [
@@ -381,7 +363,7 @@ void main(List<String> args) => archTest(
 When a class exceeds the configured limit, DartUnit reports:
 
 ```
-VIOLATION [error] classSizeLimitPreset
+VIOLATION [error] classSizeLimit
   File: lib/features/auth/auth_bloc.dart
   Class: AuthBloc
   Methods declared: 18 (max allowed: 10)
@@ -391,7 +373,7 @@ VIOLATION [error] classSizeLimitPreset
 For a fields violation:
 
 ```
-VIOLATION [error] classSizeLimitPreset
+VIOLATION [error] classSizeLimit
   File: lib/ui/screens/home_screen.dart
   Class: _HomeScreenState
   Fields declared: 11 (max allowed: 7)
@@ -401,13 +383,13 @@ VIOLATION [error] classSizeLimitPreset
 When both `maxMethods` and `maxFields` are configured and both are exceeded, DartUnit emits separate violation entries for each:
 
 ```
-VIOLATION [error] classSizeLimitPreset
+VIOLATION [error] classSizeLimit
   File: lib/services/legacy_service.dart
   Class: LegacyService
   Methods declared: 28 (max allowed: 15)
   Exceeded by: 13 methods
 
-VIOLATION [error] classSizeLimitPreset
+VIOLATION [error] classSizeLimit
   File: lib/services/legacy_service.dart
   Class: LegacyService
   Fields declared: 12 (max allowed: 8)
@@ -416,7 +398,7 @@ VIOLATION [error] classSizeLimitPreset
 
 ## Incremental Adoption Strategy
 
-Introducing `classSizeLimitPreset` to an existing codebase should be done in phases to avoid blocking the team while still making architectural progress:
+Introducing `classSizeLimit` to an existing codebase should be done in phases to avoid blocking the team while still making architectural progress:
 
 **Phase 1 — Visibility (week 1–2):** Set `severity: Severity.warning` with a generous limit (e.g., `maxMethods: 30`). Do not block CI. Let the team see what's flagged. Discuss the worst offenders in architecture reviews.
 
@@ -430,14 +412,14 @@ This approach prevents the common failure mode where a strict rule is introduced
 
 ## Pairing With Other Presets
 
-`classSizeLimitPreset` is most effective when used alongside:
+`classSizeLimit` is most effective when used alongside:
 
 - **`layerDependencyPreset`** — ensures that classes extracted from a God class don't end up in the wrong layer
 - **`namingConventionPreset`** — when splitting a `UserService` into `AuthService`, `ProfileService`, and `NotificationService`, naming conventions ensure the new classes follow the project's established patterns
-- **`noPublicFieldsPreset`** — God classes often expose internal state as public fields; after splitting, this rule ensures the new smaller classes maintain proper encapsulation
+- **`noPublicFields`** — God classes often expose internal state as public fields; after splitting, this rule ensures the new smaller classes maintain proper encapsulation
 
 ## Related Presets
 
-- [`noPublicFieldsPreset`](/presets/no-public-fields) — Enforce encapsulation after reducing class size
+- [`noPublicFields`](/presets/no-public-fields) — Enforce encapsulation after reducing class size
 - [`layerDependencyPreset`](/presets/layer) — Ensure extracted classes land in the correct layer
 - [`namingConventionPreset`](/presets/naming) — Consistent naming for newly created classes

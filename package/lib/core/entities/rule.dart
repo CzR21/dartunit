@@ -1,4 +1,5 @@
 import '../enums/rule_severity.dart';
+import '../extensions/string_extensions.dart';
 import 'violation.dart';
 import '../../analyzer/context/analysis_context.dart';
 import 'predicate.dart';
@@ -62,14 +63,13 @@ class Rule {
   }
 
   bool _isExcepted(String filePath) {
-    final normalizedPath = filePath.replaceAll('\\', '/');
+    final normalizedPath = filePath.normalized;
     return exceptions.any((e) {
-      final normalized = e.replaceAll('\\', '/');
-      if (normalized.endsWith('.dart')) {
-        return normalizedPath.endsWith(normalized) ||
-            normalizedPath == normalized;
+      final norm = e.normalized;
+      if (norm.endsWith('.dart')) {
+        return normalizedPath.endsWith(norm) || normalizedPath == norm;
       }
-      final prefix = normalized.endsWith('/') ? normalized : '$normalized/';
+      final prefix = norm.endsWith('/') ? norm : '$norm/';
       return normalizedPath.contains(prefix);
     });
   }

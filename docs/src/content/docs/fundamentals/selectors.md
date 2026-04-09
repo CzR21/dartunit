@@ -156,25 +156,19 @@ FileSelector(
 
 ### Using FileSelector with predicates
 
-`FileSelector` is typically paired with `FileContentMatchesPredicate` or `NotPredicate(FileContentMatchesPredicate(...))`:
+`FileSelector` is typically paired with `hasNoContent()` / `hasContent()` arch matchers in a `testArch` call:
 
 ```dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  ArchitectureRule(
-    description: 'No print() calls in production code',
-    severity: RuleSeverity.warning,
-    selector: FileSelector(folder: 'lib'),
-    predicate: NotPredicate(
-      FileContentMatchesPredicate(
-        r'print\s*\(',
-        description: 'contains print() call',
-      ),
-    ),
-  ),
-);
+void main() {
+  testArch('No print() calls in production code', (arch) {
+    expect(
+      arch.files(folder: 'lib'),
+      hasNoContent(r'print\s*\('),
+    );
+  }, severity: RuleSeverity.warning);
+}
 ```
 
 ## LayerSelector
@@ -201,20 +195,19 @@ LayerSelector('lib/data')
 LayerSelector('lib/presentation')
 ```
 
-**Rule using LayerSelector:**
+**Using LayerSelector via testArch:**
 
 ```dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  ArchitectureRule(
-    description: 'Domain layer must not depend on data layer',
-    severity: RuleSeverity.error,
-    selector: LayerSelector('lib/domain'),
-    predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-  ),
-);
+void main() {
+  testArch('Domain layer must not depend on data layer', (arch) {
+    expect(
+      arch.layer('domain', folder: 'lib/domain'),
+      doesNotDependOn('lib/data'),
+    );
+  }, severity: RuleSeverity.error);
+}
 ```
 
 ## The folder Filter — Substring Matching

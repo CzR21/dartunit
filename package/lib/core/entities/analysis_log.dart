@@ -1,5 +1,6 @@
 import '../enums/rule_severity.dart';
 import 'violation.dart';
+import '../extensions/violation_list_extension.dart';
 
 /// A single recorded analysis run.
 class AnalysisLog {
@@ -14,9 +15,10 @@ class AnalysisLog {
   });
 
   bool get passed => violations.isEmpty;
-  int get errorCount => violations.where((v) => v.severity == RuleSeverity.error || v.severity == RuleSeverity.critical).length;
-  int get warningCount => violations.where((v) => v.severity == RuleSeverity.warning).length;
-  int get infoCount => violations.where((v) => v.severity == RuleSeverity.info).length;
+  /// Combined error + critical count (failures that affect the exit code).
+  int get failureCount => violations.errorCount + violations.criticalCount;
+  int get warningCount => violations.warningCount;
+  int get infoCount    => violations.infoCount;
 
   Map<String, dynamic> toJson() => {
         'timestamp': timestamp.toIso8601String(),

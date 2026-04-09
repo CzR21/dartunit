@@ -5,14 +5,14 @@ sidebar:
   order: 5
 ---
 
-## noPublicFieldsPreset
+## noPublicFields
 
 Enforces that classes in the specified folders have no public fields. A public field is any field not prefixed with an underscore (`_`).
 
 ### Function signature
 
 ```dart
-ArchitectureRule noPublicFieldsPreset({
+ArchitectureRule noPublicFields({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.warning,
   List<String> exceptions = const [],
@@ -33,12 +33,12 @@ Public fields break encapsulation. They allow any code to read and mutate state 
 
 ### Example — BLoC and domain layers
 
-```dart title="arch_test/encapsulation_arch_test.dart"
+```dart title="test_arch/encapsulation_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  noPublicFieldsPreset(
+  noPublicFields(
     folders: ['lib/domain', 'lib/bloc'],
     severity: RuleSeverity.warning,
     exceptions: ['DataTransferObject'],
@@ -48,12 +48,12 @@ void main(List<String> args) => archTest(
 
 ### Example — Strict enforcement on domain
 
-```dart title="arch_test/domain_encapsulation_arch_test.dart"
+```dart title="test_arch/domain_encapsulation_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  noPublicFieldsPreset(
+  noPublicFields(
     folders: ['lib/domain'],
     severity: RuleSeverity.error,
   ),
@@ -88,14 +88,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
 ---
 
-## noBannedCallsPreset
+## noBannedCalls
 
 Bans specific text patterns from appearing in project files. Each pattern is a Dart regex applied to the full file content.
 
 ### Function signature
 
 ```dart
-List<ArchitectureRule> noBannedCallsPreset({
+List<ArchitectureRule> noBannedCalls({
   required List<String> patterns,
   List<String> excludeFolders = const [],
   RuleSeverity severity = RuleSeverity.warning,
@@ -112,11 +112,11 @@ List<ArchitectureRule> noBannedCallsPreset({
 
 ### Example — Ban debug output calls
 
-```dart title="arch_test/no_debug_calls_arch_test.dart"
+```dart title="test_arch/no_debug_calls_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: [
       r'print\s*\(',
       r'debugPrint\s*\(',
@@ -134,11 +134,11 @@ void main(List<String> args) {
 
 ### Example — Ban deprecated Flutter widgets
 
-```dart title="arch_test/no_deprecated_widgets_arch_test.dart"
+```dart title="test_arch/no_deprecated_widgets_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: [
       r'WillPopScope',
       r'FlatButton',
@@ -156,11 +156,11 @@ void main(List<String> args) {
 
 ### Example — Ban hardcoded configuration strings
 
-```dart title="arch_test/no_hardcoded_config_arch_test.dart"
+```dart title="test_arch/no_hardcoded_config_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: [
       r'"http://',
       r'"https://api\.staging',
@@ -179,11 +179,11 @@ void main(List<String> args) {
 
 ### Example — Ban TODO/FIXME comments in production
 
-```dart title="arch_test/no_todos_arch_test.dart"
+```dart title="test_arch/no_todos_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noBannedCallsPreset(
+  final rules = noBannedCalls(
     patterns: [
       r'//\s*TODO',
       r'//\s*FIXME',
@@ -212,7 +212,7 @@ WARNING | No banned pattern: debugPrint\s*\(
 ```
 
 :::tip[Exclude test folders]
-Debug calls in tests are completely normal. Always exclude `test` and `integration_test` from `noBannedCallsPreset` rules that target debug output.
+Debug calls in tests are completely normal. Always exclude `test` and `integration_test` from `noBannedCalls` rules that target debug output.
 :::
 
 :::tip[Use single quotes for patterns in Dart strings]

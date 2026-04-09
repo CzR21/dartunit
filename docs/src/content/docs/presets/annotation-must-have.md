@@ -1,15 +1,15 @@
 ---
-title: annotationMustHavePreset
+title: annotationMustHave
 description: Enforce that every class in specified folders carries a required annotation. Prevent missing @injectable, @immutable, @freezed, or custom annotations at CI time.
 sidebar:
   order: 13
 ---
 
-`annotationMustHavePreset` enforces that every class in specified folders carries a particular annotation. It is a completeness check — it ensures no class silently misses a required annotation when it was supposed to have one. Common use cases include enforcing `@injectable` for dependency injection, `@immutable` for state and value objects, `@freezed` for generated sealed classes, and custom project-defined annotations for compliance tracking.
+`annotationMustHave` enforces that every class in specified folders carries a particular annotation. It is a completeness check — it ensures no class silently misses a required annotation when it was supposed to have one. Common use cases include enforcing `@injectable` for dependency injection, `@immutable` for state and value objects, `@freezed` for generated sealed classes, and custom project-defined annotations for compliance tracking.
 
 ## Why Annotation Enforcement Matters
 
-Annotations in Dart serve as machine-readable metadata that frameworks and tools act upon. When an annotation is missing, the framework silently skips the class, producing runtime failures instead of compile-time errors. `annotationMustHavePreset` converts these silent runtime failures into loud CI failures.
+Annotations in Dart serve as machine-readable metadata that frameworks and tools act upon. When an annotation is missing, the framework silently skips the class, producing runtime failures instead of compile-time errors. `annotationMustHave` converts these silent runtime failures into loud CI failures.
 
 ### The Dependency Injection Scenario
 
@@ -46,10 +46,10 @@ Unhandled Exception: StateError: Expected a value of type 'OrderService',
 but got one of type 'Null'
 ```
 
-This error appears in testing, staging, or — in the worst case — production. Finding its root cause requires understanding the DI container's resolution order. `annotationMustHavePreset` turns this into a build failure:
+This error appears in testing, staging, or — in the worst case — production. Finding its root cause requires understanding the DI container's resolution order. `annotationMustHave` turns this into a build failure:
 
 ```
-VIOLATION [error] annotationMustHavePreset[@injectable]
+VIOLATION [error] annotationMustHave[@injectable]
   File: lib/services/order_service.dart
   Class: OrderService
   Missing annotation: @injectable
@@ -90,13 +90,13 @@ class AuthLoading extends AuthState {
 }
 ```
 
-The code works fine in most cases. But if someone later adds a non-final field to `AuthLoading`, there is no warning that it violates the immutability contract the rest of the state hierarchy follows. `annotationMustHavePreset` ensures that `@immutable` is consistently present on all state classes, maintaining a uniform signal to both developers and tools.
+The code works fine in most cases. But if someone later adds a non-final field to `AuthLoading`, there is no warning that it violates the immutability contract the rest of the state hierarchy follows. `annotationMustHave` ensures that `@immutable` is consistently present on all state classes, maintaining a uniform signal to both developers and tools.
 
 ### Preventing Silent Registration Failures Over Time
 
-In any codebase that grows over time, "remember to add annotation X to every class in folder Y" is a convention that breaks down. Developers work under time pressure, conventions are not in code, and new team members don't know the rules. The combination of `annotationMustHavePreset` and CI enforcement means:
+In any codebase that grows over time, "remember to add annotation X to every class in folder Y" is a convention that breaks down. Developers work under time pressure, conventions are not in code, and new team members don't know the rules. The combination of `annotationMustHave` and CI enforcement means:
 
-1. The rule is stated explicitly in the `arch_test/` directory (which is committed code).
+1. The rule is stated explicitly in the `test_arch/` directory (which is committed code).
 2. Any PR that violates the rule fails CI automatically.
 3. New team members learn the rule when they encounter a CI failure — with a clear, actionable message.
 
@@ -118,7 +118,7 @@ For annotations with parameters (like `@JsonSerializable(explicitToJson: true)`)
 ## Function Signature
 
 ```dart
-ArchitectureRule annotationMustHavePreset({
+void annotationMustHave({
   required List<String> folders,
   required String annotation,
   Severity severity = Severity.error,
@@ -182,12 +182,10 @@ exceptions: [
 ## Usage
 
 ```dart
-// arch_test/injectable_check.dart
+// test_arch/injectable_check.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustHavePreset(
+void main() => annotationMustHave(
     folders: ['lib/services', 'lib/repositories'],
     annotation: 'injectable',
     severity: Severity.error,
@@ -208,12 +206,10 @@ dart run dartunit analyze
 The primary DI enforcement use case. Every class in the registered DI folders must have `@injectable` (or `@lazySingleton`, `@singleton`, etc. — note that each variant is a distinct annotation, so you would need separate rules for each, or use `@injectable` as your team's standard).
 
 ```dart
-// arch_test/di_completeness.dart
+// test_arch/di_completeness.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustHavePreset(
+void main() => annotationMustHave(
     folders: [
       'lib/services',
       'lib/repositories',
@@ -236,7 +232,7 @@ void main(List<String> args) => archTest(
 This ensures that every concrete class in these folders is explicitly opted into DI registration. If a new developer creates a service class and forgets `@injectable`, the CI check fails with:
 
 ```
-VIOLATION [error] annotationMustHavePreset[@injectable]
+VIOLATION [error] annotationMustHave[@injectable]
   File: lib/services/recommendation_service.dart
   Class: RecommendationService
   Missing annotation: @injectable
@@ -249,12 +245,10 @@ VIOLATION [error] annotationMustHavePreset[@injectable]
 BLoC states represent snapshots of application state. They must be immutable — the BLoC emits new instances rather than mutating existing ones. Enforcing `@immutable` on all state classes provides a clear signal to developers and enables static analysis to catch accidental mutations.
 
 ```dart
-// arch_test/bloc_state_immutability.dart
+// test_arch/bloc_state_immutability.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustHavePreset(
+void main() => annotationMustHave(
     folders: ['lib/blocs/states', 'lib/cubits/states'],
     annotation: 'immutable',
     severity: Severity.error,
@@ -269,12 +263,10 @@ void main(List<String> args) => archTest(
 To extend this to all BLoC-related files (states, events, and the BLoC itself), use multiple rule files or a combined folders list:
 
 ```dart
-// arch_test/bloc_immutability.dart
+// test_arch/bloc_immutability.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustHavePreset(
+void main() => annotationMustHave(
     // States AND events should be immutable
     folders: [
       'lib/blocs/states',
@@ -289,7 +281,7 @@ void main(List<String> args) => archTest(
 A violation example:
 
 ```
-VIOLATION [error] annotationMustHavePreset[@immutable]
+VIOLATION [error] annotationMustHave[@immutable]
   File: lib/blocs/states/payment_state.dart
   Class: PaymentProcessing
   Missing annotation: @immutable
@@ -302,12 +294,10 @@ VIOLATION [error] annotationMustHavePreset[@immutable]
 Value objects in domain-driven design represent concepts without identity — money amounts, addresses, email addresses, phone numbers. They should be final (no subclassing), value-equal (equality by content, not reference), and immutable. The `@sealed` annotation prevents subclassing.
 
 ```dart
-// arch_test/value_object_sealed.dart
+// test_arch/value_object_sealed.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustHavePreset(
+void main() => annotationMustHave(
     folders: ['lib/domain/value_objects'],
     annotation: 'sealed',
     severity: Severity.error,
@@ -353,7 +343,7 @@ class EmailAddress {
 
 ### Example 4: Custom `@reviewed` Annotation for Compliance
 
-In regulated industries (healthcare, finance, legal tech), teams sometimes need to track which classes have been reviewed for compliance, security, or legal requirements. A custom annotation can serve as this marker, and `annotationMustHavePreset` enforces that no new class is deployed without a review.
+In regulated industries (healthcare, finance, legal tech), teams sometimes need to track which classes have been reviewed for compliance, security, or legal requirements. A custom annotation can serve as this marker, and `annotationMustHave` enforces that no new class is deployed without a review.
 
 First, define the annotation in your project:
 
@@ -375,12 +365,10 @@ class reviewed {
 Then enforce it:
 
 ```dart
-// arch_test/compliance_review.dart
+// test_arch/compliance_review.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustHavePreset(
+void main() => annotationMustHave(
     folders: [
       'lib/features/payment',   // Payment processing — requires review
       'lib/features/health',    // Health data — requires HIPAA review
@@ -409,7 +397,7 @@ class PaymentProcessor {
 A new class without `@reviewed` in these folders fails CI:
 
 ```
-VIOLATION [error] annotationMustHavePreset[@reviewed]
+VIOLATION [error] annotationMustHave[@reviewed]
   File: lib/features/payment/refund_service.dart
   Class: RefundService
   Missing annotation: @reviewed
@@ -419,30 +407,30 @@ VIOLATION [error] annotationMustHavePreset[@reviewed]
 
 This makes compliance review a hard requirement rather than a post-deployment process.
 
-## Pairing With `annotationMustNotHavePreset`
+## Pairing With `annotationMustNotHave`
 
-`annotationMustHavePreset` and `annotationMustNotHavePreset` address opposite concerns:
+`annotationMustHave` and `annotationMustNotHave` address opposite concerns:
 
 - **Must-have = completeness.** Every class in a folder must carry annotation X. Use this to ensure nothing is accidentally skipped (DI registration, immutability marking, compliance review).
-- **Must-not-have = boundary enforcement.** No class in a folder may carry annotation Y. Use this to prevent annotation-implied dependencies from leaking into the wrong layer (see [`annotationMustNotHavePreset`](/presets/annotation-must-not-have)).
+- **Must-not-have = boundary enforcement.** No class in a folder may carry annotation Y. Use this to prevent annotation-implied dependencies from leaking into the wrong layer (see [`annotationMustNotHave`](/presets/annotation-must-not-have)).
 
 Combining both on the same folder creates precise annotation policies:
 
 ```dart
-// arch_test/domain_state_annotations.dart
+// test_arch/domain_state_annotations.dart
 import 'package:dartunit/dartunit.dart';
 
 // BLoC states must be @immutable and must NOT be @JsonSerializable
 void main(List<String> args) {
   // Requirement: must have @immutable
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/blocs/states'],
     annotation: 'immutable',
     severity: Severity.error,
   ));
 
   // Boundary: must NOT have @JsonSerializable
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/blocs/states'],
     annotation: 'JsonSerializable',
     severity: Severity.error,
@@ -452,24 +440,24 @@ void main(List<String> args) {
 
 This establishes that BLoC state classes are always immutable and are never serialized directly to JSON (serialization is handled by DTO mappers in the data layer, not by the states themselves).
 
-## Using Multiple `annotationMustHavePreset` Calls
+## Using Multiple `annotationMustHave` Calls
 
 You can combine multiple annotation requirements for the same folder in a single rule file by calling `archTest` multiple times:
 
 ```dart
-// arch_test/domain_entity_annotations.dart
+// test_arch/domain_entity_annotations.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // Domain entities must be immutable
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/domain/entities'],
     annotation: 'immutable',
     severity: Severity.error,
   ));
 
   // Domain entities must be sealed (no subclassing outside domain)
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/domain/entities'],
     annotation: 'sealed',
     severity: Severity.error,
@@ -486,7 +474,7 @@ void main(List<String> args) {
 When a class in a targeted folder lacks the required annotation:
 
 ```
-VIOLATION [error] annotationMustHavePreset[@injectable]
+VIOLATION [error] annotationMustHave[@injectable]
   File: lib/repositories/product_repository.dart
   Class: ProductRepository
   Missing annotation: @injectable
@@ -497,6 +485,6 @@ The message includes the file, the class name, the missing annotation, and the r
 
 ## Related Presets
 
-- [`annotationMustNotHavePreset`](/presets/annotation-must-not-have) — Enforce that classes do NOT carry certain annotations (boundary enforcement)
-- [`noPublicFieldsPreset`](/presets/no-public-fields) — Enforce encapsulation rules that complement `@immutable` requirements
-- [`noExternalPackagePreset`](/presets/no-external-package) — Prevent annotation-implied dependencies from leaking into wrong layers
+- [`annotationMustNotHave`](/presets/annotation-must-not-have) — Enforce that classes do NOT carry certain annotations (boundary enforcement)
+- [`noPublicFields`](/presets/no-public-fields) — Enforce encapsulation rules that complement `@immutable` requirements
+- [`noExternalPackage`](/presets/no-external-package) — Prevent annotation-implied dependencies from leaking into wrong layers

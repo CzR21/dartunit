@@ -1,18 +1,18 @@
 ---
 title: Metrics Presets
-description: The classSizeLimitPreset for controlling the size of classes in your project.
+description: The classSizeLimit for controlling the size of classes in your project.
 sidebar:
   order: 4
 ---
 
-## classSizeLimitPreset
+## classSizeLimit
 
 Limits the maximum number of methods and/or fields per class, helping to prevent God Classes from accumulating.
 
 ### Function signature
 
 ```dart
-ArchitectureRule classSizeLimitPreset({
+ArchitectureRule classSizeLimit({
   required List<String> folders,
   int? maxMethods,
   int? maxFields,
@@ -37,12 +37,12 @@ At least one of `maxMethods` or `maxFields` must be specified.
 
 ### Example — Global size limit
 
-```dart title="arch_test/class_size_arch_test.dart"
+```dart title="test_arch/class_size_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  classSizeLimitPreset(
+  classSizeLimit(
     folders: ['lib'],
     maxMethods: 20,
     maxFields: 15,
@@ -54,14 +54,14 @@ void main(List<String> args) => archTest(
 
 ### Example — Stricter limits for the domain layer
 
-```dart title="arch_test/class_size_arch_test.dart"
+```dart title="test_arch/class_size_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // General limit across the whole project
   archTest(
     args,
-    classSizeLimitPreset(
+    classSizeLimit(
       folders: ['lib'],
       maxMethods: 25,
       severity: RuleSeverity.warning,
@@ -71,7 +71,7 @@ void main(List<String> args) {
   // Stricter limit for domain entities (should be small and focused)
   archTest(
     args,
-    classSizeLimitPreset(
+    classSizeLimit(
       folders: ['lib/domain/entities'],
       maxFields: 8,
       severity: RuleSeverity.warning,
@@ -82,12 +82,12 @@ void main(List<String> args) {
 
 ### Example — Only limit fields (no method limit)
 
-```dart title="arch_test/class_size_arch_test.dart"
+```dart title="test_arch/class_size_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  classSizeLimitPreset(
+  classSizeLimit(
     folders: ['lib/domain'],
     maxFields: 10,
     severity: RuleSeverity.info,

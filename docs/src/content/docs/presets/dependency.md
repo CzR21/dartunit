@@ -1,18 +1,18 @@
 ---
 title: Dependency Presets
-description: The noExternalPackagePreset for controlling which external packages can be used in specific folders.
+description: The noExternalPackage for controlling which external packages can be used in specific folders.
 sidebar:
   order: 6
 ---
 
-## noExternalPackagePreset
+## noExternalPackage
 
 Prohibits the use of specific external packages in certain project folders. Generates one `ArchitectureRule` per package per folder combination.
 
 ### Function signature
 
 ```dart
-List<ArchitectureRule> noExternalPackagePreset({
+List<ArchitectureRule> noExternalPackage({
   required List<String> folders,
   required List<String> packages,
   RuleSeverity severity = RuleSeverity.error,
@@ -31,11 +31,11 @@ List<ArchitectureRule> noExternalPackagePreset({
 
 ### Example — Pure domain — no external dependencies
 
-```dart title="arch_test/domain_purity_arch_test.dart"
+```dart title="test_arch/domain_purity_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/domain'],
     packages: [
       'flutter',           // no Flutter in domain
@@ -57,11 +57,11 @@ void main(List<String> args) {
 
 ### Example — Presentation layer without HTTP access
 
-```dart title="arch_test/presentation_deps_arch_test.dart"
+```dart title="test_arch/presentation_deps_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/presentation', 'lib/bloc'],
     packages: ['dio', 'http', 'retrofit', 'chopper'],
     severity: RuleSeverity.warning,
@@ -75,11 +75,11 @@ void main(List<String> args) {
 
 ### Example — Ban packages being phased out
 
-```dart title="arch_test/legacy_packages_arch_test.dart"
+```dart title="test_arch/legacy_packages_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib'],
     packages: [
       'provider',   // migrating to BLoC
@@ -121,14 +121,14 @@ packages: [
 
 ### Combining with layer presets
 
-For complete domain isolation, combine `noExternalPackagePreset` with `layerCannotDependOnPreset`:
+For complete domain isolation, combine `noExternalPackage` with `layerCannotDependOn`:
 
-```dart title="arch_test/domain_isolation_arch_test.dart"
+```dart title="test_arch/domain_isolation_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // Ban specific packages from domain
-  final packageRules = noExternalPackagePreset(
+  final packageRules = noExternalPackage(
     folders: ['lib/domain'],
     packages: ['flutter', 'dio', 'hive', 'get_it'],
     severity: RuleSeverity.error,
@@ -140,7 +140,7 @@ void main(List<String> args) {
   // Also ban data layer imports in domain
   archTest(
     args,
-    layerCannotDependOnPreset(
+    layerCannotDependOn(
       from: 'lib/domain',
       to: 'lib/data',
       severity: RuleSeverity.error,

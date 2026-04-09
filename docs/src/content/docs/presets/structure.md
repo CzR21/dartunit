@@ -9,14 +9,14 @@ Structure presets enforce properties of class declarations: whether they are abs
 
 ---
 
-## mustBeAbstractPreset
+## mustBeAbstract
 
 Enforces that all classes in the specified folders are declared `abstract`.
 
 ### Function signature
 
 ```dart
-ArchitectureRule mustBeAbstractPreset({
+ArchitectureRule mustBeAbstract({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
@@ -37,12 +37,12 @@ Repository interfaces, use case interfaces, and domain service contracts should 
 
 ### Example — Domain repository interfaces
 
-```dart title="arch_test/domain_abstractions_arch_test.dart"
+```dart title="test_arch/domain_abstractions_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  mustBeAbstractPreset(
+  mustBeAbstract(
     folders: ['lib/domain/repositories'],
     severity: RuleSeverity.error,
   ),
@@ -51,12 +51,12 @@ void main(List<String> args) => archTest(
 
 ### Example — Multiple contract folders
 
-```dart title="arch_test/contracts_arch_test.dart"
+```dart title="test_arch/contracts_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  mustBeAbstractPreset(
+  mustBeAbstract(
     folders: [
       'lib/domain/repositories',
       'lib/domain/usecases',
@@ -87,14 +87,14 @@ class UserRepository {
 
 ---
 
-## mustBeImmutablePreset
+## mustBeImmutable
 
 Enforces that all instance fields in classes in the specified folders are `final` or `const`.
 
 ### Function signature
 
 ```dart
-ArchitectureRule mustBeImmutablePreset({
+ArchitectureRule mustBeImmutable({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
@@ -115,12 +115,12 @@ Immutable domain entities cannot be accidentally modified after creation. They a
 
 ### Example — Domain entities and value objects
 
-```dart title="arch_test/immutability_arch_test.dart"
+```dart title="test_arch/immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  mustBeImmutablePreset(
+  mustBeImmutable(
     folders: [
       'lib/domain/entities',
       'lib/domain/value_objects',
@@ -132,12 +132,12 @@ void main(List<String> args) => archTest(
 
 ### Example — With exceptions for generated code
 
-```dart title="arch_test/immutability_arch_test.dart"
+```dart title="test_arch/immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  mustBeImmutablePreset(
+  mustBeImmutable(
     folders: ['lib/domain/entities'],
     severity: RuleSeverity.error,
     exceptions: [
@@ -173,14 +173,14 @@ class User {
 
 ---
 
-## noCircularDependenciesPreset
+## noCircularDependencies
 
 Enforces that no class in the project is part of a circular import chain.
 
 ### Function signature
 
 ```dart
-ArchitectureRule noCircularDependenciesPreset({
+ArchitectureRule noCircularDependencies({
   RuleSeverity severity = RuleSeverity.critical,
 })
 ```
@@ -197,12 +197,12 @@ Circular dependencies cause maintenance problems, make testing significantly har
 
 ### Example
 
-```dart title="arch_test/no_cycles_arch_test.dart"
+```dart title="test_arch/no_cycles_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  noCircularDependenciesPreset(severity: RuleSeverity.critical),
+  noCircularDependencies(severity: RuleSeverity.critical),
 );
 ```
 

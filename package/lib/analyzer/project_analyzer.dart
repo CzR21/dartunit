@@ -6,7 +6,7 @@ import 'context/analysis_context.dart';
 import 'graph/dependency_graph.dart';
 import '../utils/path_helper.dart';
 import 'models/analyzed_file.dart';
-import '../utils/class_parser_helper.dart';
+import 'parsers/class_declaration_parser.dart';
 import 'parsers/import_parser.dart';
 
 /// Analyzes a Dart/Flutter project and produces an [AnalysisContext].
@@ -27,7 +27,7 @@ class ProjectAnalyzer {
       projectRoot: projectRoot,
       packageName: packageName,
     );
-    const classParser = ClassParserHelper();
+    const classParser = ClassDeclarationParser();
 
     final graph = DependencyGraph();
     final allFiles = <AnalyzedFile>[];

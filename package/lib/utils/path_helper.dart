@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import '../core/extensions/string_extensions.dart';
 
 /// Path utilities used throughout the analyzer.
 class PathHelper {
   PathHelper._();
 
   /// Normalises [path] to use forward slashes for cross-platform consistency.
-  static String normalize(String path) => path.replaceAll('\\', '/');
+  static String normalize(String path) => path.normalized;
 
   /// Converts an absolute [filePath] to a `package:` URI when it lives under
   /// `<projectRoot>/lib/`. Returns the normalised path unchanged otherwise.

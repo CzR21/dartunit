@@ -1,6 +1,7 @@
 import '../../analyzer/context/analysis_context.dart';
 import '../../core/entities/selector.dart';
 import '../../core/entities/subject.dart';
+import '../../core/extensions/string_extensions.dart';
 
 /// Selects analyzed files based on folder or name pattern.
 ///
@@ -33,7 +34,7 @@ class FileSelector extends Selector {
     if (folder != null) {
       files = files
           .where((f) =>
-              f.filePath.replaceAll('\\', '/').contains(folder!))
+              f.filePath.normalized.contains(folder!))
           .toList();
     }
 
@@ -44,8 +45,8 @@ class FileSelector extends Selector {
 
     if (excludeFolders.isNotEmpty) {
       files = files.where((f) {
-        final path = f.filePath.replaceAll('\\', '/');
-        return !excludeFolders.any((ex) => path.contains(ex.replaceAll('\\', '/')));
+        final path = f.filePath.normalized;
+        return !excludeFolders.any((ex) => path.contains(ex.normalized));
       }).toList();
     }
 

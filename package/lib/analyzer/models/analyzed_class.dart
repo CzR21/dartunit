@@ -1,5 +1,6 @@
 import 'analyzed_method.dart';
 import 'analyzed_field.dart';
+import '../../core/extensions/string_extensions.dart';
 
 /// Represents an analyzed Dart class, mixin, enum, or extension.
 class AnalyzedClass {
@@ -39,18 +40,16 @@ class AnalyzedClass {
 
   /// Returns the folder containing this class file.
   String get folder {
-    final parts = filePath.replaceAll('\\', '/').split('/');
+    final parts = filePath.normalized.split('/');
     return parts.sublist(0, parts.length - 1).join('/');
   }
 
   /// Returns the normalized file path using forward slashes.
-  String get normalizedFilePath => filePath.replaceAll('\\', '/');
+  String get normalizedFilePath => filePath.normalized;
 
   /// Returns true if this class depends on files in [folderPath].
-  bool dependsOnFolder(String folderPath) {
-    final normalized = folderPath.replaceAll('\\', '/');
-    return imports.any((imp) => imp.contains(normalized));
-  }
+  bool dependsOnFolder(String folderPath) =>
+      imports.any((imp) => imp.contains(folderPath.normalized));
 
   /// Returns true if this class directly imports [filePath].
   bool importsFile(String filePath) {

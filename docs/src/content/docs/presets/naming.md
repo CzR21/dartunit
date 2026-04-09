@@ -9,14 +9,14 @@ Naming conventions are one of the most common architecture rules. The naming pre
 
 ---
 
-## namingFolderSuffixPreset
+## namingFolderSuffix
 
 Enforces that classes in a folder end with a suffix derived from the folder's base name. For example, classes in `lib/bloc` must end with `Bloc`, and classes in `lib/repository` must end with `Repository`.
 
 ### Function signature
 
 ```dart
-ArchitectureRule namingFolderSuffixPreset({
+ArchitectureRule namingFolderSuffix({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.warning,
   List<String> exceptions = const [],
@@ -46,12 +46,12 @@ The preset takes the last segment of the folder path and capitalizes it:
 
 ### Example — Flutter BLoC project
 
-```dart title="arch_test/naming_arch_test.dart"
+```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingFolderSuffixPreset(
+  namingFolderSuffix(
     folders: [
       'lib/bloc',
       'lib/cubit',
@@ -67,12 +67,12 @@ void main(List<String> args) => archTest(
 
 ### Example — MVC project
 
-```dart title="arch_test/naming_arch_test.dart"
+```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingFolderSuffixPreset(
+  namingFolderSuffix(
     folders: [
       'lib/controllers',
       'lib/models',
@@ -84,12 +84,12 @@ void main(List<String> args) => archTest(
 
 ### Example — Strict enforcement (error severity)
 
-```dart title="arch_test/naming_arch_test.dart"
+```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingFolderSuffixPreset(
+  namingFolderSuffix(
     folders: [
       'lib/bloc',
       'lib/domain/repositories',
@@ -118,14 +118,14 @@ Classes like `BaseBloc`, `AbstractService`, and code-generated files often legit
 
 ---
 
-## namingNamePatternPreset
+## namingNamePattern
 
-Enforces that classes in a folder match a specific regex pattern. More flexible than `namingFolderSuffixPreset` when the convention cannot be described by a simple suffix.
+Enforces that classes in a folder match a specific regex pattern. More flexible than `namingFolderSuffix` when the convention cannot be described by a simple suffix.
 
 ### Function signature
 
 ```dart
-ArchitectureRule namingNamePatternPreset({
+ArchitectureRule namingNamePattern({
   required String folder,
   required String pattern,
   RuleSeverity severity = RuleSeverity.warning,
@@ -144,12 +144,12 @@ ArchitectureRule namingNamePatternPreset({
 
 ### Example — Domain entities must follow Entity suffix
 
-```dart title="arch_test/entity_naming_arch_test.dart"
+```dart title="test_arch/entity_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingNamePatternPreset(
+  namingNamePattern(
     folder: 'lib/domain/entities',
     pattern: r'^[A-Z][a-zA-Z]+Entity$',
     severity: RuleSeverity.warning,
@@ -159,12 +159,12 @@ void main(List<String> args) => archTest(
 
 ### Example — Repository interfaces must start with I
 
-```dart title="arch_test/repository_naming_arch_test.dart"
+```dart title="test_arch/repository_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingNamePatternPreset(
+  namingNamePattern(
     folder: 'lib/domain/repositories',
     pattern: r'^I[A-Z][a-zA-Z]+$',
     severity: RuleSeverity.warning,
@@ -175,12 +175,12 @@ void main(List<String> args) => archTest(
 
 ### Example — Mappers must contain "Mapper"
 
-```dart title="arch_test/mapper_naming_arch_test.dart"
+```dart title="test_arch/mapper_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingNamePatternPreset(
+  namingNamePattern(
     folder: 'lib/data/mappers',
     pattern: r'.*Mapper$',
     severity: RuleSeverity.warning,

@@ -64,15 +64,7 @@ dart run dartunit init --template <name>
 dart run dartunit init --template clean
 ```
 
-Generates `test_arch/clean_test_arch.dart` with rules for a typical Flutter Clean Architecture:
-
-- Domain layer isolated from data and presentation
-- Presentation must not access data directly
-- Repository interfaces abstract in domain, implementations in data
-- Use cases single-responsibility and Flutter-agnostic
-- Domain entities and data models immutable
-
-Assumes:
+Generates `test_arch/clean_test_arch.dart` for a typical Flutter Clean Architecture. Assumes:
 
 ```
 lib/
@@ -81,8 +73,34 @@ lib/
 │   ├── entities/
 │   ├── repositories/
 │   └── usecases/
-└── data/
+├── data/
+└── services/
 ```
+
+**Rules generated:**
+
+| Group | Rule | Severity |
+|-------|------|----------|
+| Domain layer isolation | Domain must not depend on `lib/data` | error |
+| | Domain must not depend on `lib/presentation` | error |
+| | Domain must be Flutter-agnostic (no `flutter` package) | error |
+| | Domain must not use HTTP packages (`dio`, `http`) | error |
+| Presentation layer | Presentation must not access `lib/data` directly | error |
+| Data layer | Data layer must not depend on `lib/presentation` | error |
+| Repository contract | Classes matching `.*Repository$` in domain must be abstract | error |
+| | Classes matching `.*RepositoryImpl$` must be concrete | error |
+| | Repository implementations must not access presentation | error |
+| Use cases | Classes matching `.*UseCase$` must not depend on `lib/data` | error |
+| | Use cases must not depend on `lib/presentation` | error |
+| | Use cases must be Flutter-agnostic | error |
+| | Use cases must have at most 3 methods | **warning** |
+| Domain entities | Classes matching `.*Entity$` in domain must have all-final fields | error |
+| | Domain entities must not expose public mutable fields | error |
+| Repository isolation | Repositories must not depend on other repositories | error |
+| Services layer | Services must not depend on `lib/presentation`, `lib/data`, or `lib/domain` | error |
+| | Classes matching `.*Service$` must have all-final fields | error |
+| Data models | Classes matching `.*Model$` in data must have all-final fields | **warning** |
+| | Data models must not expose public mutable fields | **warning** |
 
 #### `bloc` — BLoC Pattern
 
@@ -90,14 +108,7 @@ lib/
 dart run dartunit init --template bloc
 ```
 
-Generates `test_arch/bloc_test_arch.dart` with rules for the BLoC pattern:
-
-- BLoC/Cubit classes must not import from data layer
-- Domain must not depend on presentation or BLoC layers
-- State and Event classes must have all-final fields
-- Coupling limits on BLoC/Cubit imports
-
-Assumes:
+Generates `test_arch/bloc_test_arch.dart` for the BLoC pattern. Assumes:
 
 ```
 lib/
@@ -107,20 +118,31 @@ lib/
 └── data/
 ```
 
+**Rules generated:**
+
+| Group | Rule | Severity |
+|-------|------|----------|
+| Presentation layer | Presentation widgets must not import from `lib/data` | error |
+| Data layer | Data must not depend on `lib/presentation` | error |
+| | Data must not depend on `lib/blocs` | error |
+| Repository pattern | Classes matching `.*Repository$` must be abstract | error |
+| | Classes matching `.*RepositoryImpl$` must be concrete | error |
+| | Repository implementations must not import from presentation | error |
+| State & Event immutability | Classes matching `.*State$` must have all-final fields | error |
+| | Classes matching `.*Event$` must have all-final fields | error |
+| Data models | Classes matching `.*Model$` in data must have all-final fields | **warning** |
+| BLoC isolation | Classes matching `.*Bloc$` must not depend on `lib/blocs` (no Bloc-to-Bloc) | **critical** |
+| | Classes matching `.*Cubit$` must not depend on `lib/blocs` | **critical** |
+| Coupling limits | Classes matching `.*Bloc$` must have at most 15 imports | **warning** |
+| | Classes matching `.*Cubit$` must have at most 15 imports | **warning** |
+
 #### `mvc` — MVC Pattern
 
 ```bash
 dart run dartunit init --template mvc
 ```
 
-Generates `test_arch/mvc_test_arch.dart` with rules for Model-View-Controller:
-
-- Model must not know about View or Controller
-- View must communicate through Controller only
-- Services must be UI-agnostic
-- Model immutability and Controller cohesion limits
-
-Assumes:
+Generates `test_arch/mvc_test_arch.dart` for Model-View-Controller. Assumes:
 
 ```
 lib/
@@ -130,20 +152,32 @@ lib/
 └── services/
 ```
 
+**Rules generated:**
+
+| Group | Rule | Severity |
+|-------|------|----------|
+| Model layer | Models must not depend on `lib/controllers` | error |
+| | Models must not depend on `lib/views` | error |
+| | Models must be Flutter-agnostic (no `flutter` package) | **warning** |
+| View layer | Views must not access `lib/models` directly | error |
+| | Views must not access `lib/services` directly | error |
+| Service layer | Classes matching `.*Service$` must not depend on `lib/views` | error |
+| | Services must not depend on `lib/controllers` | error |
+| | Services must not depend on `lib/models` | error |
+| Model immutability | All classes in `lib/models` must have all-final fields | **warning** |
+| | Models must not expose public mutable fields | **warning** |
+| Controller cohesion | Classes matching `.*Controller$` must have at most 15 public methods | **warning** |
+| | Controllers must have at most 12 imports | **warning** |
+| Controller isolation | Controllers must not depend on other controllers | error |
+| Services stateless | Classes matching `.*Service$` must have all-final fields | error |
+
 #### `mvvm` — MVVM Pattern
 
 ```bash
 dart run dartunit init --template mvvm
 ```
 
-Generates `test_arch/mvvm_test_arch.dart` with rules for Model-View-ViewModel:
-
-- Views must not access data, models, or services directly
-- ViewModels must be Flutter-agnostic and not access data layer
-- Repository and Service layers must not reach into UI
-- ViewModel cohesion limits (max methods and imports)
-
-Assumes:
+Generates `test_arch/mvvm_test_arch.dart` for Model-View-ViewModel. Assumes:
 
 ```
 lib/
@@ -152,7 +186,31 @@ lib/
 ├── repositories/
 ├── models/
 └── services/
+└── data/
 ```
+
+**Rules generated:**
+
+| Group | Rule | Severity |
+|-------|------|----------|
+| View layer | Views must not access `lib/data` directly | error |
+| | Views must not access `lib/models` directly | error |
+| | Views must not depend on `lib/services` directly | error |
+| ViewModel layer | Classes matching `.*ViewModel$` must not access `lib/data` | error |
+| | ViewModels must not depend on other ViewModels (`lib/viewmodels`) | error |
+| Repository layer | Classes matching `.*Repository$` must not depend on `lib/views` | error |
+| | Repositories must not depend on `lib/viewmodels` | error |
+| | Repositories must not depend on other repositories | error |
+| Service layer | Classes matching `.*Service$` must not depend on `lib/views` | error |
+| | Services must not depend on `lib/viewmodels` | error |
+| | Services must not depend on `lib/repositories` | error |
+| Repository contracts | Classes matching `.*Repository$` (non-Impl) in `lib/repositories` must be abstract | error |
+| | Classes matching `.*RepositoryImpl$` must be concrete | error |
+| ViewModel cohesion | ViewModels must have at most 10 public methods | **warning** |
+| | ViewModels must have at most 15 imports | **warning** |
+| Models | All classes in `lib/models` must have all-final fields | error |
+| | Models must not expose public mutable fields | error |
+| Services stateless | Classes matching `.*Service$` must have all-final fields | error |
 
 ### Customizing a template
 

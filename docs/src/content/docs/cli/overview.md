@@ -5,27 +5,26 @@ sidebar:
   order: 1
 ---
 
-DartUnit provides four commands for the complete architecture testing workflow.
+DartUnit provides four CLI commands for the complete architecture testing workflow.
+
+```
+dart run dartunit <command> [options]
+```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| [`DartUnit init`](/cli/init) | Creates the `arch_test/` folder and generates starter rule files |
-| [`DartUnit analyze`](/cli/analyze) | Discovers and runs all `*_arch_test.dart` files, reports violations |
-| [`DartUnit generate <name>`](/cli/generate) | Scaffolds a new rule file ready to customize |
-| [`DartUnit log`](/cli/log) | Shows the history of past analysis runs |
-
-## Usage
-
-```bash
-dart run dartunit <command> [options]
-```
+| [`dartunit init`](/cli/init) | Creates the `test_arch/` folder and generates starter rule files |
+| [`dartunit analyze`](/cli/analyze) | Discovers and runs all `*_test_arch.dart` files, reports violations |
+| [`dartunit generate <name>`](/cli/generate) | Scaffolds a new rule file ready to customize |
+| [`dartunit log`](/cli/log) | Shows the history of past analysis runs |
 
 ## Quick Reference
 
 ```bash
-# Initialize arch_test/ in the current project
+# ── Setup ──────────────────────────────────────────────────
+# Initialize test_arch/ in the current project
 dart run dartunit init
 
 # Initialize with a pre-built architecture template
@@ -37,6 +36,8 @@ dart run dartunit init --template mvvm
 # Initialize in a different directory
 dart run dartunit init --path /path/to/project
 
+
+# ── Analysis ───────────────────────────────────────────────
 # Run all architecture rules
 dart run dartunit analyze
 
@@ -46,23 +47,32 @@ dart run dartunit analyze --path /path/to/project
 # Run without terminal colors (for CI logs)
 dart run dartunit analyze --no-color
 
+
+# ── Development ────────────────────────────────────────────
 # Generate a new rule file scaffold
 dart run dartunit generate naming_conventions
 dart run dartunit generate no_god_classes
 
-# View history of the last 10 analysis runs
-dart run dartunit log --last 10
+# Run a single rule file during development
+dart test test_arch/my_rule_test_arch.dart
+
+
+# ── History ────────────────────────────────────────────────
+# View history of all analysis runs
+dart run dartunit log
 ```
 
-## Running a Single Rule
+## File Discovery
 
-Any rule file can be run directly during development without going through the `analyze` command:
+The `analyze` command discovers rule files by scanning the `test_arch/` folder for files matching `*_test_arch.dart`:
 
-```bash
-dart run arch_test/my_rule_arch_test.dart
 ```
-
-This is identical to how `analyze` runs it internally.
+test_arch/
+├── domain_layer_test_arch.dart        ← discovered ✓
+├── naming_conventions_test_arch.dart  ← discovered ✓
+├── helpers.dart                        ← ignored
+└── README.md                           ← ignored
+```
 
 ## Exit Codes
 
@@ -70,8 +80,9 @@ All commands follow the same exit code convention:
 
 | Code | Meaning |
 |------|---------|
-| `0` | Success |
+| `0` | Success — no violations, or only `info`/`warning` |
 | `1` | Violations found (`error` or `critical` severity) |
 | `2` | Configuration or runtime error |
 
 See [Exit Codes](/reference/exit-codes) for details.
+

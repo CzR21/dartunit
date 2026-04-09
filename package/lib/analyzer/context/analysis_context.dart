@@ -1,6 +1,7 @@
 import '../models/analyzed_class.dart';
 import '../models/analyzed_file.dart';
 import '../graph/dependency_graph.dart';
+import '../../core/extensions/string_extensions.dart';
 
 /// Holds the full result of analyzing a Dart/Flutter project.
 ///
@@ -27,9 +28,8 @@ class AnalysisContext {
 
   /// Returns all classes located in a folder that contains [folderPath].
   List<AnalyzedClass> classesInFolder(String folderPath) {
-    final normalized = folderPath.replaceAll('\\', '/');
     return classes
-        .where((c) => c.normalizedFilePath.contains(normalized))
+        .where((c) => c.normalizedFilePath.contains(folderPath.normalized))
         .toList();
   }
 
@@ -44,9 +44,8 @@ class AnalysisContext {
 
   /// Returns all files located in [folderPath].
   List<AnalyzedFile> filesInFolder(String folderPath) {
-    final normalized = folderPath.replaceAll('\\', '/');
     return files
-        .where((f) => f.filePath.replaceAll('\\', '/').contains(normalized))
+        .where((f) => f.filePath.normalized.contains(folderPath.normalized))
         .toList();
   }
 }

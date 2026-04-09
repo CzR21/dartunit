@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Rules in DartUnit are written using `testArch` and `testArchGroup` — a Flutter-inspired API analogous to `testWidgets`. Each rule file is a standard `dart test` file placed in the `test_arch/` folder.
+Rules in DartUnit are written using `testArch` and `testArchGroup`, a Flutter-inspired API analogous to `testWidgets`. Each rule file is a standard `dart test` file placed in the `test_arch/` folder.
 
 ## testArch
 
@@ -32,7 +32,7 @@ void main() {
 }
 ```
 
-A single `testArch` can have multiple `expect` calls — each calls a different matcher on the same or different subjects:
+A single `testArch` can have multiple `expect` calls, each calls a different matcher on the same or different subjects:
 
 ```dart
 testArch('Domain must not use external packages', (arch) {
@@ -77,14 +77,14 @@ void main() {
 Severity can be set at two levels:
 
 - **Group level** — all `testArch` inside the group inherit it
-- **Test level** — overrides the group severity for that specific test
+- **Test level** — can define a severity, but will be overridden by the group
 
 ```dart
 testArchGroup('Domain rules', () {
   testArch('Must not depend on data', (arch) { ... }); // inherits error
   testArch('Should have at most 3 methods per use case', (arch) {
     expect(arch.classes(namePattern: r'.*UseCase$'), hasMaxMethods(3));
-  }, severity: RuleSeverity.warning); // overrides to warning
+  }, severity: RuleSeverity.warning); // ignored — group severity wins (error)
 }, severity: RuleSeverity.error);
 ```
 
@@ -117,14 +117,28 @@ arch.classes(folder: 'lib/domain', exceptions: [
 ])                                                    // with file exceptions
 ```
 
+Use `suffix` or `prefix` as readable shortcuts for the most common name-filter patterns:
+
+```dart
+arch.classes(suffix: 'UseCase')               // .*UseCase$
+arch.classes(prefix: 'Abstract')              // ^Abstract.*
+arch.classes(suffix: 'Repository')            // .*Repository$
+arch.classes(prefix: 'I', suffix: 'Service')  // ^I.*Service$
+arch.classes(folder: 'lib/domain', suffix: 'Entity') // folder + suffix
+```
+
+`suffix`, `prefix`, and `namePattern` are mutually exclusive — use `namePattern` for full regex control when a simple suffix or prefix is not enough.
+
 ### `arch.files()`
 
 Selects files (for content-based rules).
 
 ```dart
-arch.files()                           // all files in lib/
-arch.files(folder: 'lib/src')          // files in a specific folder
-arch.files(exceptions: ['lib/gen'])    // exclude generated code
+arch.files()                              // all files in lib/
+arch.files(folder: 'lib/src')             // files in a specific folder
+arch.files(exceptions: ['lib/gen'])       // exclude generated code
+arch.files(suffix: '_datasource.dart')   // files ending with _datasource.dart
+arch.files(prefix: 'base_')              // files starting with base_
 ```
 
 ### `arch.layer()`
@@ -170,11 +184,29 @@ void main() {
 
 ### Naming convention rule
 
+Use `suffix` or `prefix` in `arch.classes()` to filter by name, and naming matchers to enforce conventions:
+
 ```dart
-testArch('BLoC classes must end with Bloc or Cubit', (arch) {
-  final blocs = arch.classes(folder: 'lib/bloc');
-  // Both matchers must pass for the same subject
-  expect(blocs, nameEndsWith('Bloc'));
+// Select classes ending with "Bloc" in the blocs folder
+testArch('BLoC classes must not depend on data layer', (arch) {
+  final blocs = arch.classes(folder: 'lib/bloc', suffix: 'Bloc');
+  expect(blocs, doesNotDependOn('lib/data'));
+});
+
+// Enforce prefix on service interfaces
+testArch('Service interfaces must start with I', (arch) {
+  final services = arch.classes(folder: 'lib/domain/services');
+  expect(services, nameStartsWith('I'));
+});
+
+// Combine prefix and suffix to select a naming convention precisely
+testArch('Abstract repository names must follow IXxxRepository pattern', (arch) {
+  final repos = arch.classes(
+    folder: 'lib/domain/repositories',
+    prefix: 'I',
+    // suffix: 'Repository',  // uncomment to also filter the selection
+  );
+  expect(repos, isAbstractClass());
 });
 ```
 

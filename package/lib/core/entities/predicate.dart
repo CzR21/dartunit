@@ -13,6 +13,7 @@ import '../../analyzer/context/analysis_context.dart';
 /// NotPredicate(DependOnFolderPredicate('lib/data'))
 /// ```
 abstract class Predicate {
+
   const Predicate();
 
   PredicateResult analyze(Subject subject, AnalysisContext context);

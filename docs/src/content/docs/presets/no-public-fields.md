@@ -1,11 +1,11 @@
 ---
-title: noPublicFieldsPreset
+title: noPublicFields
 description: Enforce that classes expose no public instance fields. Protects encapsulation and ensures state changes go through controlled access points.
 sidebar:
   order: 10
 ---
 
-`noPublicFieldsPreset` enforces that classes in the specified folders declare no public instance fields. All state must be accessed through methods, getters, or setters, preserving the class's ability to enforce its own invariants, emit change notifications, and control mutation.
+`noPublicFields` enforces that classes in the specified folders declare no public instance fields. All state must be accessed through methods, getters, or setters, preserving the class's ability to enforce its own invariants, emit change notifications, and control mutation.
 
 ## What is Encapsulation and Why Does It Matter?
 
@@ -93,7 +93,7 @@ class CartService extends ChangeNotifier {
 }
 ```
 
-Now the notification is part of the mutation logic. It cannot be skipped. `noPublicFieldsPreset` would have caught the original version before it reached code review.
+Now the notification is part of the mutation logic. It cannot be skipped. `noPublicFields` would have caught the original version before it reached code review.
 
 ## Public Fields vs. Public Getters
 
@@ -126,7 +126,7 @@ The getter and setter approach gives you:
 
 ## When This Rule Applies (and When It Doesn't)
 
-`noPublicFieldsPreset` is most important for classes that encapsulate behavior:
+`noPublicFields` is most important for classes that encapsulate behavior:
 
 - **Services** — business logic, application use cases
 - **BLoC / Cubit classes** — state management with event handling
@@ -163,12 +163,12 @@ class Money {
 }
 ```
 
-DartUnit's `noPublicFieldsPreset` targets non-final public fields by default — the kind that represent mutable state that can be modified by external code. Pure `final` fields on immutable classes are not flagged.
+DartUnit's `noPublicFields` targets non-final public fields by default — the kind that represent mutable state that can be modified by external code. Pure `final` fields on immutable classes are not flagged.
 
 ## Function Signature
 
 ```dart
-ArchitectureRule noPublicFieldsPreset({
+void noPublicFields({
   List<String> folders = const [],
   Severity severity = Severity.error,
   List<String> exceptions = const [],
@@ -184,7 +184,7 @@ ArchitectureRule noPublicFieldsPreset({
 The folders to apply this rule to. When empty, the rule applies globally to every Dart class. In most projects, you will want to target specific layers rather than the entire codebase, because models and DTOs legitimately use public fields.
 
 ```dart
-noPublicFieldsPreset(
+noPublicFields(
   folders: ['lib/application', 'lib/services', 'lib/blocs'],
 )
 ```
@@ -206,7 +206,7 @@ For encapsulation violations in service and BLoC classes, `Severity.error` is re
 Class names excluded from the rule. Use this sparingly — typically only for generated classes or framework base classes you do not control.
 
 ```dart
-noPublicFieldsPreset(
+noPublicFields(
   folders: ['lib/services'],
   exceptions: ['GeneratedTokenStorage', 'LegacySessionManager'],
 )
@@ -215,12 +215,10 @@ noPublicFieldsPreset(
 ## Usage
 
 ```dart
-// arch_test/no_public_fields.dart
+// test_arch/no_public_fields.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  noPublicFieldsPreset(
+void main() => noPublicFields(
     folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
   ),
 );
@@ -239,12 +237,10 @@ dart run dartunit analyze
 BLoC and Cubit classes are the most critical targets for this rule. A BLoC with public fields defeats its entire purpose — the BLoC pattern exists to make state changes explicit and traceable. A public field bypasses both the event system and the state stream.
 
 ```dart
-// arch_test/bloc_encapsulation.dart
+// test_arch/bloc_encapsulation.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  noPublicFieldsPreset(
+void main() => noPublicFields(
     folders: [
       'lib/blocs',
       'lib/cubits',
@@ -276,12 +272,10 @@ The fields should be part of the immutable `AuthState`, not floating public fiel
 Services and repositories coordinate business and data logic. Public fields on these classes expose implementation details that callers should never touch directly.
 
 ```dart
-// arch_test/service_encapsulation.dart
+// test_arch/service_encapsulation.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  noPublicFieldsPreset(
+void main() => noPublicFields(
     folders: [
       'lib/services',
       'lib/repositories',
@@ -317,12 +311,10 @@ If a caller sets `notificationsEnabled = false` directly, the `sendNotification`
 Domain entities in a Clean Architecture project encapsulate business rules. If their fields are public, the business rules can be circumvented.
 
 ```dart
-// arch_test/domain_encapsulation.dart
+// test_arch/domain_encapsulation.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  noPublicFieldsPreset(
+void main() => noPublicFields(
     folders: ['lib/domain/entities', 'lib/domain/value_objects'],
     severity: Severity.error,
   ),
@@ -353,13 +345,11 @@ With public `status`, a caller can do `order.status = OrderStatus.confirmed` wit
 Data Transfer Objects and JSON response models legitimately use public fields because they are pure data containers passed between layers. Exclude these from the rule:
 
 ```dart
-// arch_test/service_encapsulation.dart
+// test_arch/service_encapsulation.dart
 import 'package:dartunit/dartunit.dart';
 
 // Apply to all of lib/ EXCEPT data transfer and generated code
-void main(List<String> args) => archTest(
-  args,
-  noPublicFieldsPreset(
+void main() => noPublicFields(
     // Target only the layers where encapsulation matters
     folders: [
       'lib/application',
@@ -376,12 +366,10 @@ void main(List<String> args) => archTest(
 An alternative approach is to apply the rule globally and use `exceptions` for specific model classes:
 
 ```dart
-// arch_test/global_encapsulation.dart
+// test_arch/global_encapsulation.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  noPublicFieldsPreset(
+void main() => noPublicFields(
     folders: [], // Global
     exceptions: [
       'UserDto',
@@ -401,7 +389,7 @@ The folder-based approach scales better as the project grows — you don't need 
 When a class has public instance fields in a targeted folder, DartUnit reports:
 
 ```
-VIOLATION [error] noPublicFieldsPreset
+VIOLATION [error] noPublicFields
   File: lib/services/cart_service.dart
   Class: CartService
   Public fields found: items, discountCode, lastUpdated
@@ -410,29 +398,29 @@ VIOLATION [error] noPublicFieldsPreset
 
 Each field name is listed, making it easy to locate and fix each one.
 
-## Pairing With `mustBeImmutablePreset`
+## Pairing With `mustBeImmutable`
 
-The `noPublicFieldsPreset` and `mustBeImmutablePreset` work together to cover two complementary patterns:
+The `noPublicFields` and `mustBeImmutable` work together to cover two complementary patterns:
 
-- **For service/logic classes:** `noPublicFieldsPreset` ensures that all mutable state is accessed through controlled interfaces. These classes have private mutable fields and controlled access methods.
+- **For service/logic classes:** `noPublicFields` ensures that all mutable state is accessed through controlled interfaces. These classes have private mutable fields and controlled access methods.
 
-- **For value objects and state classes:** `mustBeImmutablePreset` (or the `@immutable` annotation rule) ensures that data classes are fully immutable — all fields are `final`, and mutation produces a new instance via `copyWith`. These classes can have public `final` fields because `final` fields cannot be externally reassigned.
+- **For value objects and state classes:** `mustBeImmutable` (or the `@immutable` annotation rule) ensures that data classes are fully immutable — all fields are `final`, and mutation produces a new instance via `copyWith`. These classes can have public `final` fields because `final` fields cannot be externally reassigned.
 
 Together, they establish a clear pattern in the codebase:
 
 ```
-Service/logic classes → private fields + methods/getters (noPublicFieldsPreset)
-Value objects/states → all-final fields + copyWith (mustBeImmutablePreset)
+Service/logic classes → private fields + methods/getters (noPublicFields)
+Value objects/states → all-final fields + copyWith (mustBeImmutable)
 ```
 
 This leaves no ambiguous middle ground where mutable public fields accumulate.
 
 ```dart
-// arch_test/encapsulation.dart
+// test_arch/encapsulation.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  archTest(args, noPublicFieldsPreset(
+  noPublicFields(
     folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
     severity: Severity.error,
   ));
@@ -440,11 +428,11 @@ void main(List<String> args) {
 ```
 
 ```dart
-// arch_test/immutability.dart
+// test_arch/immutability.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/domain/value_objects', 'lib/blocs/states'],
     annotation: 'immutable',
     severity: Severity.error,
@@ -454,7 +442,7 @@ void main(List<String> args) {
 
 ## Common Refactoring Patterns
 
-When `noPublicFieldsPreset` flags a violation, the fix depends on the field's role:
+When `noPublicFields` flags a violation, the fix depends on the field's role:
 
 **Mutable flag field → private field + method pair:**
 ```dart
@@ -492,6 +480,6 @@ MyService({Duration timeout = const Duration(seconds: 30)}) : _timeout = timeout
 
 ## Related Presets
 
-- [`classSizeLimitPreset`](/presets/class-size-limit) — Prevent classes from growing large enough that their public interface becomes unmanageable
-- [`annotationMustHavePreset`](/presets/annotation-must-have) — Enforce `@immutable` on value objects to complement encapsulation in service classes
+- [`classSizeLimit`](/presets/class-size-limit) — Prevent classes from growing large enough that their public interface becomes unmanageable
+- [`annotationMustHave`](/presets/annotation-must-have) — Enforce `@immutable` on value objects to complement encapsulation in service classes
 - [`layerDependencyPreset`](/presets/layer) — Ensure that services stay in the correct layer and are not accessed by layers that should not depend on them

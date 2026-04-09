@@ -2,7 +2,7 @@
 title: DartUnit analyze
 description: Run all architecture rules and generate a violation report.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 The `analyze` command is the primary command in DartUnit. It discovers all rule files, runs them via `dart test`, collects violations, and produces both a console summary and an HTML report.

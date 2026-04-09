@@ -1,6 +1,7 @@
 import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
+import '../extensions/string_extensions.dart';
 
 class DependOnFolderPredicate extends Predicate {
   final String folder;
@@ -14,8 +15,8 @@ class DependOnFolderPredicate extends Predicate {
   @override
   PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cls = subject.asClass;
-    final normalized = folder.replaceAll('\\', '/');
-    final prefix = normalized.endsWith('/') ? normalized : '$normalized/';
+    final norm = folder.normalized;
+    final prefix = norm.endsWith('/') ? norm : '$norm/';
 
     final imports = transitive
         ? context.dependencyGraph.transitiveDependenciesOf(cls.filePath)

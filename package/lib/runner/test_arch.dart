@@ -24,7 +24,7 @@ void testArch(
   String projectRoot = '.',
   RuleSeverity? severity,
 }) {
-  final effectiveSeverity = severity ?? _activeGroupSeverity ?? RuleSeverity.error;
+  final effectiveSeverity = _activeGroupSeverity ?? severity ?? RuleSeverity.error;
 
   test(description, () async {
 

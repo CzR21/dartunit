@@ -9,14 +9,54 @@ DartUnit classifies every violation with one of four severity levels. Severity c
 
 ## Severity Levels
 
-| Value | Dart constant | Terminal color | Fails analysis (exit 1)? |
-|-------|--------------|----------------|--------------------------|
+| Value | Dart constant | Terminal color | Fails CI (exit 1)? |
+|-------|--------------|----------------|---------------------|
 | `info` | `RuleSeverity.info` | White | No |
 | `warning` | `RuleSeverity.warning` | Yellow | No |
 | `error` | `RuleSeverity.error` | Red | **Yes** |
 | `critical` | `RuleSeverity.critical` | Magenta | **Yes** |
 
 Only `error` and `critical` cause `dartunit analyze` to return exit code 1.
+
+## Setting severity
+
+Severity can be set at three levels, each overriding the one above it:
+
+### 1. On a testArch call
+
+```dart
+testArch('Domain must not depend on data', (arch) {
+  expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+}, severity: RuleSeverity.error);
+```
+
+### 2. On a testArchGroup (inherited by all testArch inside)
+
+```dart
+testArchGroup('Domain layer rules', () {
+  testArch('Must not depend on data', (arch) { ... });       // inherits error
+  testArch('Must not depend on presentation', (arch) { ... }); // inherits error
+
+  testArch('Should have at most 5 methods', (arch) {
+    expect(arch.classes(folder: 'lib/domain'), hasMaxMethods(5));
+  }, severity: RuleSeverity.warning); // overrides to warning
+}, severity: RuleSeverity.error);
+```
+
+### 3. On a preset call
+
+```dart
+namingFolderSuffix(
+  folders: ['lib/bloc'],
+  severity: RuleSeverity.warning,
+);
+
+layerCannotDependOn(
+  from: 'lib/domain',
+  to: ['flutter', 'dio'],
+  severity: RuleSeverity.critical,
+);
+```
 
 ## When to Use Each Level
 
@@ -25,33 +65,32 @@ Only `error` and `critical` cause `dartunit analyze` to return exit code 1.
 Use `info` for observations you want to track without any impact on CI. Suitable for metrics that inform but do not enforce.
 
 ```dart
-ArchitectureRule(
-  description: 'High import count — possible coupling concern',
-  severity: RuleSeverity.info,
-  selector: ClassSelector(folder: 'lib'),
-  predicate: MaxImportsPredicate(15),
-)
+testArch('Import count — coupling indicator', (arch) {
+  expect(
+    arch.classes(folder: 'lib'),
+    hasMaxImports(15),
+  );
+}, severity: RuleSeverity.info);
 ```
 
 **Appropriate use cases:**
 - Coupling metrics for dashboard visibility
 - Complexity indicators that inform refactoring decisions
-- Rules in early evaluation that you are not yet confident enough to promote
+- Rules in early evaluation that you are not yet confident enough to promote to warning
 
 ### RuleSeverity.warning
 
 Use `warning` for conventions that should be followed but where legitimate exceptions may exist. Warnings are visible in the report but do not block CI.
 
 ```dart
-ArchitectureRule(
-  description: 'Classes in lib/bloc must end with Bloc or Cubit',
-  severity: RuleSeverity.warning,
-  selector: ClassSelector(folder: 'lib/bloc'),
-  predicate: OrPredicate([
-    NameEndsWithPredicate('Bloc'),
-    NameEndsWithPredicate('Cubit'),
-  ]),
-)
+testArchGroup('Naming conventions', () {
+  testArch('BLoC classes must end with Bloc or Cubit', (arch) {
+    expect(
+      arch.classes(folder: 'lib/bloc'),
+      nameMatchesPattern(r'.*(Bloc|Cubit)$'),
+    );
+  });
+}, severity: RuleSeverity.warning);
 ```
 
 **Appropriate use cases:**
@@ -65,18 +104,20 @@ ArchitectureRule(
 Use `error` for architectural rules that must not be violated in production code. Errors fail the CI pipeline.
 
 ```dart
-ArchitectureRule(
-  description: 'Domain layer must not depend on data layer',
-  severity: RuleSeverity.error,
-  selector: LayerSelector('lib/domain'),
-  predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-)
+testArchGroup('Domain isolation', () {
+  testArch('Domain must not depend on data layer', (arch) {
+    expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+  });
+  testArch('Domain must not depend on Flutter', (arch) {
+    expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+  });
+}, severity: RuleSeverity.error);
 ```
 
 **Appropriate use cases:**
 - Prohibited layer dependencies
 - Domain entity immutability
-- Missing abstract interfaces
+- Missing abstract interfaces in contract folders
 - External packages in restricted layers
 
 ### RuleSeverity.critical
@@ -84,17 +125,20 @@ ArchitectureRule(
 Use `critical` for violations that represent serious risks to project integrity. Critical violations are sorted first in reports and have the strongest visual indicator.
 
 ```dart
-ArchitectureRule(
-  description: 'No circular dependencies',
+// Circular dependencies are critical — they can cause runtime failures
+noCircularDependencies(severity: RuleSeverity.critical);
+
+// Domain depending on Flutter is critical — it destroys testability
+layerCannotDependOn(
+  from: 'lib/domain',
+  to: ['flutter'],
   severity: RuleSeverity.critical,
-  selector: ClassSelector(folder: 'lib'),
-  predicate: NotPredicate(HasCircularDependencyPredicate()),
-)
+);
 ```
 
 **Appropriate use cases:**
 - Circular dependency chains
-- Security-sensitive violations (e.g., hardcoded secrets)
+- Security-sensitive violations (e.g., hardcoded secrets in source files)
 - Violations that cause compilation or runtime failures
 - Public API contract breaches
 
@@ -102,23 +146,20 @@ ArchitectureRule(
 
 When adding DartUnit to an existing project with existing violations, use `warning` first to measure the scope without blocking CI, then promote to `error` after fixing the violations:
 
-```dart
-// Phase 1: discover the scope
-ArchitectureRule(
-  description: 'Domain must not depend on Flutter',
-  severity: RuleSeverity.warning, // start here
-  selector: LayerSelector('lib/domain'),
-  predicate: NotPredicate(DependOnPackagePredicate('flutter')),
-)
+```dart title="test_arch/domain_isolation_test_arch.dart"
+import 'package:dartunit/dartunit.dart';
 
-// Phase 2: enforce after violations are resolved
-ArchitectureRule(
-  description: 'Domain must not depend on Flutter',
-  severity: RuleSeverity.error, // promote to error
-  selector: LayerSelector('lib/domain'),
-  predicate: NotPredicate(DependOnPackagePredicate('flutter')),
-)
+void main() => layerCannotDependOn(
+  from: 'lib/domain',
+  to: ['lib/data', 'lib/presentation', 'flutter'],
+  // Phase 1: discover the scope without breaking CI
+  severity: RuleSeverity.warning,
+  // Phase 2: after fixing all violations, promote:
+  // severity: RuleSeverity.error,
+);
 ```
+
+Run `dart run dartunit analyze`, read the HTML report carefully, and fix violations systematically. Once the violation count reaches zero, change `severity` to `RuleSeverity.error` and commit. From that point on, CI prevents new violations from entering the codebase.
 
 ## Report Summary Line
 
@@ -133,4 +174,19 @@ If only `warning` and `info` violations are present:
 ```
 3 violations found (2 warnings, 1 info)
 Exit code: 0
+```
+
+## Sort Order in Reports
+
+Violations are always sorted from most severe to least severe in both console output and the HTML report:
+
+```
+┌──────────┬─────────────────────────────────────┬──────────────────────────────────┬──────┐
+│ Severity │ Rule                                │ File                             │ Line │
+├──────────┼─────────────────────────────────────┼──────────────────────────────────┼──────┤
+│ CRITICAL │ No circular dependencies            │ lib/core/services/auth.dart      │   1  │
+│ ERROR    │ Domain must not depend on data      │ lib/domain/usecases/get_user.dart│   3  │
+│ WARNING  │ Classes in lib/bloc must end w/ Bloc│ lib/bloc/auth_manager.dart       │   1  │
+│ INFO     │ High import count                   │ lib/core/utils/helpers.dart      │   1  │
+└──────────┴─────────────────────────────────────┴──────────────────────────────────┴──────┘
 ```

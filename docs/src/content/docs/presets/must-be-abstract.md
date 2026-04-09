@@ -1,11 +1,11 @@
 ---
-title: mustBeAbstractPreset
+title: mustBeAbstract
 description: Enforce that all classes in specified folders are declared abstract. Essential for ensuring interface/contract folders contain no concrete implementations.
 sidebar:
   order: 6
 ---
 
-`mustBeAbstractPreset` enforces that every class declared inside the specified folders is marked with the `abstract` keyword. This rule is fundamental to any architecture that separates contracts from implementations — Clean Architecture, Ports and Adapters, BLoC with repository interfaces, or any pattern that relies on the Dependency Inversion Principle.
+`mustBeAbstract` enforces that every class declared inside the specified folders is marked with the `abstract` keyword. This rule is fundamental to any architecture that separates contracts from implementations — Clean Architecture, Ports and Adapters, BLoC with repository interfaces, or any pattern that relies on the Dependency Inversion Principle.
 
 ---
 
@@ -38,7 +38,7 @@ The abstract-folder contract is the most commonly violated contract in Flutter p
 4. The concrete implementation is never moved.
 5. Six months later, the entire codebase directly depends on the concrete implementation. Mocking is impossible because the concrete class is wired everywhere.
 
-`mustBeAbstractPreset` closes this door completely. Any concrete class that appears in the interface folder is flagged immediately, before the first commit.
+`mustBeAbstract` closes this door completely. Any concrete class that appears in the interface folder is flagged immediately, before the first commit.
 
 ### Abstract classes enable multiple implementations
 
@@ -63,7 +63,7 @@ The domain layer is the innermost circle. It defines repository interfaces, use 
 - `lib/domain/usecases/` — use case base class or interface, all abstract
 - `lib/data/repositories/` — concrete implementations of the domain interfaces
 
-The `mustBeAbstractPreset` is applied to the domain layer's interface folders. The data layer's implementation folders are explicitly excluded.
+The `mustBeAbstract` is applied to the domain layer's interface folders. The data layer's implementation folders are explicitly excluded.
 
 ### In BLoC architecture
 
@@ -78,10 +78,11 @@ The "ports" are abstract interfaces. The "adapters" are concrete implementations
 ## Function signature
 
 ```dart
-ArchitectureRule mustBeAbstractPreset({
+void mustBeAbstract({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
+  String projectRoot = '.',
 })
 ```
 
@@ -101,12 +102,10 @@ ArchitectureRule mustBeAbstractPreset({
 
 The canonical Clean Architecture use case: all classes in the domain repository folder define contracts that the data layer implements. No concrete class should ever appear here.
 
-```dart title="arch_test/domain_abstract_arch_test.dart"
+```dart title="test_arch/domain_abstract_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeAbstractPreset(
+void main() => mustBeAbstract(
     folders: ['lib/domain/repositories'],
     severity: RuleSeverity.error,
   ),
@@ -134,12 +133,10 @@ The violation on `CartRepositoryImpl` is reported before any CI pipeline passes,
 
 Some teams define use case contracts in the domain layer with an abstract base class or interface, then place concrete use case implementations in the data or application layer. This pattern is common when use cases need to be mockable in widget tests:
 
-```dart title="arch_test/usecase_abstract_arch_test.dart"
+```dart title="test_arch/usecase_abstract_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeAbstractPreset(
+void main() => mustBeAbstract(
     folders: ['lib/domain/usecases'],
     severity: RuleSeverity.error,
     exceptions: [
@@ -180,12 +177,10 @@ class GetCartUseCaseImpl implements GetCartUseCase {  // valid: in data layer
 
 In Clean Architecture with explicit data source abstraction, the domain or data layer defines abstract data source interfaces that multiple implementations satisfy:
 
-```dart title="arch_test/datasource_abstract_arch_test.dart"
+```dart title="test_arch/datasource_abstract_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeAbstractPreset(
+void main() => mustBeAbstract(
     folders: ['lib/data/datasources/interfaces'],
     severity: RuleSeverity.error,
   ),
@@ -211,14 +206,12 @@ lib/
 
 A complete architecture typically has several folders that must be all-abstract. Rather than one rule file per folder, combine them:
 
-```dart title="arch_test/abstract_contracts_arch_test.dart"
+```dart title="test_arch/abstract_contracts_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // All interface/contract folders in the domain layer must be all-abstract
-  archTest(
-    args,
-    mustBeAbstractPreset(
+  mustBeAbstract(
       folders: [
         'lib/domain/repositories',
         'lib/domain/usecases',
@@ -236,7 +229,7 @@ void main(List<String> args) {
 }
 ```
 
-This single rule file enforces the abstract constraint across the entire domain layer with one `archTest` call. All violations in any of the four folders are reported under the same rule.
+This single rule file enforces the abstract constraint across the entire domain layer with one `mustBeAbstract` call. All violations in any of the four folders are reported under the same rule.
 
 ---
 
@@ -248,12 +241,10 @@ Not every class in an interface folder is itself an interface. Common legitimate
 
 In some Clean Architecture implementations, the domain folder contains both abstract repository interfaces and concrete value objects or entities. A `Money` value object or a `UserId` entity lives in `lib/domain/` but is concrete — it has actual state and behavior.
 
-```dart title="arch_test/domain_abstract_arch_test.dart"
+```dart title="test_arch/domain_abstract_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeAbstractPreset(
+void main() => mustBeAbstract(
     folders: ['lib/domain/repositories'],
     severity: RuleSeverity.error,
     exceptions: [
@@ -275,7 +266,7 @@ Error and exception classes associated with a layer often live near the interfac
 
 ## What the violation report looks like
 
-When a concrete class is found in a folder governed by `mustBeAbstractPreset`, DartUnit reports:
+When a concrete class is found in a folder governed by `mustBeAbstract`, DartUnit reports:
 
 ```
 ERROR | All classes in lib/domain/repositories must be abstract
@@ -299,25 +290,21 @@ Multiple violations in the same file are reported individually, so every concret
 
 ## Pairing with naming rules
 
-`mustBeAbstractPreset` becomes more powerful when combined with naming rules. The combination ensures that contract folders contain only abstract classes AND that those classes follow the expected naming convention:
+`mustBeAbstract` becomes more powerful when combined with naming rules. The combination ensures that contract folders contain only abstract classes AND that those classes follow the expected naming convention:
 
-```dart title="arch_test/domain_contracts_arch_test.dart"
+```dart title="test_arch/domain_contracts_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // All domain repository classes must be abstract
-  archTest(
-    args,
-    mustBeAbstractPreset(
+  mustBeAbstract(
       folders: ['lib/domain/repositories'],
       severity: RuleSeverity.error,
     ),
   );
 
   // All domain repository classes must start with I (interface convention)
-  archTest(
-    args,
-    namingNamePatternPreset(
+  namingNamePattern(
       folder: 'lib/domain/repositories',
       pattern: r'^I[A-Z][a-zA-Z]+$',
       severity: RuleSeverity.error,
@@ -352,6 +339,6 @@ An `abstract class` can have concrete (implemented) methods in Dart. The presenc
 
 ## Related presets
 
-- [`namingFolderSuffixPreset`](/presets/naming-folder-suffix/) — ensure interface classes also follow the correct suffix convention
-- [`namingNamePatternPreset`](/presets/naming-name-pattern/) — enforce prefix conventions (like `I`) alongside the abstract requirement
-- [`mustBeImmutablePreset`](/presets/must-be-immutable/) — a complementary structural constraint for model and state folders
+- [`namingFolderSuffix`](/presets/naming-folder-suffix/) — ensure interface classes also follow the correct suffix convention
+- [`namingNamePattern`](/presets/naming-name-pattern/) — enforce prefix conventions (like `I`) alongside the abstract requirement
+- [`mustBeImmutable`](/presets/must-be-immutable/) — a complementary structural constraint for model and state folders

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(sed -i 's|arch_test/|test_arch/|g' \"D:/Documentos/Dartunit/docs/src/content/docs/reference/predicates.md\")",
+      "Bash(sed -i 's|_arch_test\\\\.dart|_test_arch.dart|g' \"D:/Documentos/Dartunit/docs/src/content/docs/reference/predicates.md\")",
+      "Bash(sed -i 's|arch_test/|test_arch/|g' \"D:/Documentos/Dartunit/docs/src/content/docs/overview/installation.md\")",
+      "Bash(sed -i 's|example_arch_test\\\\.dart|example_test_arch.dart|g' \"D:/Documentos/Dartunit/docs/src/content/docs/overview/installation.md\")",
+      "Bash(sed -i 's|void main\\(List<String> args\\) => archTest||g' \"D:/Documentos/Dartunit/docs/src/content/docs/fundamentals/selectors.md\")"
+    ]
+  }
+}

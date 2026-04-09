@@ -1,11 +1,11 @@
 ---
-title: annotationMustNotHavePreset
+title: annotationMustNotHave
 description: Enforce that classes in specified folders do NOT carry certain annotations. Prevent domain entities from being annotated with infrastructure concerns like @JsonSerializable or @Entity.
 sidebar:
   order: 14
 ---
 
-`annotationMustNotHavePreset` enforces that no class in specified folders carries a particular annotation. It is a boundary enforcement rule — it prevents annotation-implied dependencies and layer violations from creeping into folders where they do not belong. Common use cases include preventing `@JsonSerializable` from appearing in the domain layer, banning `@Entity` (ORM annotations) from domain entities, preventing `@visibleForTesting` from appearing on production service classes, and excluding `@injectable` from pure data model classes.
+`annotationMustNotHave` enforces that no class in specified folders carries a particular annotation. It is a boundary enforcement rule — it prevents annotation-implied dependencies and layer violations from creeping into folders where they do not belong. Common use cases include preventing `@JsonSerializable` from appearing in the domain layer, banning `@Entity` (ORM annotations) from domain entities, preventing `@visibleForTesting` from appearing on production service classes, and excluding `@injectable` from pure data model classes.
 
 ## The Annotation Boundary Problem
 
@@ -19,7 +19,7 @@ Annotations in Dart are not merely documentation. They are metadata that framewo
 
 - **`@visibleForTesting`** marks a member as accessible only from test code. If this annotation appears on a class in a production `lib/` folder (outside of test support utilities), it is a signal that the class was not properly designed for its context.
 
-When these annotations appear where they shouldn't, they pull in inappropriate dependencies, reveal layer violations, and make the architecture harder to understand and maintain. `annotationMustNotHavePreset` catches these violations at CI time, before they're merged into the main branch.
+When these annotations appear where they shouldn't, they pull in inappropriate dependencies, reveal layer violations, and make the architecture harder to understand and maintain. `annotationMustNotHave` catches these violations at CI time, before they're merged into the main branch.
 
 ## How Annotations Imply Dependencies
 
@@ -41,7 +41,7 @@ Similarly, `@Entity` from a database ORM implies:
 3. Changing a field name to better reflect domain language requires a database migration.
 4. Domain language is now constrained by storage concerns.
 
-`annotationMustNotHavePreset` makes these boundary violations visible and automatically enforced.
+`annotationMustNotHave` makes these boundary violations visible and automatically enforced.
 
 ## The `@visibleForTesting` Production Code Problem
 
@@ -77,16 +77,16 @@ Well-designed layers have distinct annotation vocabularies:
 | Data / Infrastructure | `@JsonSerializable`, `@Entity`, `@HiveType` | `@immutable` (mutable data classes), `@visibleForTesting` |
 | Presentation / UI | `@override` (build), navigation annotations | `@injectable`, `@Entity`, `@JsonSerializable` |
 
-`annotationMustNotHavePreset` can enforce the "Inappropriate" column for each layer.
+`annotationMustNotHave` can enforce the "Inappropriate" column for each layer.
 
-## The Asymmetry With `annotationMustHavePreset`
+## The Asymmetry With `annotationMustHave`
 
 The two annotation presets serve fundamentally different purposes:
 
-**`annotationMustHavePreset` — Completeness:**
+**`annotationMustHave` — Completeness:**
 "Every class in this folder must have annotation X. If any class is missing it, that is an error of omission — something was forgotten."
 
-**`annotationMustNotHavePreset` — Boundaries:**
+**`annotationMustNotHave` — Boundaries:**
 "No class in this folder may have annotation Y. If any class has it, that is an error of commission — something was placed incorrectly or an inappropriate dependency was introduced."
 
 Both presets can apply to the same folder with different annotations, creating a complete annotation policy:
@@ -100,7 +100,7 @@ lib/domain/entities/
 ## Function Signature
 
 ```dart
-ArchitectureRule annotationMustNotHavePreset({
+void annotationMustNotHave({
   required List<String> folders,
   required String annotation,
   Severity severity = Severity.error,
@@ -161,12 +161,10 @@ Document WHY each exception exists. Unexplained exceptions become permanent tech
 ## Usage
 
 ```dart
-// arch_test/domain_annotation_boundaries.dart
+// test_arch/domain_annotation_boundaries.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustNotHavePreset(
+void main() => annotationMustNotHave(
     folders: ['lib/domain'],
     annotation: 'JsonSerializable',
     severity: Severity.error,
@@ -187,12 +185,10 @@ dart run dartunit analyze
 The canonical use case. JSON serialization is a data layer concern — it describes how a class is represented in a wire format, which is an infrastructure detail irrelevant to domain logic.
 
 ```dart
-// arch_test/domain_no_json.dart
+// test_arch/domain_no_json.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustNotHavePreset(
+void main() => annotationMustNotHave(
     folders: ['lib/domain', 'lib/domain/entities', 'lib/domain/value_objects'],
     annotation: 'JsonSerializable',
     severity: Severity.error,
@@ -224,7 +220,7 @@ class Product {
 Violation message:
 
 ```
-VIOLATION [error] annotationMustNotHavePreset[@JsonSerializable]
+VIOLATION [error] annotationMustNotHave[@JsonSerializable]
   File: lib/domain/entities/product.dart
   Class: Product
   Forbidden annotation: @JsonSerializable
@@ -247,33 +243,33 @@ lib/data/mappers/product_mapper.dart     → ProductMapper.toDomain(dto) / toDto
 Database ORM annotations like `@Entity` (Floor), `@DataClassName` (Drift), `@HiveType` (Hive), or `@Collection` (Isar) all represent database schema definitions. Domain classes annotated with these are coupled to the specific database implementation.
 
 ```dart
-// arch_test/domain_no_orm.dart
+// test_arch/domain_no_orm.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // Floor/Room-style @Entity
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain'],
     annotation: 'Entity',
     severity: Severity.error,
   ));
 
   // Hive @HiveType
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain'],
     annotation: 'HiveType',
     severity: Severity.error,
   ));
 
   // Isar @Collection
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain'],
     annotation: 'collection',  // Isar uses lowercase
     severity: Severity.error,
   ));
 
   // Drift @DataClassName
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain'],
     annotation: 'DataClassName',
     severity: Severity.error,
@@ -309,12 +305,10 @@ lib/data/local/mappers/user_local_mapper.dart    → Converts between User and U
 `@visibleForTesting` should not appear in production `lib/` code outside of explicitly designated test support files.
 
 ```dart
-// arch_test/no_visible_for_testing.dart
+// test_arch/no_visible_for_testing.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustNotHavePreset(
+void main() => annotationMustNotHave(
     folders: ['lib/services', 'lib/repositories', 'lib/domain', 'lib/blocs'],
     annotation: 'visibleForTesting',
     severity: Severity.error,
@@ -351,12 +345,10 @@ The existence of `@visibleForTesting` here reveals that `resetRetryCount` is an 
 Pure data classes — models, entities, value objects — should not be registered with the DI container. They are created with constructors and typically take no injected dependencies. Marking them `@injectable` is at best useless and at worst confusing (the DI container will try to satisfy their constructor dependencies, which are data, not services).
 
 ```dart
-// arch_test/models_not_injectable.dart
+// test_arch/models_not_injectable.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  annotationMustNotHavePreset(
+void main() => annotationMustNotHave(
     folders: [
       'lib/domain/entities',
       'lib/domain/value_objects',
@@ -391,10 +383,10 @@ The `@injectable` annotation on a data model like `UserProfile` is almost certai
 
 ## Combining Both Presets: Complete Annotation Policies
 
-`annotationMustHavePreset` and `annotationMustNotHavePreset` together define a complete annotation policy for a folder. Here is a real-world complete policy for a Clean Architecture Flutter project:
+`annotationMustHave` and `annotationMustNotHave` together define a complete annotation policy for a folder. Here is a real-world complete policy for a Clean Architecture Flutter project:
 
 ```dart
-// arch_test/annotation_policies.dart
+// test_arch/annotation_policies.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -404,26 +396,26 @@ void main(List<String> args) {
   // Must not: @JsonSerializable, @Entity, @HiveType, @injectable
   // ==================================================
 
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/domain/entities'],
     annotation: 'immutable',
     severity: Severity.error,
     exceptions: ['Entity', 'AggregateRoot'], // Abstract base classes
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain/entities'],
     annotation: 'JsonSerializable',
     severity: Severity.error,
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain/entities'],
     annotation: 'Entity',
     severity: Severity.error,
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/domain/entities'],
     annotation: 'injectable',
     severity: Severity.error,
@@ -435,19 +427,19 @@ void main(List<String> args) {
   // Must not: @JsonSerializable, @injectable
   // ==================================================
 
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/blocs/states'],
     annotation: 'immutable',
     severity: Severity.error,
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/blocs/states'],
     annotation: 'JsonSerializable',
     severity: Severity.error,
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/blocs/states'],
     annotation: 'injectable',
     severity: Severity.error,
@@ -459,20 +451,20 @@ void main(List<String> args) {
   // Must not: @Entity, @JsonSerializable, @visibleForTesting
   // ==================================================
 
-  archTest(args, annotationMustHavePreset(
+  annotationMustHave(
     folders: ['lib/services'],
     annotation: 'injectable',
     severity: Severity.error,
     exceptions: ['BaseService', 'IService'],
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/services'],
     annotation: 'Entity',
     severity: Severity.error,
   ));
 
-  archTest(args, annotationMustNotHavePreset(
+  annotationMustNotHave(
     folders: ['lib/services'],
     annotation: 'visibleForTesting',
     severity: Severity.error,
@@ -487,7 +479,7 @@ This single rule file expresses the complete annotation contract for three archi
 When a class in a targeted folder carries the forbidden annotation:
 
 ```
-VIOLATION [error] annotationMustNotHavePreset[@JsonSerializable]
+VIOLATION [error] annotationMustNotHave[@JsonSerializable]
   File: lib/domain/entities/order.dart
   Class: Order
   Forbidden annotation: @JsonSerializable
@@ -519,7 +511,7 @@ Each exception in the list is a documented gap in your architectural boundary. M
 Organize your boundary rules by layer for clarity and maintainability:
 
 ```
-arch_test/
+test_arch/
   boundaries/
     domain_boundaries.dart       # What domain may and may not have
     application_boundaries.dart  # What application layer may and may not have
@@ -531,7 +523,7 @@ Each file becomes a specification document for its layer's architectural contrac
 
 ## Related Presets
 
-- [`annotationMustHavePreset`](/presets/annotation-must-have) — Enforce required annotations (completeness checks)
-- [`noExternalPackagePreset`](/presets/no-external-package) — Prevent importing annotation-implying packages in the wrong layers
-- [`noPublicFieldsPreset`](/presets/no-public-fields) — Complement annotation boundaries with structural encapsulation rules
+- [`annotationMustHave`](/presets/annotation-must-have) — Enforce required annotations (completeness checks)
+- [`noExternalPackage`](/presets/no-external-package) — Prevent importing annotation-implying packages in the wrong layers
+- [`noPublicFields`](/presets/no-public-fields) — Complement annotation boundaries with structural encapsulation rules
 - [`layerDependencyPreset`](/presets/layer) — Enforce import boundaries between project layers

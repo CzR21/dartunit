@@ -105,3 +105,4 @@ export 'presets/no_banned_calls.dart';
 
 // Reporter
 export 'reporter/console_reporter.dart';
+export 'reporter/html_report_writer.dart';

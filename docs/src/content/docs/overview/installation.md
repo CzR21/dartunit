@@ -54,7 +54,7 @@ dart run dartunit --version
 
 ## Initialize your project
 
-After installing, run `init` to create the `arch_test/` folder:
+After installing, run `init` to create the `test_arch/` folder:
 
 ```bash
 dart run dartunit init
@@ -64,8 +64,8 @@ This creates:
 
 ```
 my_project/
-├── arch_test/
-│   └── example_arch_test.dart   ← working example rule
+├── test_arch/
+│   └── example_test_arch.dart   ← working example rule
 ├── lib/
 │   └── ...
 └── pubspec.yaml

@@ -1,3 +1,5 @@
+import '../../core/extensions/string_extensions.dart';
+
 /// Represents an analyzed Dart source file.
 class AnalyzedFile {
   /// The absolute, forward-slash-normalised path to this file.
@@ -21,12 +23,12 @@ class AnalyzedFile {
 
   /// The directory containing this file (forward-slash separated).
   String get folder {
-    final parts = filePath.replaceAll('\\', '/').split('/');
+    final parts = filePath.normalized.split('/');
     return parts.sublist(0, parts.length - 1).join('/');
   }
 
   /// The file name, e.g. `user_repository.dart`.
-  String get fileName => filePath.replaceAll('\\', '/').split('/').last;
+  String get fileName => filePath.normalized.split('/').last;
 
   @override
   String toString() => 'AnalyzedFile($filePath)';

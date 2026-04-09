@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../../utils/ansi_helper.dart';
+import '../../utils/ansi_formatter.dart';
 
 /// A terminal spinner for indicating progress during async operations.
 class Spinner {
@@ -18,7 +18,7 @@ class Spinner {
   void start() {
     _hideCursor();
     _timer = Timer.periodic(const Duration(milliseconds: 80), (_) {
-      final frame = ANSIHelper.cyan(_frames[_index % _frames.length], useColor);
+      final frame = ANSIFormatter.cyan(_frames[_index % _frames.length], useColor);
       stdout.write('\r  $frame $message');
       _index++;
     });
@@ -27,14 +27,14 @@ class Spinner {
   void stop({String? doneMessage}) {
     _timer?.cancel();
     _timer = null;
-    stdout.write('\r  ${ANSIHelper.green('✓', useColor)} ${doneMessage ?? message}\n');
+    stdout.write('\r  ${ANSIFormatter.green('✓', useColor)} ${doneMessage ?? message}\n');
     _showCursor();
   }
 
   void fail({String? errorMessage}) {
     _timer?.cancel();
     _timer = null;
-    stdout.write('\r  ${ANSIHelper.red('✗', useColor)} ${errorMessage ?? message}\n');
+    stdout.write('\r  ${ANSIFormatter.red('✗', useColor)} ${errorMessage ?? message}\n');
     _showCursor();
   }
 

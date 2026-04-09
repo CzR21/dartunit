@@ -30,11 +30,12 @@ export default defineConfig({
           label: 'Fundamentals',
           items: [
             { label: 'How It Works', slug: 'fundamentals/how-it-works' },
-            { label: 'Rules (Rule)', slug: 'fundamentals/rules' },
-            { label: 'Selectors (Selector)', slug: 'fundamentals/selectors' },
-            { label: 'Predicates (Predicate)', slug: 'fundamentals/predicates' },
+            { label: 'Rules', slug: 'fundamentals/rules' },
+            { label: 'Selectors', slug: 'fundamentals/selectors' },
+            { label: 'Predicates', slug: 'fundamentals/predicates' },
             { label: 'Presets', slug: 'fundamentals/presets' },
-            { label: 'Subjects & Violations', slug: 'fundamentals/subjects-violations' },
+            { label: 'Subjects', slug: 'fundamentals/subjects' },
+            { label: 'Violations', slug: 'fundamentals/violations' },
           ],
         },
         {
@@ -48,23 +49,120 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Built-in Presets',
+          label: 'Predicates',
           collapsed: true,
           items: [
-            { label: 'layeredArchitecturePreset', slug: 'presets/layered-architecture' },
-            { label: 'layerCannotDependOnPreset', slug: 'presets/layer-cannot-depend-on' },
-            { label: 'layerCanOnlyDependOnPreset', slug: 'presets/layer-can-only-depend-on' },
-            { label: 'namingFolderSuffixPreset', slug: 'presets/naming-folder-suffix' },
-            { label: 'namingNamePatternPreset', slug: 'presets/naming-name-pattern' },
-            { label: 'mustBeAbstractPreset', slug: 'presets/must-be-abstract' },
-            { label: 'mustBeImmutablePreset', slug: 'presets/must-be-immutable' },
-            { label: 'noCircularDependenciesPreset', slug: 'presets/no-circular-dependencies' },
-            { label: 'classSizeLimitPreset', slug: 'presets/class-size-limit' },
-            { label: 'noPublicFieldsPreset', slug: 'presets/no-public-fields' },
-            { label: 'noBannedCallsPreset', slug: 'presets/no-banned-calls' },
-            { label: 'noExternalPackagePreset', slug: 'presets/no-external-package' },
-            { label: 'annotationMustHavePreset', slug: 'presets/annotation-must-have' },
-            { label: 'annotationMustNotHavePreset', slug: 'presets/annotation-must-not-have' },
+            {
+              label: 'Dependency',
+              items: [
+                { label: 'dependsOn / doesNotDependOn', slug: 'predicates/depend-on-folder' },
+                { label: 'dependsOnPackage / doesNotDependOnPackage', slug: 'predicates/depend-on-package' },
+                { label: 'onlyDependsOnFolders', slug: 'predicates/only-depend-on-folders' },
+                { label: 'hasNoCircularDependency', slug: 'predicates/has-circular-dependency' },
+                { label: 'hasMaxImports', slug: 'predicates/max-imports' },
+              ],
+            },
+            {
+              label: 'Naming',
+              items: [
+                { label: 'nameStartsWith', slug: 'predicates/name-starts-with' },
+                { label: 'nameEndsWith', slug: 'predicates/name-ends-with' },
+                { label: 'nameContains', slug: 'predicates/name-contains' },
+                { label: 'nameMatchesPattern', slug: 'predicates/name-matches-pattern' },
+              ],
+            },
+            {
+              label: 'Type',
+              items: [
+                { label: 'isAbstractClass', slug: 'predicates/is-abstract' },
+                { label: 'isConcreteClass', slug: 'predicates/is-concrete-class' },
+                { label: 'isEnumType', slug: 'predicates/is-enum' },
+                { label: 'isMixinType', slug: 'predicates/is-mixin' },
+                { label: 'isExtensionType', slug: 'predicates/is-extension' },
+                { label: 'extendsClass', slug: 'predicates/extends' },
+                { label: 'implementsInterface', slug: 'predicates/implements' },
+                { label: 'usesMixin', slug: 'predicates/uses-mixin' },
+              ],
+            },
+            {
+              label: 'Annotations',
+              items: [
+                { label: 'hasAnnotation / doesNotHaveAnnotation', slug: 'predicates/annotated-with' },
+              ],
+            },
+            {
+              label: 'Metrics',
+              items: [
+                { label: 'hasMaxMethods', slug: 'predicates/max-methods' },
+                { label: 'hasMinMethods', slug: 'predicates/min-methods' },
+                { label: 'hasMaxFields', slug: 'predicates/max-fields' },
+                { label: 'hasMinFields', slug: 'predicates/min-fields' },
+              ],
+            },
+            {
+              label: 'Quality & Structure',
+              items: [
+                { label: 'hasAllFinalFields', slug: 'predicates/has-all-final-fields' },
+                { label: 'hasNoPublicFields', slug: 'predicates/has-no-public-fields' },
+                { label: 'hasNoPublicMethods', slug: 'predicates/has-no-public-methods' },
+                { label: 'hasMethod', slug: 'predicates/has-method' },
+                { label: 'hasContent / hasNoContent', slug: 'predicates/file-content-matches' },
+              ],
+            },
+            {
+              label: 'Combining Matchers',
+              items: [
+                { label: 'NOT — doesNot / hasNo', slug: 'predicates/not' },
+                { label: 'AND — multiple expect()', slug: 'predicates/and' },
+                { label: 'OR — regex alternation', slug: 'predicates/or' },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Presets',
+          collapsed: true,
+          items: [
+            {
+              label: 'Layer',
+              items: [
+                { label: 'layeredArchitecture', slug: 'presets/layered-architecture' },
+                { label: 'layerCannotDependOn', slug: 'presets/layer-cannot-depend-on' },
+                { label: 'layerCanOnlyDependOn', slug: 'presets/layer-can-only-depend-on' },
+              ],
+            },
+            {
+              label: 'Naming',
+              items: [
+                { label: 'namingFolderSuffix', slug: 'presets/naming-folder-suffix' },
+                { label: 'namingFileSuffix', slug: 'presets/naming-file-suffix' },
+                { label: 'namingNamePattern', slug: 'presets/naming-name-pattern' },
+              ],
+            },
+            {
+              label: 'Structure',
+              items: [
+                { label: 'mustBeAbstract', slug: 'presets/must-be-abstract' },
+                { label: 'mustBeImmutable', slug: 'presets/must-be-immutable' },
+                { label: 'noPublicFields', slug: 'presets/no-public-fields' },
+                { label: 'noCircularDependencies', slug: 'presets/no-circular-dependencies' },
+              ],
+            },
+            {
+              label: 'Quality & Metrics',
+              items: [
+                { label: 'classSizeLimit', slug: 'presets/class-size-limit' },
+                { label: 'noBannedCalls', slug: 'presets/no-banned-calls' },
+                { label: 'noExternalPackage', slug: 'presets/no-external-package' },
+              ],
+            },
+            {
+              label: 'Annotations',
+              items: [
+                { label: 'annotationMustHave', slug: 'presets/annotation-must-have' },
+                { label: 'annotationMustNotHave', slug: 'presets/annotation-must-not-have' },
+              ],
+            },
           ],
         },
         {

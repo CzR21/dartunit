@@ -1,11 +1,11 @@
 ---
-title: noExternalPackagePreset
+title: noExternalPackage
 description: Forbid folders from importing specified external packages. Keep your domain and business logic layer free from framework and infrastructure dependencies.
 sidebar:
   order: 12
 ---
 
-`noExternalPackagePreset` forbids classes in specified folders from importing specific external packages. It returns `List<ArchitectureRule>` — one rule per forbidden package. Use this to enforce the Dependency Rule from Clean Architecture: inner layers (domain, application) must not depend on outer layers (Flutter framework, HTTP clients, database packages, state management frameworks).
+`noExternalPackage` forbids classes in specified folders from importing specific external packages. It returns `List<ArchitectureRule>` — one rule per forbidden package. Use this to enforce the Dependency Rule from Clean Architecture: inner layers (domain, application) must not depend on outer layers (Flutter framework, HTTP clients, database packages, state management frameworks).
 
 ## The Domain Layer Purity Problem
 
@@ -40,7 +40,7 @@ In practice for a Flutter application:
 - The **infrastructure layer** (repositories, data sources, HTTP clients, database adapters) implements domain interfaces and may import any package it needs.
 - The **presentation layer** (widgets, screens, navigation) imports application layer and Flutter.
 
-`noExternalPackagePreset` makes this rule machine-verifiable. Instead of relying on code reviews to catch a developer who accidentally imports `dio` in a domain service, DartUnit enforces it automatically.
+`noExternalPackage` makes this rule machine-verifiable. Instead of relying on code reviews to catch a developer who accidentally imports `dio` in a domain service, DartUnit enforces it automatically.
 
 ## The Practical Benefit: Fast Domain Tests
 
@@ -67,20 +67,20 @@ Beyond speed, `dart test` domain tests can be run in environments without Flutte
 
 ## Return Type: `List<ArchitectureRule>`
 
-`noExternalPackagePreset` returns `List<ArchitectureRule>` — one rule per forbidden package. This allows DartUnit to report violations from each forbidden package as a distinct rule, making the output easier to read and process.
+`noExternalPackage` returns `List<ArchitectureRule>` — one rule per forbidden package. This allows DartUnit to report violations from each forbidden package as a distinct rule, making the output easier to read and process.
 
 ```dart
-// arch_test/domain_packages.dart
+// test_arch/domain_packages.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/domain'],
     packages: ['flutter', 'dio', 'hive'],
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -88,11 +88,11 @@ void main(List<String> args) {
 Or using a helper:
 
 ```dart
-// arch_test/domain_packages.dart
+// test_arch/domain_packages.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  archTestAll(args, noExternalPackagePreset(
+  archTestAll(args, noExternalPackage(
     folders: ['lib/domain'],
     packages: ['flutter', 'dio', 'hive'],
   ));
@@ -117,7 +117,7 @@ packages: ['hive', 'hive_flutter']
 ## Function Signature
 
 ```dart
-List<ArchitectureRule> noExternalPackagePreset({
+List<ArchitectureRule> noExternalPackage({
   required List<String> folders,
   required List<String> packages,
   Severity severity = Severity.error,
@@ -133,7 +133,7 @@ List<ArchitectureRule> noExternalPackagePreset({
 
 The folders where the import restriction applies. Typically the inner architectural layers: `lib/domain`, `lib/application`, `lib/core`.
 
-Unlike most other presets where `folders` defaults to `[]` (global), `noExternalPackagePreset` requires folders to be specified explicitly. This avoids accidentally applying infrastructure restrictions to the infrastructure layer itself.
+Unlike most other presets where `folders` defaults to `[]` (global), `noExternalPackage` requires folders to be specified explicitly. This avoids accidentally applying infrastructure restrictions to the infrastructure layer itself.
 
 ```dart
 folders: ['lib/domain', 'lib/domain/entities', 'lib/domain/use_cases']
@@ -176,18 +176,18 @@ However, note that `package:meta/meta.dart` provides `@immutable` and does not d
 The core constraint for Clean Architecture in Flutter. Domain code — entities, value objects, domain services, repository interfaces — must not depend on Flutter.
 
 ```dart
-// arch_test/domain_no_flutter.dart
+// test_arch/domain_no_flutter.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/domain'],
     packages: ['flutter'],
     severity: Severity.error,
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -225,11 +225,11 @@ class Money {
 HTTP packages represent the infrastructure layer. Domain code that imports them is tightly coupled to the specific HTTP client implementation.
 
 ```dart
-// arch_test/domain_no_http.dart
+// test_arch/domain_no_http.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/domain'],
     packages: [
       'dio',
@@ -241,7 +241,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -272,11 +272,11 @@ The `UserRepository` implementation belongs in `lib/infrastructure` or `lib/data
 Use cases (application layer) orchestrate domain operations. They should not know about the specific database used to persist data — that is an infrastructure concern.
 
 ```dart
-// arch_test/application_no_db.dart
+// test_arch/application_no_db.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/application', 'lib/use_cases'],
     packages: [
       'sqflite',
@@ -291,7 +291,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -303,11 +303,11 @@ A use case that imports Drift (a local database package) is tied to that databas
 Data models represent data structures. They should not depend on state management packages — that would mean a model class knows how it is managed in the application, coupling data structure to application architecture.
 
 ```dart
-// arch_test/models_no_state_management.dart
+// test_arch/models_no_state_management.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/domain/models', 'lib/data/models'],
     packages: [
       'flutter_bloc',
@@ -323,7 +323,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -335,13 +335,13 @@ A model class that imports `flutter_bloc` or `provider` is no longer a pure data
 In practice, you want to enforce all domain isolation rules in a single, comprehensive rule file. Combine all forbidden packages:
 
 ```dart
-// arch_test/domain_isolation.dart
+// test_arch/domain_isolation.dart
 import 'package:dartunit/dartunit.dart';
 
 // The domain layer must be pure Dart — no framework, HTTP, database,
 // platform, or state management dependencies.
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: [
       'lib/domain',
       'lib/domain/entities',
@@ -398,7 +398,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -406,7 +406,7 @@ void main(List<String> args) {
 This comprehensive list ensures the domain layer has truly zero infrastructure dependencies. When DartUnit runs this in CI, any developer who accidentally imports a forbidden package gets an immediate, clear error:
 
 ```
-VIOLATION [error] noExternalPackagePreset[flutter]
+VIOLATION [error] noExternalPackage[flutter]
   File: lib/domain/services/payment_service.dart
   Line 3: import 'package:flutter/foundation.dart';
   Package: flutter
@@ -421,11 +421,11 @@ VIOLATION [error] noExternalPackagePreset[flutter]
 The application layer (use cases, BLoC, application services) has slightly looser constraints. It may depend on BLoC/provider for state management but should not import Flutter widgets or infrastructure packages:
 
 ```dart
-// arch_test/application_isolation.dart
+// test_arch/application_isolation.dart
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  final rules = noExternalPackagePreset(
+  final rules = noExternalPackage(
     folders: ['lib/application', 'lib/blocs', 'lib/use_cases'],
     packages: [
       // No Flutter widgets in application layer
@@ -455,7 +455,7 @@ void main(List<String> args) {
   );
 
   for (final rule in rules) {
-    archTest(args, rule);
+    rule);
   }
 }
 ```
@@ -465,7 +465,7 @@ void main(List<String> args) {
 When a forbidden import is detected:
 
 ```
-VIOLATION [error] noExternalPackagePreset[dio]
+VIOLATION [error] noExternalPackage[dio]
   File: lib/domain/repositories/product_repository_impl.dart
   Line 4: import 'package:dio/dio.dart';
   Package: dio
@@ -482,7 +482,7 @@ Each rule in the returned list generates violations independently. A file that i
 For large projects, organize package restriction rules by layer:
 
 ```
-arch_test/
+test_arch/
   domain_isolation.dart       # Domain layer package restrictions
   application_isolation.dart  # Application layer restrictions
   presentation_rules.dart     # Presentation layer rules
@@ -493,19 +493,19 @@ Each file is a standalone Dart program run independently by DartUnit. This organ
 
 ## Pairing With Layer Dependency Rules
 
-`noExternalPackagePreset` and `layerDependencyPreset` are complementary:
+`noExternalPackage` and `layerDependencyPreset` are complementary:
 
 - `layerDependencyPreset` controls which **project layers** can import which other project layers (e.g., presentation may import application, but not domain directly).
-- `noExternalPackagePreset` controls which **external packages** can be imported by which layers.
+- `noExternalPackage` controls which **external packages** can be imported by which layers.
 
 Together, they form a complete dependency boundary that covers both internal and external dependencies.
 
 ```dart
-// arch_test/domain_boundaries.dart — controls project-internal imports
+// test_arch/domain_boundaries.dart — controls project-internal imports
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  archTest(args, layerDependencyPreset(
+  layerDependencyPreset(
     layers: {
       'domain': [],                         // Domain imports nothing from this project
       'application': ['domain'],            // Application may import domain
@@ -517,11 +517,11 @@ void main(List<String> args) {
 ```
 
 ```dart
-// arch_test/domain_external.dart — controls external package imports
+// test_arch/domain_external.dart — controls external package imports
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
-  archTestAll(args, noExternalPackagePreset(
+  archTestAll(args, noExternalPackage(
     folders: ['lib/domain'],
     packages: ['flutter', 'dio', 'hive', 'shared_preferences'],
     severity: Severity.error,
@@ -532,5 +532,5 @@ void main(List<String> args) {
 ## Related Presets
 
 - [`layerDependencyPreset`](/presets/layer) — Control imports between project layers (internal dependencies)
-- [`noBannedCallsPreset`](/presets/no-banned-calls) — Ban specific textual patterns including direct method calls
-- [`annotationMustNotHavePreset`](/presets/annotation-must-not-have) — Prevent infrastructure-specific annotations from appearing in the domain layer
+- [`noBannedCalls`](/presets/no-banned-calls) — Ban specific textual patterns including direct method calls
+- [`annotationMustNotHave`](/presets/annotation-must-not-have) — Prevent infrastructure-specific annotations from appearing in the domain layer

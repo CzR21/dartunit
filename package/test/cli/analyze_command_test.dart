@@ -120,14 +120,14 @@ dependencies:
     });
 
     test('returns 0 when rule produces no violations', () async {
-      _writeRuleFile(tempDir, 'no_violations_test_arch.dart', []);
+      _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
       final code =
           await DartunitCli().run(['analyze', '--path', tempDir.path]);
       expect(code, equals(0));
     });
 
     test('returns 1 when error-level violations are found', () async {
-      _writeRuleFile(tempDir, 'has_violations_test_arch.dart', [
+      _writeRuleFile(tempDir, 'has_violations_arch_test.dart', [
         {
           'ruleDescription': 'Domain must not depend on Data',
           'message': 'Bad depends on lib/data',
@@ -141,7 +141,7 @@ dependencies:
     });
 
     test('returns 0 when only warnings are found', () async {
-      _writeRuleFile(tempDir, 'warnings_test_arch.dart', [
+      _writeRuleFile(tempDir, 'warnings_arch_test.dart', [
         {
           'ruleDescription': 'God-class check',
           'message': 'BigClass has too many methods',
@@ -157,7 +157,7 @@ dependencies:
 
   group('analyze — flags', () {
     test('--no-color flag is accepted without error', () async {
-      _writeRuleFile(tempDir, 'no_violations_test_arch.dart', []);
+      _writeRuleFile(tempDir, 'no_violations_arch_test.dart', []);
       final code = await DartunitCli()
           .run(['analyze', '--path', tempDir.path, '--no-color']);
       expect(code, equals(0));
@@ -166,7 +166,7 @@ dependencies:
 
   group('analyze — multiple rule files', () {
     test('collects violations from multiple rule files', () async {
-      _writeRuleFile(tempDir, 'rule_a_test_arch.dart', [
+      _writeRuleFile(tempDir, 'rule_a_arch_test.dart', [
         {
           'ruleDescription': 'Rule A',
           'message': 'Violation A',
@@ -174,7 +174,7 @@ dependencies:
           'severity': 'error',
         },
       ]);
-      _writeRuleFile(tempDir, 'rule_b_test_arch.dart', [
+      _writeRuleFile(tempDir, 'rule_b_arch_test.dart', [
         {
           'ruleDescription': 'Rule B',
           'message': 'Violation B',

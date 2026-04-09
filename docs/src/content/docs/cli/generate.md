@@ -2,7 +2,7 @@
 title: DartUnit generate
 description: Scaffold a new rule file with a pre-filled template ready to customize.
 sidebar:
-  order: 4
+  order: 3
 ---
 
 The `generate` command creates a new `*_test_arch.dart` file in the `test_arch/` folder with the required structure already in place, so you can focus on writing the rule logic rather than the boilerplate.

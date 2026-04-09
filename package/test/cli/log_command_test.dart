@@ -83,7 +83,7 @@ void main() {
       ]);
       final entries = logger.load();
       expect(entries.first.violations.length, equals(1));
-      expect(entries.first.errorCount, equals(1));
+      expect(entries.first.failureCount, equals(1));
       expect(entries.first.passed, isFalse);
     });
 

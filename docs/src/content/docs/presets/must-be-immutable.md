@@ -1,11 +1,11 @@
 ---
-title: mustBeImmutablePreset
+title: mustBeImmutable
 description: Enforce that all instance fields in specified folders are final or const. Prevents accidental mutation of states, models, and value objects.
 sidebar:
   order: 7
 ---
 
-`mustBeImmutablePreset` enforces that every instance field in every class within the specified folders is declared `final` or `const`. Mutable fields in state objects, models, and value objects are one of the most common sources of subtle, hard-to-diagnose bugs in Flutter applications.
+`mustBeImmutable` enforces that every instance field in every class within the specified folders is declared `final` or `const`. Mutable fields in state objects, models, and value objects are one of the most common sources of subtle, hard-to-diagnose bugs in Flutter applications.
 
 ---
 
@@ -102,7 +102,7 @@ class CartState {
 Consider a shopping cart application with this state class:
 
 ```dart
-// Without mustBeImmutablePreset, this compiles silently
+// Without mustBeImmutable, this compiles silently
 class CartState extends Equatable {
   List<CartItem> items;        // NOT final — this is the bug
   double totalPrice;           // NOT final
@@ -131,13 +131,13 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
 `BlocBuilder` receives the emit. It calls `state == previousState`. Because `Equatable` compares by value, and both `state` and `previousState` are the same object, they are equal. No rebuild. The cart appears frozen even though the data changed.
 
-With `mustBeImmutablePreset` targeting `lib/bloc/states/` (or wherever `CartState` lives), this compiles but DartUnit reports a violation before CI passes. The developer is forced to fix the state class before the code merges.
+With `mustBeImmutable` targeting `lib/bloc/states/` (or wherever `CartState` lives), this compiles but DartUnit reports a violation before CI passes. The developer is forced to fix the state class before the code merges.
 
 ---
 
 ## The distinction between `final` and deeply immutable
 
-`mustBeImmutablePreset` enforces `final` field declarations. This is **reference immutability**, not **deep immutability**. Understanding the distinction prevents false confidence.
+`mustBeImmutable` enforces `final` field declarations. This is **reference immutability**, not **deep immutability**. Understanding the distinction prevents false confidence.
 
 ### What `final` prevents
 
@@ -171,7 +171,7 @@ For truly deep immutability, use:
 - `package:built_value` for immutable value types
 - `UnmodifiableListView` from `dart:collection` for read-only list exposure
 
-`mustBeImmutablePreset` is a necessary but not sufficient condition for deep immutability. It closes the most common mutation pathway (field reassignment) but does not protect against collection mutation. For full protection, pair it with a review practice or freezed-generated classes.
+`mustBeImmutable` is a necessary but not sufficient condition for deep immutability. It closes the most common mutation pathway (field reassignment) but does not protect against collection mutation. For full protection, pair it with a review practice or freezed-generated classes.
 
 ---
 
@@ -191,9 +191,9 @@ class CartState {
 
 When a class is annotated with `@immutable`, the Dart analyzer emits a warning if any instance field is not `final`. This is the "official" Dart approach to enforcing immutability.
 
-The differences between `@immutable` and `mustBeImmutablePreset`:
+The differences between `@immutable` and `mustBeImmutable`:
 
-| Aspect | `@immutable` annotation | `mustBeImmutablePreset` |
+| Aspect | `@immutable` annotation | `mustBeImmutable` |
 |---|---|---|
 | Requires developer action | Yes — must add annotation to every class | No — rule applies to all classes in the folder |
 | Scope | Per class | Per folder (all classes) |
@@ -201,14 +201,14 @@ The differences between `@immutable` and `mustBeImmutablePreset`:
 | Coverage | Only annotated classes | Every class in the folder, no exceptions unless listed |
 | Visibility | In source code | In architecture test reports |
 
-The two approaches are complementary, not mutually exclusive. You can use `mustBeImmutablePreset` to catch any class in a state folder that forgot the `@immutable` annotation, while `@immutable` provides inline documentation of intent.
+The two approaches are complementary, not mutually exclusive. You can use `mustBeImmutable` to catch any class in a state folder that forgot the `@immutable` annotation, while `@immutable` provides inline documentation of intent.
 
 ---
 
 ## Function signature
 
 ```dart
-ArchitectureRule mustBeImmutablePreset({
+void mustBeImmutable({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
@@ -231,12 +231,10 @@ ArchitectureRule mustBeImmutablePreset({
 
 The most common application. All state classes must have final fields:
 
-```dart title="arch_test/bloc_immutability_arch_test.dart"
+```dart title="test_arch/bloc_immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeImmutablePreset(
+void main() => mustBeImmutable(
     folders: ['lib/bloc/states'],
     severity: RuleSeverity.error,
   ),
@@ -245,12 +243,10 @@ void main(List<String> args) => archTest(
 
 If your project puts states alongside blocs and events in a flat folder:
 
-```dart title="arch_test/bloc_folder_immutability_arch_test.dart"
+```dart title="test_arch/bloc_folder_immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeImmutablePreset(
+void main() => mustBeImmutable(
     folders: ['lib/bloc'],
     severity: RuleSeverity.error,
     exceptions: [
@@ -265,12 +261,10 @@ void main(List<String> args) => archTest(
 
 Domain entities and value objects represent core business concepts. Their identity and equality semantics depend on value, not reference — which presupposes immutability:
 
-```dart title="arch_test/domain_immutability_arch_test.dart"
+```dart title="test_arch/domain_immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeImmutablePreset(
+void main() => mustBeImmutable(
     folders: [
       'lib/domain/entities',
       'lib/domain/value_objects',
@@ -289,12 +283,10 @@ Value objects — `Money`, `Email`, `PhoneNumber`, `DateRange` — must be immut
 
 Network response models are deserialized once and then read. They should never be mutated:
 
-```dart title="arch_test/model_immutability_arch_test.dart"
+```dart title="test_arch/model_immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeImmutablePreset(
+void main() => mustBeImmutable(
     folders: ['lib/data/models'],
     severity: RuleSeverity.warning,
   ),
@@ -307,12 +299,10 @@ Using `RuleSeverity.warning` here is intentional: some teams allow mutable model
 
 A feature-first project with per-feature model folders:
 
-```dart title="arch_test/all_models_immutability_arch_test.dart"
+```dart title="test_arch/all_models_immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  mustBeImmutablePreset(
+void main() => mustBeImmutable(
     folders: [
       'lib/features/cart/models',
       'lib/features/product/models',
@@ -333,11 +323,11 @@ void main(List<String> args) => archTest(
 
 ## How to pair with `HasAllFinalFieldsPredicate` for custom rules
 
-If you need to write a custom rule — for example, immutability only for classes that also implement `Equatable`, or only for classes annotated with `@immutable` — you can build on the underlying predicate that `mustBeImmutablePreset` uses internally.
+If you need to write a custom rule — for example, immutability only for classes that also implement `Equatable`, or only for classes annotated with `@immutable` — you can build on the underlying predicate that `mustBeImmutable` uses internally.
 
 Dartunit exposes predicates as building blocks for custom `ArchitectureRule` objects:
 
-```dart title="arch_test/custom_equatable_immutability_arch_test.dart"
+```dart title="test_arch/custom_equatable_immutability_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -350,11 +340,11 @@ void main(List<String> args) {
     severity: RuleSeverity.error,
   );
 
-  archTest(args, rule);
+  rule);
 }
 ```
 
-The `HasAllFinalFieldsPredicate` is the same predicate used internally by `mustBeImmutablePreset`. Using it directly in a custom rule gives you full control over which classes are selected and how violations are reported.
+The `HasAllFinalFieldsPredicate` is the same predicate used internally by `mustBeImmutable`. Using it directly in a custom rule gives you full control over which classes are selected and how violations are reported.
 
 ---
 
@@ -384,7 +374,7 @@ Each mutable field is reported as a separate violation, so you can see all mutab
 
 ### Static fields are not checked
 
-`mustBeImmutablePreset` only checks instance fields. `static` fields are excluded from the check because static fields are class-level, not instance-level, and are commonly mutable by design (caches, registries, lazy singletons).
+`mustBeImmutable` only checks instance fields. `static` fields are excluded from the check because static fields are class-level, not instance-level, and are commonly mutable by design (caches, registries, lazy singletons).
 
 ```dart
 class CartState {
@@ -429,5 +419,5 @@ class CartState {
 
 ## Related presets
 
-- [`mustBeAbstractPreset`](/presets/must-be-abstract/) — structural constraint for interface folders; pair with this preset for full domain layer enforcement
-- [`namingFolderSuffixPreset`](/presets/naming-folder-suffix/) — combine with this preset to ensure state classes are both named correctly and immutable
+- [`mustBeAbstract`](/presets/must-be-abstract/) — structural constraint for interface folders; pair with this preset for full domain layer enforcement
+- [`namingFolderSuffix`](/presets/naming-folder-suffix/) — combine with this preset to ensure state classes are both named correctly and immutable

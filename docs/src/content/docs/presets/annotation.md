@@ -9,14 +9,14 @@ The annotation presets ensure that certain annotations are present or absent in 
 
 ---
 
-## annotationMustHavePreset
+## annotationMustHave
 
 Enforces that all classes in a folder have a specific annotation.
 
 ### Function signature
 
 ```dart
-ArchitectureRule annotationMustHavePreset({
+ArchitectureRule annotationMustHave({
   required String folder,
   required String annotation,
   RuleSeverity severity = RuleSeverity.warning,
@@ -35,12 +35,12 @@ ArchitectureRule annotationMustHavePreset({
 
 ### Example — Services must be registered with the DI container
 
-```dart title="arch_test/di_registration_arch_test.dart"
+```dart title="test_arch/di_registration_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  annotationMustHavePreset(
+  annotationMustHave(
     folder: 'lib/service',
     annotation: 'injectable',
     severity: RuleSeverity.warning,
@@ -51,12 +51,12 @@ void main(List<String> args) => archTest(
 
 ### Example — Data repositories must be registered as lazy singletons
 
-```dart title="arch_test/repository_registration_arch_test.dart"
+```dart title="test_arch/repository_registration_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  annotationMustHavePreset(
+  annotationMustHave(
     folder: 'lib/data/repositories',
     annotation: 'LazySingleton',
     severity: RuleSeverity.error,
@@ -67,12 +67,12 @@ void main(List<String> args) => archTest(
 
 ### Example — All use case implementations must be injectable
 
-```dart title="arch_test/usecase_di_arch_test.dart"
+```dart title="test_arch/usecase_di_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  annotationMustHavePreset(
+  annotationMustHave(
     folder: 'lib/domain/usecases',
     annotation: 'injectable',
     severity: RuleSeverity.warning,
@@ -90,14 +90,14 @@ WARNING | Classes in lib/service must be annotated with @injectable
 
 ---
 
-## annotationMustNotHavePreset
+## annotationMustNotHave
 
 Enforces that classes in a folder do **not** have a specific annotation.
 
 ### Function signature
 
 ```dart
-ArchitectureRule annotationMustNotHavePreset({
+ArchitectureRule annotationMustNotHave({
   required String folder,
   required String annotation,
   RuleSeverity severity = RuleSeverity.warning,
@@ -116,14 +116,14 @@ ArchitectureRule annotationMustNotHavePreset({
 
 ### Example — Domain entities must not have JSON serialization annotations
 
-```dart title="arch_test/domain_purity_arch_test.dart"
+```dart title="test_arch/domain_purity_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // Entities must not be serializable (JSON belongs in data layer)
   archTest(
     args,
-    annotationMustNotHavePreset(
+    annotationMustNotHave(
       folder: 'lib/domain/entities',
       annotation: 'JsonSerializable',
       severity: RuleSeverity.error,
@@ -133,7 +133,7 @@ void main(List<String> args) {
   // Entities must not be stored in Hive (persistence belongs in data layer)
   archTest(
     args,
-    annotationMustNotHavePreset(
+    annotationMustNotHave(
       folder: 'lib/domain/entities',
       annotation: 'HiveType',
       severity: RuleSeverity.error,
@@ -144,13 +144,13 @@ void main(List<String> args) {
 
 ### Example — Domain classes must not use injectable annotations
 
-```dart title="arch_test/domain_annotations_arch_test.dart"
+```dart title="test_arch/domain_annotations_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   archTest(
     args,
-    annotationMustNotHavePreset(
+    annotationMustNotHave(
       folder: 'lib/domain',
       annotation: 'injectable',
       severity: RuleSeverity.warning,
@@ -160,7 +160,7 @@ void main(List<String> args) {
 
   archTest(
     args,
-    annotationMustNotHavePreset(
+    annotationMustNotHave(
       folder: 'lib/domain',
       annotation: 'LazySingleton',
       severity: RuleSeverity.warning,
@@ -183,7 +183,7 @@ ERROR | Classes in lib/domain/entities must not be annotated with @JsonSerializa
 
 For more flexibility (e.g., combining with other selector filters), use `AnnotatedWithPredicate` and `NotAnnotatedWithPredicate` directly in a custom rule:
 
-```dart title="arch_test/injectable_services_arch_test.dart"
+```dart title="test_arch/injectable_services_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(

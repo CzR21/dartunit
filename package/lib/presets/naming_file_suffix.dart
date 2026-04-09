@@ -100,7 +100,7 @@ String _buildDescription(
   }
   final effectiveSuffix = suffix != null
       ? _ensureDartExtension(suffix)
-      : '_${folderBasename}.dart';
+      : '_$folderBasename.dart';
   if (prefix != null) {
     return 'Files in "$folder" must start with "$prefix" and end with "$effectiveSuffix"';
   }

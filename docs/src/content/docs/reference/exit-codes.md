@@ -44,7 +44,7 @@ echo $?  # → 1
 
 A problem occurred before analysis could start. Common causes:
 
-- `arch_test/` folder not found (run `dart run dartunit init` first)
+- `test_arch/` folder not found (run `dart run dartunit init` first)
 - A rule file has a syntax error that prevents it from being compiled
 - The `--path` directory does not exist
 
@@ -123,7 +123,7 @@ elif [ $EXIT_CODE -eq 1 ]; then
   echo "Architecture violations found. Fix them before merging."
   exit 1
 elif [ $EXIT_CODE -eq 2 ]; then
-  echo "dartunit configuration error. Check your arch_test/ folder."
+  echo "dartunit configuration error. Check your test_arch/ folder."
   exit 2
 fi
 ```

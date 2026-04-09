@@ -1,17 +1,17 @@
 ---
-title: namingNamePatternPreset
+title: namingNamePattern
 description: Enforce custom naming conventions with regex patterns. Use when folder-suffix naming isn't flexible enough for your project's conventions.
 sidebar:
   order: 5
 ---
 
-`namingNamePatternPreset` enforces that every class in a specified folder has a name matching a custom regular expression. Where `namingFolderSuffixPreset` derives the expected suffix from the folder name, this preset lets you supply any regex — prefixes, combined prefix+suffix rules, strict formats, or negative patterns.
+`namingNamePattern` enforces that every class in a specified folder has a name matching a custom regular expression. Where `namingFolderSuffix` derives the expected suffix from the folder name, this preset lets you supply any regex — prefixes, combined prefix+suffix rules, strict formats, or negative patterns.
 
 ---
 
 ## When folder-suffix naming is not enough
 
-`namingFolderSuffixPreset` covers the common case: everything in `lib/repositories/` ends with `Repository`. But many real-world conventions cannot be expressed as a simple suffix derived from the folder name.
+`namingFolderSuffix` covers the common case: everything in `lib/repositories/` ends with `Repository`. But many real-world conventions cannot be expressed as a simple suffix derived from the folder name.
 
 ### Interface prefix conventions
 
@@ -88,7 +88,7 @@ r'^(?!Abstract).*$'   # does not start with Abstract
 ## Function signature
 
 ```dart
-ArchitectureRule namingNamePatternPreset({
+void namingNamePattern({
   required String folder,
   required String pattern,
   RuleSeverity severity = RuleSeverity.warning,
@@ -113,12 +113,10 @@ ArchitectureRule namingNamePatternPreset({
 
 A team following the interface-prefix convention requires that every class in `lib/domain/repositories/` starts with `I` (uppercase) and is followed immediately by an uppercase letter (to prevent names like `Irepository`):
 
-```dart title="arch_test/interface_naming_arch_test.dart"
+```dart title="test_arch/interface_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  namingNamePatternPreset(
+void main() => namingNamePattern(
     folder: 'lib/domain/repositories',
     pattern: r'^I[A-Z][a-zA-Z]+$',
     severity: RuleSeverity.error,
@@ -149,12 +147,10 @@ class IUser { ... }               // depends on team: single-word interface name
 
 A project places all abstract base classes in `lib/core/base/`. The convention requires them to start with `Abstract`:
 
-```dart title="arch_test/base_class_naming_arch_test.dart"
+```dart title="test_arch/base_class_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  namingNamePatternPreset(
+void main() => namingNamePattern(
     folder: 'lib/core/base',
     pattern: r'^Abstract[A-Z][a-zA-Z]+$',
     severity: RuleSeverity.warning,
@@ -176,7 +172,7 @@ class Repository { ... }             // violation: no prefix at all
 To allow both `Abstract` and `Base` as accepted prefixes, use alternation:
 
 ```dart
-namingNamePatternPreset(
+namingNamePattern(
   folder: 'lib/core/base',
   pattern: r'^(Abstract|Base)[A-Z][a-zA-Z]+$',
   severity: RuleSeverity.warning,
@@ -187,14 +183,12 @@ namingNamePatternPreset(
 
 In a feature-first Flutter project, all classes inside the `cart` feature's bloc folder must start with `Cart` to make their feature ownership explicit:
 
-```dart title="arch_test/cart_naming_arch_test.dart"
+```dart title="test_arch/cart_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // Cart BLoC classes must start with Cart
-  archTest(
-    args,
-    namingNamePatternPreset(
+  namingNamePattern(
       folder: 'lib/features/cart/bloc',
       pattern: r'^Cart[A-Z][a-zA-Z]*(Bloc|Event|State|Cubit)$',
       severity: RuleSeverity.error,
@@ -202,9 +196,7 @@ void main(List<String> args) {
   );
 
   // Product BLoC classes must start with Product
-  archTest(
-    args,
-    namingNamePatternPreset(
+  namingNamePattern(
       folder: 'lib/features/product/bloc',
       pattern: r'^Product[A-Z][a-zA-Z]*(Bloc|Event|State|Cubit)$',
       severity: RuleSeverity.error,
@@ -229,14 +221,12 @@ class CartManager { ... }                                        // violation: n
 
 Test helpers — mocks, fakes, and stubs — are commonly placed in a shared `test/helpers/` directory. Enforcing consistent naming makes it immediately clear what kind of test double you are looking at:
 
-```dart title="arch_test/test_double_naming_arch_test.dart"
+```dart title="test_arch/test_double_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
   // Mocks must start with Mock
-  archTest(
-    args,
-    namingNamePatternPreset(
+  namingNamePattern(
       folder: 'test/mocks',
       pattern: r'^Mock[A-Z][a-zA-Z]+$',
       severity: RuleSeverity.warning,
@@ -244,9 +234,7 @@ void main(List<String> args) {
   );
 
   // Fakes must start with Fake
-  archTest(
-    args,
-    namingNamePatternPreset(
+  namingNamePattern(
       folder: 'test/fakes',
       pattern: r'^Fake[A-Z][a-zA-Z]+$',
       severity: RuleSeverity.warning,
@@ -254,9 +242,7 @@ void main(List<String> args) {
   );
 
   // Stubs must start with Stub
-  archTest(
-    args,
-    namingNamePatternPreset(
+  namingNamePattern(
       folder: 'test/stubs',
       pattern: r'^Stub[A-Z][a-zA-Z]+$',
       severity: RuleSeverity.warning,
@@ -267,12 +253,10 @@ void main(List<String> args) {
 
 Alternatively, if all test doubles are in the same folder:
 
-```dart title="arch_test/test_helpers_naming_arch_test.dart"
+```dart title="test_arch/test_helpers_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  namingNamePatternPreset(
+void main() => namingNamePattern(
     folder: 'test/helpers',
     pattern: r'^(Mock|Fake|Stub|Spy)[A-Z][a-zA-Z]+$',
     severity: RuleSeverity.warning,
@@ -287,12 +271,10 @@ void main(List<String> args) => archTest(
 
 Some teams use both `AbstractFoo` and `FooBase` conventions for base classes, depending on the module. Rather than two separate rules, a single alternation pattern covers both:
 
-```dart title="arch_test/base_naming_arch_test.dart"
+```dart title="test_arch/base_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(
-  args,
-  namingNamePatternPreset(
+void main() => namingNamePattern(
     folder: 'lib/core',
     pattern: r'^(Abstract[A-Z][a-zA-Z]+|[A-Z][a-zA-Z]+Base)$',
     severity: RuleSeverity.warning,
@@ -327,7 +309,7 @@ pattern: r'^I[A-Z][a-zA-Z]+$'
 A regex alone can be cryptic for the next developer reading the rule file. Add a comment stating what the pattern means in plain language:
 
 ```dart
-namingNamePatternPreset(
+namingNamePattern(
   folder: 'lib/domain/repositories',
   // Must start with I followed by uppercase: IUserRepository, ICartService
   pattern: r'^I[A-Z][a-zA-Z]+$',
@@ -402,5 +384,5 @@ The violation message includes:
 
 ## Related presets
 
-- [`namingFolderSuffixPreset`](/presets/naming-folder-suffix/) — simpler approach when the convention is just a suffix derived from the folder name
-- [`mustBeAbstractPreset`](/presets/must-be-abstract/) — combine with this preset to enforce that interface-prefixed classes are also declared `abstract`
+- [`namingFolderSuffix`](/presets/naming-folder-suffix/) — simpler approach when the convention is just a suffix derived from the folder name
+- [`mustBeAbstract`](/presets/must-be-abstract/) — combine with this preset to enforce that interface-prefixed classes are also declared `abstract`

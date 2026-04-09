@@ -1,28 +1,28 @@
 ---
 title: Predicates Reference
-description: Complete reference for all 28 built-in predicates. Each predicate defines a positive condition — use NotPredicate to invert.
+description: Complete reference for all 31 built-in predicates. Each predicate defines a positive condition — use NotPredicate to invert.
 sidebar:
   order: 1
 ---
 
 All predicates implement the `Predicate` interface and follow the **positive condition model**: a predicate describes the condition that a compliant element satisfies. When the condition is met, the predicate **passes**. When you need to enforce the _absence_ of a condition, wrap the predicate in `NotPredicate`.
 
-Every predicate is used inside an `ArchitectureRule`:
+In rule files, predicates are used indirectly through arch matchers in `testArch`/`testArchGroup`:
 
 ```dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) => archTest(args, myRule);
-
-final myRule = ArchitectureRule(
-  description: 'Human-readable description of what is enforced',
-  severity: RuleSeverity.error,
-  selector: ClassSelector(folder: 'lib/domain'),
-  predicate: SomePredicate(),
-);
+void main() {
+  testArch('Domain must not depend on data', (arch) {
+    expect(
+      arch.classes(folder: 'lib/domain'),
+      doesNotDependOn('lib/data'),  // wraps NotPredicate(DependOnFolderPredicate('lib/data'))
+    );
+  });
+}
 ```
 
-Predicates also expose three **convenience methods** for inline composition:
+For advanced composition (e.g., custom rule loaders), predicates can be instantiated directly and composed with three **convenience methods**:
 
 ```dart
 predicate.not()           // equivalent to NotPredicate(predicate)

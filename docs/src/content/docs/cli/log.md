@@ -17,7 +17,8 @@ dart run dartunit log [options]
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--last <N>` | All entries | Limit output to the last `N` runs |
+| `--path <dir>` | `.` (current directory) | Path to the project root where the `.dartunit` log file is located |
+| `--no-color` | `false` | Disable colored output |
 
 ## Examples
 
@@ -25,39 +26,32 @@ dart run dartunit log [options]
 # Show all recorded runs
 dart run dartunit log
 
-# Show only the last 5 runs
-dart run dartunit log --last 5
+# Show log for a project in another directory
+dart run dartunit log --path /path/to/project
 
-# Show only the most recent run
-dart run dartunit log --last 1
+# Show log without colors (useful in CI)
+dart run dartunit log --no-color
 ```
 
 ## Output format
 
-Each entry shows the timestamp, result, and a summary of violations found:
+Each run entry displays the execution timestamp, the result, and a summary of the violations found:
 
 ```
-Run #12 — 2026-03-24 14:32:10
-  Result:     FAIL (exit 1)
-  Violations: 3 (1 critical, 2 errors)
+── Run #3  ·  05 Apr 2026  14:50  ·  2 rules ────
 
-Run #11 — 2026-03-23 09:15:44
-  Result:     PASS (exit 0)
-  Violations: 0
+── Run #2  ·  06 Apr 2026  10:17  ·  2 rules ────
 
-Run #10 — 2026-03-22 17:48:02
-  Result:     FAIL (exit 1)
-  Violations: 5 (3 errors, 2 warnings)
+── Run #1  ·  07 Apr 2026  21:39  ·  2 rules ────
 ```
 
 ## The .dartunit log file
 
-The `.dartunit` file is written by `dartunit analyze` at the project root after every run. It stores structured metadata about each execution, including:
+The `.dartunit` file is written by `dartunit analyze` at the project root after every run. It stores structured metadata about every run, including:
 
-- Timestamp
-- Exit code
-- Violation counts per severity level
-- Number of rules evaluated
+- Timestamp of the execution
+- List of violations with descriptions
+- Total number of analyzed rules
 
 :::tip
 Add `.dartunit` to your `.gitignore` if you do not want to track analysis history in version control, or commit it to maintain a shared history across the team.

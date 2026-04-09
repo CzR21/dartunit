@@ -1,15 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart' hide ExitCode;
 import 'package:path/path.dart' as p;
-import '../../core/entities/violation.dart';
-import '../../core/enums/rule_severity.dart';
+
 import '../../engine/analysis_logger.dart';
+import '../../engine/test_result_parser.dart';
+import '../../reporter/html_report_writer.dart';
+import '../../reporter/console_reporter.dart';
 import '../../utils/banner_helper.dart';
 import '../../utils/terminal_helper.dart';
-import '../../reporter/console_reporter.dart';
-import '../../reporter/html_reporter.dart';
 import '../../core/enums/exit_code.dart';
 
 class AnalyzeCommand extends Command<ExitCode> {
@@ -41,6 +41,8 @@ class AnalyzeCommand extends Command<ExitCode> {
     final useColor = !(argResults!['no-color'] as bool);
     final logger = Logger();
     final reporter = ConsoleReporter(logger: logger, useColor: useColor);
+    const resultParser = TestResultParser();
+    const htmlWriter = HtmlReportWriter();
     final archTestDir = p.join(projectRoot, 'test_arch');
 
     BannerHelper.printBanner(logger);
@@ -84,56 +86,27 @@ class AnalyzeCommand extends Command<ExitCode> {
       environment: {...Platform.environment, 'DARTUNIT_PROTOCOL': '1'},
     );
 
-    final allViolations = <Violation>[];
-    int parsedRules = 0;
-
-    for (final line in (result.stderr as String).split('\n')) {
-      final trimmed = line.trim();
-      if (!trimmed.startsWith('DARTUNIT_RESULT:')) continue;
-      try {
-        final json = jsonDecode(trimmed.substring('DARTUNIT_RESULT:'.length))
-            as Map<String, dynamic>;
-        parsedRules++;
-        final violations =
-            (json['violations'] as List).cast<Map<String, dynamic>>();
-        for (final v in violations) {
-          allViolations.add(Violation(
-            ruleDescription: v['ruleDescription'] as String,
-            message: v['message'] as String,
-            filePath: v['filePath'] as String,
-            severity: RuleSeverity.fromString(v['severity'] as String),
-            line: v['line'] as int?,
-          ));
-        }
-      } catch (_) {
-        // Malformed line — skip.
-      }
-    }
+    final (:violations, :parsedRules) =
+        resultParser.parse(result.stderr as String);
 
     if (parsedRules == 0 && result.exitCode != 0) {
       evalProgress.fail('Analysis failed');
-      final err = (result.stderr as String)
-          .split('\n')
-          .where((l) => !l.startsWith('DARTUNIT_RESULT:'))
-          .join('\n')
-          .trim();
-      if (err.isNotEmpty) {
-        logger.err('dart test error:\n  $err');
-      }
+      final err = resultParser.extractRawError(result.stderr as String);
+      if (err.isNotEmpty) logger.err('dart test error:\n  $err');
       logger.info('');
       return ExitCode.error;
     }
 
     evalProgress.complete('Rules analyzed');
 
-    reporter.report(allViolations);
+    reporter.report(violations);
 
     final now = DateTime.now();
-    AnalysisLogger(projectRoot).save(allViolations, rulesCount: ruleFiles.length);
+    AnalysisLogger(projectRoot).save(violations, rulesCount: ruleFiles.length);
 
-    final htmlPath = _saveHtmlReport(
+    final htmlPath = htmlWriter.write(
       projectRoot: projectRoot,
-      violations: allViolations,
+      violations: violations,
       rulesCount: ruleFiles.length,
       timestamp: now,
     );
@@ -144,30 +117,7 @@ class AnalyzeCommand extends Command<ExitCode> {
       logger.info('');
     }
 
-    final hasFailures = allViolations.any((v) => v.severity.isFailure);
+    final hasFailures = violations.any((v) => v.severity.isFailure);
     return hasFailures ? ExitCode.violations : ExitCode.success;
-  }
-
-  String? _saveHtmlReport({
-    required String projectRoot,
-    required List<Violation> violations,
-    required int rulesCount,
-    required DateTime timestamp,
-  }) {
-    try {
-      final html = HtmlReporter().generate(
-        violations,
-        rulesCount: rulesCount,
-        timestamp: timestamp,
-        projectRoot: projectRoot,
-      );
-      final reportDir = p.join(projectRoot, '.dartunit');
-      Directory(reportDir).createSync(recursive: true);
-      final reportPath = p.join(reportDir, 'report.html');
-      File(reportPath).writeAsStringSync(html);
-      return p.normalize(p.absolute(reportPath));
-    } catch (_) {
-      return null;
-    }
   }
 }

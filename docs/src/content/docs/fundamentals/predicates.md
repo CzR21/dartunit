@@ -1,206 +1,180 @@
 ---
-title: Predicates (Predicate)
-description: How predicates define conditions that selected elements must satisfy in DartUnit.
+title: Predicates
+description: Conditions that selected elements must satisfy in DartUnit rules.
 sidebar:
   order: 4
 ---
 
-A **Predicate** defines the condition that each selected element must satisfy. When a predicate returns `false` for an element, DartUnit records a `Violation`.
+A **predicate** defines the condition that each selected element must satisfy. In `testArch` and `testArchGroup`, predicates are expressed through **arch matchers** — the functions you pass to `expect()`.
 
-## Positive Condition Model
+```dart
+testArch('Domain must not depend on data', (arch) {
+  expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+  //                                         ^^^^ arch matcher
+});
+```
 
-:::important
-Predicates describe a condition that, when **true**, means the element **passes**. DartUnit reports a violation when the predicate **fails**.
+When the matcher's condition is not met for an element, DartUnit records a `Violation` for it.
 
-To express "must not do X", wrap the predicate in `NotPredicate`:
+## Arch Matchers Reference
+
+### Dependency
+
+| Matcher | Passes when |
+|---------|-------------|
+| `doesNotDependOn(folder)` | Class does NOT import from `folder` |
+| `dependsOn(folder)` | Class imports from `folder` |
+| `doesNotDependOnTransitive(folder)` | Class does not transitively depend on `folder` |
+| `dependsOnTransitive(folder)` | Class transitively depends on `folder` |
+| `doesNotDependOnPackage(package)` | Class does NOT import `package` |
+| `dependsOnPackage(package)` | Class imports `package` |
+| `onlyDependsOnFolders(folders)` | Class only imports from the listed `folders` |
+| `hasNoCircularDependency()` | Class is not part of a circular import chain |
+| `hasCircularDependency()` | Class is part of a circular import chain |
+
+### Naming
+
+| Matcher | Passes when |
+|---------|-------------|
+| `nameEndsWith(suffix)` | Class name ends with `suffix` |
+| `nameStartsWith(prefix)` | Class name starts with `prefix` |
+| `nameContains(substring)` | Class name contains `substring` |
+| `nameMatchesPattern(pattern)` | Class name matches the regex `pattern` |
+
+### Type
+
+| Matcher | Passes when |
+|---------|-------------|
+| `isAbstractClass()` | Class is declared `abstract` |
+| `isConcreteClass()` | Class is concrete (not abstract, mixin, enum, or extension) |
+| `isEnumType()` | Declaration is an `enum` |
+| `isMixinType()` | Declaration is a `mixin` |
+| `isExtensionType()` | Declaration is an `extension` |
+| `extendsClass(className)` | Class `extends` the given type |
+| `implementsInterface(interfaceName)` | Class `implements` the given interface |
+| `usesMixin(mixinName)` | Class uses the given mixin via `with` |
+
+### Annotation
+
+| Matcher | Passes when |
+|---------|-------------|
+| `hasAnnotation(name)` | Class has `@name` annotation (without the `@`) |
+| `doesNotHaveAnnotation(name)` | Class does NOT have `@name` annotation |
+
+### Metrics
+
+| Matcher | Passes when |
+|---------|-------------|
+| `hasMaxMethods(max)` | Method count ≤ `max` |
+| `hasMinMethods(min)` | Method count ≥ `min` |
+| `hasMaxFields(max)` | Field count ≤ `max` |
+| `hasMinFields(min)` | Field count ≥ `min` |
+| `hasMaxImports(max)` | Import count ≤ `max` |
+
+### Quality
+
+| Matcher | Passes when |
+|---------|-------------|
+| `hasAllFinalFields()` | All instance fields are `final` or `const` |
+| `hasNoPublicFields()` | No public fields (all start with `_`) |
+| `hasNoPublicMethods()` | No public methods (all start with `_`) |
+| `hasMethod(methodName)` | Class declares a method named `methodName` |
+| `hasContent(pattern)` | File content matches the regex `pattern` |
+| `hasNoContent(pattern)` | File content does NOT match the regex `pattern` |
+
+:::note
+`hasContent` and `hasNoContent` are used with `arch.files()`, not `arch.classes()`.
 :::
 
-```dart
-// "Classes in lib/domain must depend on lib/data"
-// (predicate passes when dependency exists)
-predicate: DependOnFolderPredicate('lib/data')
+## Expressing Logic
 
-// "Classes in lib/domain must NOT depend on lib/data"
-// (predicate passes when dependency does NOT exist)
-predicate: NotPredicate(DependOnFolderPredicate('lib/data'))
+### AND — multiple `expect()` calls
+
+Multiple `expect()` calls inside one `testArch` are combined with AND: every condition must pass. This is the most common pattern.
+
+```dart
+testArch('BLoC classes must be clean', (arch) {
+  final blocs = arch.classes(suffix: 'Bloc');
+  expect(blocs, doesNotDependOn('lib/data'));   // AND
+  expect(blocs, hasAllFinalFields());           // AND
+  expect(blocs, hasMaxImports(15));             // AND
+});
 ```
 
-This consistent model applies to all predicates — the predicate always describes the positive case.
+### NOT — dedicated matchers
 
-## Categories
-
-DartUnit provides 28 predicates organized into six categories:
-
-- **Dependency** — what a class imports
-- **Naming** — what the class name looks like
-- **Type** — what kind of declaration the class is
-- **Annotation** — what annotations the class has
-- **Metrics** — how many methods, fields, or imports
-- **Quality** — immutability, encapsulation, file content
-
-## Dependency Predicates
-
-| Class | Description |
-|-------|-------------|
-| `DependOnFolderPredicate(folder)` | Passes if the class imports from a path containing `folder` |
-| `DependOnPackagePredicate(package)` | Passes if the class imports from the given package |
-| `OnlyDependOnFoldersPredicate(folders)` | Passes if **all** imports are from the listed folders |
-| `HasCircularDependencyPredicate()` | Passes if the class is part of a circular import chain |
-
-## Naming Predicates
-
-| Class | Description |
-|-------|-------------|
-| `NameStartsWithPredicate(prefix)` | Passes if the class name starts with `prefix` |
-| `NameEndsWithPredicate(suffix)` | Passes if the class name ends with `suffix` |
-| `NameContainsPredicate(substring)` | Passes if the class name contains `substring` |
-| `NameMatchesPatternPredicate(pattern)` | Passes if the class name matches the regex `pattern` |
-
-## Type Predicates
-
-| Class | Description |
-|-------|-------------|
-| `IsAbstractPredicate()` | Passes if the class is declared `abstract` |
-| `IsConcreteClassPredicate()` | Passes if the class is concrete (not abstract, mixin, enum, or extension) |
-| `IsEnumPredicate()` | Passes if the declaration is an `enum` |
-| `IsMixinPredicate()` | Passes if the declaration is a `mixin` |
-| `IsExtensionPredicate()` | Passes if the declaration is an `extension` |
-| `ExtendsPredicate(type)` | Passes if the class `extends` the given type |
-| `ImplementsPredicate(type)` | Passes if the class `implements` the given type |
-| `UsesMixinPredicate(mixin)` | Passes if the class uses the given mixin |
-
-## Annotation Predicates
-
-| Class | Description |
-|-------|-------------|
-| `AnnotatedWithPredicate(annotation)` | Passes if the class has the given annotation (without `@`) |
-| `NotAnnotatedWithPredicate(annotation)` | Passes if the class does NOT have the given annotation |
-
-## Metrics Predicates
-
-| Class | Description |
-|-------|-------------|
-| `MaxMethodsPredicate(max)` | Passes if the method count is <= `max` |
-| `MinMethodsPredicate(min)` | Passes if the method count is >= `min` |
-| `MaxFieldsPredicate(max)` | Passes if the field count is <= `max` |
-| `MinFieldsPredicate(min)` | Passes if the field count is >= `min` |
-| `MaxImportsPredicate(max)` | Passes if the import count is <= `max` |
-
-## Quality Predicates
-
-| Class | Description |
-|-------|-------------|
-| `HasAllFinalFieldsPredicate()` | Passes if all instance fields are `final` or `const` |
-| `HasNoPublicFieldsPredicate()` | Passes if the class has no public fields (no fields without `_`) |
-| `HasNoPublicMethodsPredicate()` | Passes if the class has no public methods |
-| `HasMethodPredicate(methodName)` | Passes if the class declares a method named `methodName` |
-| `FileContentMatchesPredicate(pattern, {description})` | Passes if the file content matches the regex `pattern` (use with `FileSelector`) |
-
-## Composite Predicates
-
-Predicates can be composed to express complex logic.
-
-### NotPredicate — Logical NOT
-
-Passes when the inner predicate **fails**.
+Every "must not" condition has a dedicated matcher with the `doesNot` or `hasNo` prefix. You do not need to negate anything manually:
 
 ```dart
-// "Must NOT depend on lib/data"
-NotPredicate(DependOnFolderPredicate('lib/data'))
-
-// "Must NOT be annotated with @deprecated"
-NotPredicate(AnnotatedWithPredicate('deprecated'))
+expect(domain, doesNotDependOn('lib/data'));          // not + dependsOn
+expect(domain, doesNotDependOnPackage('flutter'));     // not + dependsOnPackage
+expect(classes, doesNotHaveAnnotation('deprecated')); // not + hasAnnotation
+expect(classes, hasNoPublicFields());                 // not + public fields
+expect(classes, hasNoContent(r'print\s*\('));         // not + content match
 ```
 
-### AndPredicate — Logical AND
+### OR — regex alternation
 
-Passes when **all** inner predicates pass. Uses short-circuit evaluation.
+For OR conditions on names, use `nameMatchesPattern()` with a regex alternation, or include the OR condition directly in the `namePattern` of the selector:
 
 ```dart
-// Must end with "Service" AND have no public fields AND not depend on lib/ui
-AndPredicate([
-  NameEndsWithPredicate('Service'),
-  HasNoPublicFieldsPredicate(),
-  NotPredicate(DependOnFolderPredicate('lib/ui')),
-])
+// "Must end with 'Bloc' OR 'Cubit'"
+testArch('State managers must be Bloc or Cubit', (arch) {
+  final stateManagers = arch.classes(folder: 'lib/blocs');
+  expect(stateManagers, nameMatchesPattern(r'.*(Bloc|Cubit)$'));
+});
 ```
 
-### OrPredicate — Logical OR
-
-Passes when **any** inner predicate passes. Uses short-circuit evaluation.
-
 ```dart
-// Must end with "Bloc" OR "Cubit"
-OrPredicate([
-  NameEndsWithPredicate('Bloc'),
-  NameEndsWithPredicate('Cubit'),
-])
+// Use namePattern in the selector to restrict which classes are evaluated
+testArch('Bloc/Cubit must not access data directly', (arch) {
+  final blocs = arch.classes(
+    folder: 'lib/blocs',
+    namePattern: r'.*(Bloc|Cubit)$',  // selects Blocs OR Cubits
+  );
+  expect(blocs, doesNotDependOn('lib/data'));
+});
 ```
 
-### Nested composition
+## Advanced: Predicate Composition
 
-Composites can be nested to express arbitrarily complex conditions:
+When building custom rules via the `CustomRule` interface, predicates can be composed directly using `AndPredicate`, `OrPredicate`, and `NotPredicate`, or through the convenience methods `.and()`, `.or()`, and `.not()` available on any predicate.
 
 ```dart
-// (ends with "Bloc" OR ends with "Cubit") AND NOT depends on lib/ui
-AndPredicate([
-  OrPredicate([
-    NameEndsWithPredicate('Bloc'),
-    NameEndsWithPredicate('Cubit'),
+// Inside CustomRule.build():
+Rule(
+  selector: ClassSelector(folder: 'lib/domain'),
+  predicate: AndPredicate([
+    IsAbstractPredicate(),
+    HasMethodPredicate('call'),
+    DependOnFolderPredicate('lib/data').not(),
   ]),
-  NotPredicate(DependOnFolderPredicate('lib/ui')),
-])
+  ...
+)
 ```
 
-## Convenience Methods
-
-Every predicate exposes three convenience methods that build composite predicates without explicitly instantiating the composite classes:
+**Convenience methods** on any predicate produce the same result:
 
 ```dart
-// These are equivalent:
-NotPredicate(DependOnFolderPredicate('lib/data'))
+// .not() — invert
 DependOnFolderPredicate('lib/data').not()
 
-// These are equivalent:
-AndPredicate([IsAbstractPredicate(), HasNoPublicFieldsPredicate()])
+// .and() — both must pass
 IsAbstractPredicate().and(HasNoPublicFieldsPredicate())
 
-// These are equivalent:
-OrPredicate([NameEndsWithPredicate('Bloc'), NameEndsWithPredicate('Cubit')])
+// .or() — at least one must pass
 NameEndsWithPredicate('Bloc').or(NameEndsWithPredicate('Cubit'))
-```
 
-The convenience methods produce identical behavior to explicit instantiation and can be chained:
-
-```dart
-// Must be abstract AND not depend on lib/data AND not depend on flutter
+// Chain as needed
 IsAbstractPredicate()
   .and(DependOnFolderPredicate('lib/data').not())
   .and(DependOnPackagePredicate('flutter').not())
 ```
 
-## Usage in Rule Files
-
-```dart
-import 'package:dartunit/dartunit.dart';
-
-void main(List<String> args) => archTest(
-  args,
-  ArchitectureRule(
-    description: 'Use cases must be abstract and declare a call() method',
-    severity: RuleSeverity.error,
-    selector: ClassSelector(
-      folder: 'lib/domain/usecases',
-      namePattern: r'.*UseCase$',
-    ),
-    predicate: AndPredicate([
-      IsAbstractPredicate(),
-      HasMethodPredicate('call'),
-    ]),
-  ),
-);
-```
+:::caution
+Predicate composition is for building `CustomRule` implementations (low-level API). In regular `testArch` rules, use multiple `expect()` calls for AND, dedicated `doesNot`/`hasNo` matchers for NOT, and `nameMatchesPattern()` for OR.
+:::
 
 ## Complete Reference
 
-For the full description of all 28 predicates with parameters and examples, see [Predicates — Reference](/reference/predicates).
+For the full matcher list with parameters and examples, see [Predicates — Reference](/reference/predicates).
