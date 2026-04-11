@@ -2,6 +2,7 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject's class has at most [maxFields] fields.
 class MaxFieldsPredicate extends Predicate {
   final int maxFields;
   const MaxFieldsPredicate(this.maxFields);

@@ -12,33 +12,6 @@ import '../utils/name_pattern_helper.dart';
 /// snake_case, appended with `.dart`
 /// (e.g. `lib/services` → files must end with `_services.dart`).
 ///
-/// Override with [suffix], [prefix], or a raw [namePattern]:
-///
-/// ```dart
-/// // Auto-suffix from folder name
-/// void main() => namingFileSuffix(
-///   folders: ['lib/services', 'lib/repositories'],
-/// );
-///
-/// // Explicit suffix (without .dart — it is appended automatically)
-/// void main() => namingFileSuffix(
-///   folders: ['lib/services'],
-///   suffix: '_service',
-/// );
-///
-/// // Prefix + suffix
-/// void main() => namingFileSuffix(
-///   folders: ['lib/data'],
-///   prefix: 'remote_',
-///   suffix: '_datasource',
-/// );
-///
-/// // Raw regex
-/// void main() => namingFileSuffix(
-///   folders: ['lib/bloc'],
-///   namePattern: r'.*(bloc|cubit)\.dart$',
-/// );
-/// ```
 void namingFileSuffix({
   required List<String> folders,
   String? namePattern,
@@ -59,7 +32,7 @@ void namingFileSuffix({
       for (final folder in folders) {
         final effectiveSuffix = suffix != null
             ? _ensureDartExtension(suffix)
-            : '_${p.basename(folder)}.dart';
+            : '${p.basename(folder)}.dart';
 
         final effectivePattern = namePattern ??
             resolveNamePattern(
@@ -84,7 +57,6 @@ void namingFileSuffix({
   );
 }
 
-/// Appends `.dart` to [s] if not already present.
 String _ensureDartExtension(String s) =>
     s.endsWith('.dart') ? s : '$s.dart';
 

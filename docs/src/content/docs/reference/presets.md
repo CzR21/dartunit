@@ -7,16 +7,15 @@ sidebar:
 
 Presets are functions that internally call `testArchGroup` and `testArch` to register complete rule sets from a minimal configuration. Import `package:dartunit/dartunit.dart` and call them directly in `main()`.
 
-## All 15 Presets
+## All 14 Presets
 
 | Preset | Category | What it enforces |
 |--------|----------|-------------------|
 | [`layeredArchitecture`](/presets/layered-architecture) | Layer | Rules for every forbidden layer pair in a multi-layer architecture |
 | [`layerCanOnlyDependOn`](/presets/layer-can-only-depend-on) | Layer | A folder may only import from an allowed set of folders (whitelist) |
 | [`layerCannotDependOn`](/presets/layer-cannot-depend-on) | Layer | A folder must not import from specific folders or packages (blacklist) |
-| [`namingFolderSuffix`](/presets/naming-folder-suffix) | Naming | Classes must end with the capitalized base name of their folder |
+| [`namingClassSuffix`](/presets/naming-class-suffix) | Naming | Classes must end with the capitalized base name of their folder |
 | [`namingFileSuffix`](/presets/naming-file-suffix) | Naming | Files must match a naming pattern derived from their folder name |
-| [`namingNamePattern`](/presets/naming-name-pattern) | Naming | Classes must match a custom regex pattern |
 | [`mustBeAbstract`](/presets/must-be-abstract) | Structure | Classes must be declared `abstract` |
 | [`mustBeImmutable`](/presets/must-be-immutable) | Structure | All instance fields must be `final` or `const` |
 | [`noPublicFields`](/presets/no-public-fields) | Structure | Classes must have no public fields |
@@ -54,7 +53,7 @@ void main() {
   );
 
   // Naming conventions
-  namingFolderSuffix(folders: ['lib/bloc', 'lib/service', 'lib/repository']);
+  namingClassSuffix(folders: ['lib/bloc', 'lib/service', 'lib/repository']);
   namingFileSuffix(folders: ['lib/data/datasources'], suffix: '_datasource');
 
   // Structure rules

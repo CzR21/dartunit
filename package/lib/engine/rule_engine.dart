@@ -12,7 +12,6 @@ class RuleEngine {
   /// The ordered list of rules to analyze.
   final List<Rule> rules;
 
-  // Delegates single-rule analysis; injectable for testability.
   final RuleExecutor _executor;
 
   RuleEngine(this.rules, {RuleExecutor? executor})

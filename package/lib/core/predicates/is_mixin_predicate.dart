@@ -2,6 +2,7 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject is declared as a `mixin`.
 class IsMixinPredicate extends Predicate {
   const IsMixinPredicate();
 

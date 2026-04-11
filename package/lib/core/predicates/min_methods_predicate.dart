@@ -2,6 +2,7 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject's class has at least [minMethods] methods.
 class MinMethodsPredicate extends Predicate {
   final int minMethods;
   const MinMethodsPredicate(this.minMethods);

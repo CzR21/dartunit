@@ -135,7 +135,7 @@ Or use a preset for common patterns:
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFolderSuffix(
+void main() => namingClassSuffix(
   folders: ['lib/service', 'lib/repository'],
 );
 ```

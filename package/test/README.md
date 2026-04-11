@@ -146,8 +146,7 @@ Cada preset tem grupos para:
 
 | Arquivo | Preset ID |
 |---------|-----------|
-| `naming_folder_suffix_preset_test.dart` | `naming/folder-name-suffix` |
-| `naming_name_pattern_preset_test.dart` | `naming/name-pattern` |
+| `naming_class_suffix_preset_test.dart` | `naming/class-name-suffix` |
 | `layer_cannot_depend_on_preset_test.dart` | `layer/cannot-depend-on` |
 | `layer_can_only_depend_on_preset_test.dart` | `layer/can-only-depend-on` |
 | `layer_layered_architecture_preset_test.dart` | `layer/layered-architecture` |

@@ -12,5 +12,5 @@ import 'package:test/test.dart';
 void main() => testArch('UI layer must not access the data layer directly',
     (arch) {
   final ui = arch.classes(folder: 'lib/ui');
-  expect(ui, doesNotDependOn('lib/data');
+  expect(ui, doesNotDependOn('lib/data'));
 });

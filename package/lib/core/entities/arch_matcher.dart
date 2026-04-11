@@ -4,6 +4,12 @@ import '../../dartunit.dart';
 import '../../utils/report_helper.dart';
 import 'package:test/test.dart';
 
+/// A [Matcher] that applies a [Predicate] to an [ArchSubject] and records
+/// any violations produced.
+///
+/// Always returns `true` from [matches] — violations are collected on the
+/// [ArchTester] rather than causing an immediate [expect] failure, so all
+/// rules in a group are evaluated before the test fails.
 class ArchMatcher extends Matcher {
 
   final Predicate _predicate;

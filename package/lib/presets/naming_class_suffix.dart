@@ -15,30 +15,30 @@ import '../utils/name_pattern_helper.dart';
 ///
 /// ```dart
 /// // Auto-suffix from folder name
-/// void main() => namingFolderSuffix(
+/// void main() => namingClassSuffix(
 ///   folders: ['lib/service', 'lib/repository'],
 /// );
 ///
 /// // Explicit suffix
-/// void main() => namingFolderSuffix(
+/// void main() => namingClassSuffix(
 ///   folders: ['lib/bloc'],
 ///   suffix: 'Bloc',
 /// );
 ///
 /// // Prefix + suffix
-/// void main() => namingFolderSuffix(
+/// void main() => namingClassSuffix(
 ///   folders: ['lib/domain/repository'],
 ///   prefix: 'I',
 ///   suffix: 'Repository',
 /// );
 ///
 /// // Raw regex
-/// void main() => namingFolderSuffix(
+/// void main() => namingClassSuffix(
 ///   folders: ['lib/bloc'],
 ///   namePattern: r'.*(Bloc|Cubit)$',
 /// );
 /// ```
-void namingFolderSuffix({
+void namingClassSuffix({
   required List<String> folders,
   String? namePattern,
   String? prefix,
@@ -53,7 +53,7 @@ void namingFolderSuffix({
   );
 
   testArchGroup(
-    'Naming — folder name suffix',
+    'Naming — class name suffix',
     () {
       for (final folder in folders) {
         final effectivePattern = resolveNamePattern(

@@ -313,7 +313,7 @@ For common patterns you can use preset factories instead of writing matchers man
 import 'package:dartunit/dartunit.dart';
 
 // Naming: all classes in lib/bloc must end with "Bloc"
-final rules = namingFolderSuffix(folders: ['lib/bloc', 'lib/repository']);
+final rules = namingClassSuffix(folders: ['lib/bloc', 'lib/repository']);
 
 // Layered architecture (generates N² rules)
 final rules = layeredArchitecture(layers: [

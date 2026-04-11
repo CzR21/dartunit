@@ -82,7 +82,7 @@ Callable functions that register complete rule sets for common patterns. One lin
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFolderSuffix(
+void main() => namingClassSuffix(
   folders: ['lib/bloc', 'lib/repository', 'lib/service'],
 );
 ```

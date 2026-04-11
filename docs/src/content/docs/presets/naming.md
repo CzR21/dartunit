@@ -9,14 +9,14 @@ Naming conventions are one of the most common architecture rules. The naming pre
 
 ---
 
-## namingFolderSuffix
+## namingClassSuffix
 
 Enforces that classes in a folder end with a suffix derived from the folder's base name. For example, classes in `lib/bloc` must end with `Bloc`, and classes in `lib/repository` must end with `Repository`.
 
 ### Function signature
 
 ```dart
-ArchitectureRule namingFolderSuffix({
+ArchitectureRule namingClassSuffix({
   required List<String> folders,
   RuleSeverity severity = RuleSeverity.warning,
   List<String> exceptions = const [],
@@ -51,7 +51,7 @@ import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingFolderSuffix(
+  namingClassSuffix(
     folders: [
       'lib/bloc',
       'lib/cubit',
@@ -72,7 +72,7 @@ import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingFolderSuffix(
+  namingClassSuffix(
     folders: [
       'lib/controllers',
       'lib/models',
@@ -89,7 +89,7 @@ import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
   args,
-  namingFolderSuffix(
+  namingClassSuffix(
     folders: [
       'lib/bloc',
       'lib/domain/repositories',
@@ -116,89 +116,3 @@ WARNING | Classes in lib/bloc must end with "Bloc"
 Classes like `BaseBloc`, `AbstractService`, and code-generated files often legitimately deviate from the suffix convention. Use `exceptions` rather than relaxing the rule:
 :::
 
----
-
-## namingNamePattern
-
-Enforces that classes in a folder match a specific regex pattern. More flexible than `namingFolderSuffix` when the convention cannot be described by a simple suffix.
-
-### Function signature
-
-```dart
-ArchitectureRule namingNamePattern({
-  required String folder,
-  required String pattern,
-  RuleSeverity severity = RuleSeverity.warning,
-  List<String> exceptions = const [],
-})
-```
-
-### Parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `folder` | `String` | required | The folder to check (substring match) |
-| `pattern` | `String` | required | Dart regex that class names must match |
-| `severity` | `RuleSeverity` | `RuleSeverity.warning` | Violation severity |
-| `exceptions` | `List<String>` | `[]` | Exact class names to exempt |
-
-### Example — Domain entities must follow Entity suffix
-
-```dart title="test_arch/entity_naming_test_arch.dart"
-import 'package:dartunit/dartunit.dart';
-
-void main(List<String> args) => archTest(
-  args,
-  namingNamePattern(
-    folder: 'lib/domain/entities',
-    pattern: r'^[A-Z][a-zA-Z]+Entity$',
-    severity: RuleSeverity.warning,
-  ),
-);
-```
-
-### Example — Repository interfaces must start with I
-
-```dart title="test_arch/repository_naming_test_arch.dart"
-import 'package:dartunit/dartunit.dart';
-
-void main(List<String> args) => archTest(
-  args,
-  namingNamePattern(
-    folder: 'lib/domain/repositories',
-    pattern: r'^I[A-Z][a-zA-Z]+$',
-    severity: RuleSeverity.warning,
-    exceptions: ['RepositoryBase'],
-  ),
-);
-```
-
-### Example — Mappers must contain "Mapper"
-
-```dart title="test_arch/mapper_naming_test_arch.dart"
-import 'package:dartunit/dartunit.dart';
-
-void main(List<String> args) => archTest(
-  args,
-  namingNamePattern(
-    folder: 'lib/data/mappers',
-    pattern: r'.*Mapper$',
-    severity: RuleSeverity.warning,
-  ),
-);
-```
-
-### Common patterns
-
-| Use case | Pattern |
-|----------|---------|
-| Ends with "Entity" | `r'^[A-Z][a-zA-Z]+Entity$'` |
-| Ends with "Bloc" or "Cubit" | `r'.*(Bloc\|Cubit)$'` |
-| Starts with "I" (interface convention) | `r'^I[A-Z].*$'` |
-| Contains "Mapper" | `r'.*Mapper.*'` |
-| Does not end with "Impl" | `r'^(?!.*Impl$).*'` |
-| PascalCase with any suffix | `r'^[A-Z][a-zA-Z0-9]+$'` |
-
-:::caution[Regex is case-sensitive]
-`r'.*service$'` will not match `AuthService`. Always use the correct case: `r'.*Service$'`.
-:::

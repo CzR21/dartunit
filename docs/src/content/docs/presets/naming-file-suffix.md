@@ -7,7 +7,7 @@ sidebar:
 
 `namingFileSuffix` enforces that every `.dart` file inside a given folder ends with a suffix derived from that folder's name. Files in `lib/services/` must end with `_service.dart`. Files in `lib/repositories/` must end with `_repository.dart`. Files in `lib/bloc/` must end with `_bloc.dart` or `_cubit.dart`.
 
-This is the **file-level** counterpart to [`namingFolderSuffix`](/presets/naming-folder-suffix), which enforces naming at the **class** level. Use `namingFileSuffix` when you want to enforce the file name convention independent of the class names inside the file.
+This is the **file-level** counterpart to [`namingClassSuffix`](/presets/naming-class-suffix), which enforces naming at the **class** level. Use `namingFileSuffix` when you want to enforce the file name convention independent of the class names inside the file.
 
 ## Function signature
 
@@ -169,7 +169,7 @@ void main() {
 }
 ```
 
-## Combining with namingFolderSuffix
+## Combining with namingClassSuffix
 
 For the most comprehensive naming enforcement, combine both file-level and class-level checks:
 
@@ -185,7 +185,7 @@ void main() {
   );
 
   // Classes in lib/services must end with Service
-  namingFolderSuffix(
+  namingClassSuffix(
     folders: ['lib/services'],
     suffix: 'Service',
     severity: RuleSeverity.warning,
@@ -208,5 +208,4 @@ When a file does not match the required naming pattern:
 
 | Preset | What it checks |
 |--------|---------------|
-| [`namingFolderSuffix`](/presets/naming-folder-suffix) | Class names inside a folder |
-| [`namingNamePattern`](/presets/naming-name-pattern) | Class names against a custom regex |
+| [`namingClassSuffix`](/presets/naming-class-suffix) | Class names inside a folder |

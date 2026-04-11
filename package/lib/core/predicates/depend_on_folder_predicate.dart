@@ -3,6 +3,9 @@ import '../entities/subject.dart';
 import '../entities/predicate.dart';
 import '../extensions/string_extensions.dart';
 
+/// Passes if the subject imports from [folder] (directly or transitively).
+///
+/// Use with [NotPredicate] to enforce that a layer does NOT depend on a folder.
 class DependOnFolderPredicate extends Predicate {
   final String folder;
 

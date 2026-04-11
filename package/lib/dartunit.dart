@@ -87,9 +87,8 @@ export 'runner/arch_matchers.dart';
 export 'package:test/test.dart' show expect;
 
 // Rule presets
-export 'presets/naming_folder_suffix.dart';
+export 'presets/naming_class_suffix.dart';
 export 'presets/naming_file_suffix.dart';
-export 'presets/naming_name_pattern.dart';
 export 'presets/must_be_abstract.dart';
 export 'presets/must_be_immutable.dart';
 export 'presets/no_public_fields.dart';

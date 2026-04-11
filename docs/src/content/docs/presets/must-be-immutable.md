@@ -420,4 +420,4 @@ class CartState {
 ## Related presets
 
 - [`mustBeAbstract`](/presets/must-be-abstract/) — structural constraint for interface folders; pair with this preset for full domain layer enforcement
-- [`namingFolderSuffix`](/presets/naming-folder-suffix/) — combine with this preset to ensure state classes are both named correctly and immutable
+- [`namingClassSuffix`](/presets/naming-class-suffix/) — combine with this preset to ensure state classes are both named correctly and immutable

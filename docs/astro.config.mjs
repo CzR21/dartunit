@@ -134,9 +134,8 @@ export default defineConfig({
             {
               label: 'Naming',
               items: [
-                { label: 'namingFolderSuffix', slug: 'presets/naming-folder-suffix' },
+                { label: 'namingClassSuffix', slug: 'presets/naming-class-suffix' },
                 { label: 'namingFileSuffix', slug: 'presets/naming-file-suffix' },
-                { label: 'namingNamePattern', slug: 'presets/naming-name-pattern' },
               ],
             },
             {

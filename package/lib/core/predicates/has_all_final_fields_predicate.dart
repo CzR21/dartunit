@@ -2,6 +2,9 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if all instance fields of the subject's class are `final` or `const`.
+///
+/// Static fields are excluded from the check.
 class HasAllFinalFieldsPredicate extends Predicate {
   const HasAllFinalFieldsPredicate();
 

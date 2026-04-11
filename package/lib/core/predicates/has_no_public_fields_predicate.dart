@@ -2,6 +2,9 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject's class exposes no public instance fields.
+///
+/// Static fields are excluded from the check.
 class HasNoPublicFieldsPredicate extends Predicate {
   const HasNoPublicFieldsPredicate();
 

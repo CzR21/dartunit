@@ -352,8 +352,7 @@ AnalyzeCommand
 
 | Preset | O que gera |
 |--------|-----------|
-| `namingFolderSuffix` | Classes em pasta X devem terminar com sufixo Y |
-| `namingNamePattern` | Classes em pasta devem casar regex |
+| `namingClassSuffix` | Classes em pasta X devem terminar com sufixo Y |
 | `mustBeAbstract` | Classes em pasta devem ser abstratas |
 | `mustBeImmutable` | Todos os campos devem ser `final` |
 | `noPublicFields` | Sem campos públicos |

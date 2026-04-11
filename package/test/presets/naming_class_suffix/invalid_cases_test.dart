@@ -3,7 +3,7 @@ import 'package:dartunit/dartunit.dart';
 import '../../helpers/test_helpers.dart';
 
 void main() {
-  group('namingFolderSuffix preset — invalid cases (NameEndsWithPredicate)', () {
+  group('namingClassSuffix preset — invalid cases (NameEndsWithPredicate)', () {
     final ctx = emptyCtx();
 
     test('fails when class in service folder lacks "Service" suffix', () {

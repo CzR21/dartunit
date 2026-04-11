@@ -3,6 +3,9 @@ import '../entities/subject.dart';
 import '../entities/predicate.dart';
 import '../extensions/string_extensions.dart';
 
+/// Passes if the subject imports ONLY from folders listed in [allowedFolders].
+///
+/// Any import that does not match an allowed prefix is reported as a violation.
 class OnlyDependOnFoldersPredicate extends Predicate {
   final List<String> allowedFolders;
   const OnlyDependOnFoldersPredicate(this.allowedFolders);

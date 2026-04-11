@@ -4,20 +4,49 @@ import '../../core/extensions/string_extensions.dart';
 
 /// Represents an analyzed Dart class, mixin, enum, or extension.
 class AnalyzedClass {
+  /// The simple class/mixin/enum/extension name as declared in source.
   final String name;
+
+  /// The absolute or project-relative path to the file containing this element.
   final String filePath;
+
+  /// The `package:` URI path used in import statements.
   final String packagePath;
+
+  /// Annotation names applied to this element (without the leading `@`).
   final List<String> annotations;
+
+  /// Resolved import paths of all `import` directives in this file.
   final List<String> imports;
+
+  /// The name of the directly extended supertype, or `null` if none.
   final String? extendedType;
+
+  /// Names of all interfaces this element implements.
   final List<String> implementedTypes;
+
+  /// Names of all mixins applied with `with`.
   final List<String> mixinTypes;
+
+  /// All methods declared directly in this element.
   final List<AnalyzedMethod> methods;
+
+  /// All fields declared directly in this element.
   final List<AnalyzedField> fields;
+
+  /// Whether this element is declared `abstract`.
   final bool isAbstract;
+
+  /// Whether this element is declared as a `mixin`.
   final bool isMixin;
+
+  /// Whether this element is declared as an `enum`.
   final bool isEnum;
+
+  /// Whether this element is declared as an `extension`.
   final bool isExtension;
+
+  /// The 1-based source line of the declaration, or `null` if unavailable.
   final int? line;
 
   const AnalyzedClass({

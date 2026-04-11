@@ -304,11 +304,10 @@ void main(List<String> args) {
   );
 
   // All domain repository classes must start with I (interface convention)
-  namingNamePattern(
-      folder: 'lib/domain/repositories',
-      pattern: r'^I[A-Z][a-zA-Z]+$',
-      severity: RuleSeverity.error,
-    ),
+  namingClassSuffix(
+    folders: ['lib/domain/repositories'],
+    prefix: 'I',
+    severity: RuleSeverity.error,
   );
 }
 ```
@@ -339,6 +338,5 @@ An `abstract class` can have concrete (implemented) methods in Dart. The presenc
 
 ## Related presets
 
-- [`namingFolderSuffix`](/presets/naming-folder-suffix/) — ensure interface classes also follow the correct suffix convention
-- [`namingNamePattern`](/presets/naming-name-pattern/) — enforce prefix conventions (like `I`) alongside the abstract requirement
+- [`namingClassSuffix`](/presets/naming-class-suffix/) — ensure interface classes also follow the correct suffix or prefix convention
 - [`mustBeImmutable`](/presets/must-be-immutable/) — a complementary structural constraint for model and state folders

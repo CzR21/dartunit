@@ -3,6 +3,10 @@ import '../entities/subject.dart';
 import '../entities/predicate.dart';
 import '../extensions/string_extensions.dart';
 
+/// Passes if the subject's file is part of a circular import chain.
+///
+/// Use with [NotPredicate] (via [hasNoCircularDependency]) to enforce that
+/// no file participates in a cycle.
 class HasCircularDependencyPredicate extends Predicate {
   const HasCircularDependencyPredicate();
 

@@ -2,6 +2,7 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject's name starts with [prefix].
 class NameStartsWithPredicate extends Predicate {
   final String prefix;
   const NameStartsWithPredicate(this.prefix);

@@ -2,6 +2,7 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject's class declares a method named [methodName].
 class HasMethodPredicate extends Predicate {
   final String methodName;
   const HasMethodPredicate(this.methodName);

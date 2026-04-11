@@ -3,7 +3,7 @@ import 'package:dartunit/dartunit.dart';
 import '../../helpers/test_helpers.dart';
 
 void main() {
-  group('namingFolderSuffix preset — valid cases (NameEndsWithPredicate)', () {
+  group('namingClassSuffix preset — valid cases (NameEndsWithPredicate)', () {
     final ctx = emptyCtx();
 
     test('passes when service class ends with "Service"', () {

@@ -2,6 +2,7 @@ import '../../analyzer/context/analysis_context.dart';
 import '../entities/subject.dart';
 import '../entities/predicate.dart';
 
+/// Passes if the subject's class has at most [maxImports] import statements.
 class MaxImportsPredicate extends Predicate {
   final int maxImports;
   const MaxImportsPredicate(this.maxImports);

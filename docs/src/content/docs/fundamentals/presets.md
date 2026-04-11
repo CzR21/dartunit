@@ -14,7 +14,7 @@ Import `package:dartunit/dartunit.dart` and call the preset function directly fr
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFolderSuffix(
+void main() => namingClassSuffix(
   folders: ['lib/service', 'lib/repository', 'lib/bloc'],
 );
 ```
@@ -39,7 +39,7 @@ void main() {
 }
 ```
 
-## All 15 Presets
+## All 14 Presets
 
 ### Layer presets
 
@@ -53,9 +53,8 @@ void main() {
 
 | Preset | Description |
 |--------|-------------|
-| [`namingFolderSuffix`](/presets/naming-folder-suffix) | Classes in a folder must end with the folder's base name capitalized (e.g., `lib/bloc` → must end with `Bloc`) |
+| [`namingClassSuffix`](/presets/naming-class-suffix) | Classes in a folder must end with the folder's base name capitalized (e.g., `lib/bloc` → must end with `Bloc`) |
 | [`namingFileSuffix`](/presets/naming-file-suffix) | Files in a folder must match a naming pattern (file-level naming convention) |
-| [`namingNamePattern`](/presets/naming-name-pattern) | Classes in folders must match a custom regex pattern |
 
 ### Structure presets
 
@@ -92,12 +91,11 @@ All presets accept `severity` (default `RuleSeverity.error`) and `projectRoot` (
 
 ```dart
 // Naming presets
-namingFolderSuffix(folders: ['lib/service'])
-namingFolderSuffix(folders: ['lib/bloc'], suffix: 'Bloc')
-namingFolderSuffix(folders: ['lib/bloc'], namePattern: r'.*(Bloc|Cubit)$')
+namingClassSuffix(folders: ['lib/service'])
+namingClassSuffix(folders: ['lib/bloc'], suffix: 'Bloc')
+namingClassSuffix(folders: ['lib/bloc'], namePattern: r'.*(Bloc|Cubit)$')
 namingFileSuffix(folders: ['lib/services'], suffix: '_service')
 namingFileSuffix(folders: ['lib/bloc'], namePattern: r'.*(bloc|cubit)\.dart$')
-namingNamePattern(pattern: r'.*Bloc$', folders: ['lib/bloc'])
 
 // Structure presets
 mustBeAbstract(folders: ['lib/domain/repositories'])
@@ -163,7 +161,7 @@ Templates generate a ready-to-run `*_test_arch.dart` file with all rules inlined
 ## Detailed Preset Documentation
 
 - [Layer Presets](/presets/layered-architecture) — `layeredArchitecture`, `layerCanOnlyDependOn`, `layerCannotDependOn`
-- [Naming Presets](/presets/naming-folder-suffix) — `namingFolderSuffix`, `namingFileSuffix`, `namingNamePattern`
+- [Naming Presets](/presets/naming-class-suffix) — `namingClassSuffix`, `namingFileSuffix`
 - [Structure Presets](/presets/must-be-abstract) — `mustBeAbstract`, `mustBeImmutable`, `noPublicFields`, `noCircularDependencies`
 - [Metrics & Quality](/presets/class-size-limit) — `classSizeLimit`, `noBannedCalls`, `noExternalPackage`
 - [Annotation Presets](/presets/annotation-must-have) — `annotationMustHave`, `annotationMustNotHave`
