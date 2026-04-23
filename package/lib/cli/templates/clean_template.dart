@@ -1,5 +1,5 @@
 const List<({String fileName, String content})> cleanRuleFiles = [
-  (fileName: 'clean_test_arch.dart', content: _cleanArchTest),
+  (fileName: 'clean_arch_test.dart', content: _cleanArchTest),
 ];
 
 const String _cleanArchTest = '''

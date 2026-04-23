@@ -12,6 +12,7 @@ import '../../core/entities/subject.dart';
 /// LayerSelector(layerName: 'Presentation', layerFolder: 'lib/presentation')
 /// ```
 class LayerSelector extends Selector {
+
   /// A human-readable label for the layer (used in rule descriptions).
   final String layerName;
 

@@ -12,7 +12,7 @@ import '../utils/name_pattern_helper.dart';
 /// snake_case, appended with `.dart`
 /// (e.g. `lib/services` → files must end with `_services.dart`).
 ///
-void namingFileSuffix({
+void namingFileConvention({
   required List<String> folders,
   String? namePattern,
   String? prefix,

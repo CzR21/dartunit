@@ -134,8 +134,8 @@ export default defineConfig({
             {
               label: 'Naming',
               items: [
-                { label: 'namingClassSuffix', slug: 'presets/naming-class-suffix' },
-                { label: 'namingFileSuffix', slug: 'presets/naming-file-suffix' },
+                { label: 'namingClassConvention', slug: 'presets/naming-class-convention' },
+                { label: 'namingFileConvention', slug: 'presets/naming-file-convention' },
               ],
             },
             {
@@ -162,13 +162,6 @@ export default defineConfig({
                 { label: 'annotationMustNotHave', slug: 'presets/annotation-must-not-have' },
               ],
             },
-          ],
-        },
-        {
-          label: 'Custom Rules',
-          items: [
-            { label: 'Creating Custom Rules', slug: 'custom-rules/creating' },
-            { label: 'Reference API', slug: 'custom-rules/api' },
           ],
         },
         {

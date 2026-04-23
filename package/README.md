@@ -43,7 +43,7 @@ dart pub global activate dartunit
 # 1. Scaffold the test_arch/ folder
 dart run dartunit init
 
-# 2. Edit test_arch/example_test_arch.dart with your rules
+# 2. Edit test_arch/example_arch_test.dart with your rules
 
 # 3. Run the analysis
 dart run dartunit analyze

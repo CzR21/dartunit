@@ -76,8 +76,8 @@ class InitCommand extends Command<ExitCode> {
       logger.info('');
       _printNextSteps(logger, initTemplateNextSteps(template.label, template.ruleFiles.length));
     } else {
-      File(p.join(archTestDir, 'example_test_arch.dart')).writeAsStringSync(exampleRule);
-      _printCreated(logger, 'example_test_arch.dart');
+      File(p.join(archTestDir, 'example_arch_test.dart')).writeAsStringSync(exampleRule);
+      _printCreated(logger, 'example_arch_test.dart');
       logger.info('');
       logger.success(initSuccess);
       logger.info('');

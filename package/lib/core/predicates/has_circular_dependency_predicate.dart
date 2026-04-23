@@ -14,10 +14,13 @@ class HasCircularDependencyPredicate extends Predicate {
   PredicateResult analyze(Subject subject, AnalysisContext context) {
     final cycles = context.dependencyGraph.detectCycles();
     final subjectPath = subject.filePath.normalized;
-    final involvedCycles =
-        cycles.where((cycle) => cycle.contains(subjectPath)).toList();
-    if (involvedCycles.isEmpty) return const PredicateResult.pass();
-    return PredicateResult.fail(
+    final involvedCycles = cycles.where((cycle) => cycle.contains(subjectPath)).toList();
+
+    if (involvedCycles.isEmpty) {
+      return const PredicateResult.fail('not part of any circular dependency');
+    }
+
+    return PredicateResult.pass(
       '${subject.name} is part of a circular dependency: ${involvedCycles.first.join(' -> ')}',
     );
   }

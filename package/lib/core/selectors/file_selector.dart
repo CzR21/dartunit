@@ -12,6 +12,7 @@ import '../../core/extensions/string_extensions.dart';
 /// FileSelector(folder: 'lib/data', namePattern: r'.*_impl\.dart$')
 /// ```
 class FileSelector extends Selector {
+
   /// Only select files whose path contains this folder segment.
   final String? folder;
 

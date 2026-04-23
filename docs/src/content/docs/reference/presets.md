@@ -14,8 +14,8 @@ Presets are functions that internally call `testArchGroup` and `testArch` to reg
 | [`layeredArchitecture`](/presets/layered-architecture) | Layer | Rules for every forbidden layer pair in a multi-layer architecture |
 | [`layerCanOnlyDependOn`](/presets/layer-can-only-depend-on) | Layer | A folder may only import from an allowed set of folders (whitelist) |
 | [`layerCannotDependOn`](/presets/layer-cannot-depend-on) | Layer | A folder must not import from specific folders or packages (blacklist) |
-| [`namingClassSuffix`](/presets/naming-class-suffix) | Naming | Classes must end with the capitalized base name of their folder |
-| [`namingFileSuffix`](/presets/naming-file-suffix) | Naming | Files must match a naming pattern derived from their folder name |
+| [`namingClassConvention`](/presets/naming-class-convention) | Naming | Classes must end with the capitalized base name of their folder |
+| [`namingFileConvention`](/presets/naming-file-convention) | Naming | Files must match a naming pattern derived from their folder name |
 | [`mustBeAbstract`](/presets/must-be-abstract) | Structure | Classes must be declared `abstract` |
 | [`mustBeImmutable`](/presets/must-be-immutable) | Structure | All instance fields must be `final` or `const` |
 | [`noPublicFields`](/presets/no-public-fields) | Structure | Classes must have no public fields |
@@ -53,8 +53,8 @@ void main() {
   );
 
   // Naming conventions
-  namingClassSuffix(folders: ['lib/bloc', 'lib/service', 'lib/repository']);
-  namingFileSuffix(folders: ['lib/data/datasources'], suffix: '_datasource');
+  namingClassConvention(folders: ['lib/bloc', 'lib/service', 'lib/repository']);
+  namingFileConvention(folders: ['lib/data/datasources'], suffix: '_datasource');
 
   // Structure rules
   mustBeAbstract(folders: ['lib/domain/repositories']);

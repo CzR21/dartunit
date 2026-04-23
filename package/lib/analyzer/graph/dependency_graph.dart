@@ -4,6 +4,8 @@
 class DependencyGraph {
   final Map<String, Set<String>> _adjacency = {};
   final Map<String, Set<String>> _reverseAdjacency = {};
+  final Map<String, Set<String>> _transitiveCache = {};
+  List<List<String>>? _cachedCycles;
 
   /// Adds a directed edge from [from] to [to] (i.e., [from] imports [to]).
   void addEdge(String from, String to) {
@@ -26,7 +28,13 @@ class DependencyGraph {
   Set<String> get allNodes => _adjacency.keys.toSet();
 
   /// Returns all files that [filePath] depends on, directly or transitively.
+  ///
+  /// Result is memoized — the BFS runs at most once per file path.
   Set<String> transitiveDependenciesOf(String filePath) {
+    return _transitiveCache[filePath] ??= _computeTransitive(filePath);
+  }
+
+  Set<String> _computeTransitive(String filePath) {
     final visited = <String>{};
     final queue = [filePath];
 
@@ -44,7 +52,10 @@ class DependencyGraph {
   /// Detects all cyclic dependency chains in the graph.
   ///
   /// Returns a list of cycles, where each cycle is a list of file paths.
-  List<List<String>> detectCycles() {
+  /// Result is memoized — the DFS runs at most once per [DependencyGraph].
+  List<List<String>> detectCycles() => _cachedCycles ??= _computeCycles();
+
+  List<List<String>> _computeCycles() {
     final cycles = <List<String>>[];
     final visited = <String>{};
     final stack = <String>[];

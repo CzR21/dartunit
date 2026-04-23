@@ -102,8 +102,8 @@ dart run dartunit analyze
 ### Output — no violations
 
 ```
-  ✓  Domain must not depend on the data layer
-  ✓  Domain must be Flutter-agnostic
+✓ Found x rule file(s)
+✓ Rules analyzed
 
 No architecture violations found.
 ```
@@ -111,10 +111,21 @@ No architecture violations found.
 ### Output — with violations
 
 ```
-  ✗  Domain must not depend on the data layer
-       ✗ lib/domain/usecases/get_user_usecase.dart [error] — depends on lib/data
-
-1 violation(s) found
+  ┌──────┬──────────────────────────────┬──────────────────────────────────────┬──────┬────────────────────────────────────────┐
+  │      │ Description                  │ File                                 │ Line │ Message                                │
+  ├──────┼──────────────────────────────┼──────────────────────────────────────┼──────┼────────────────────────────────────────┤
+  │ ERR  │ must have at most 10 methods │ lib/generated/intl/messages_en.dart  │ 18   │ MessageLookup has 14 methods — ma...   │
+  │ ERR  │ must have at most 10 methods │ lib/generated/intl/messages_pt.dart  │ 18   │ MessageLookup has 14 methods — ma...   │
+  │ ERR  │ must have at most 10 methods │ lib/generated/intl/messages_uk.dart  │ 18   │ MessageLookup has 14 methods — ma...   │
+  │ ERR  │ must have at most 10 methods │ lib/generated/l10n.dart              │ 13   │ S has 15 methods — maximum allowe...   │
+  │ ERR  │ must have at most 10 methods │ lib/l10n/app_localizations.dart      │ 65   │ AppLocalizations has 13 methods —...   │
+  │ ERR  │ must have at most 10 methods │ lib/l10n/app_localizations_de.dart   │ 7    │ AppLocalizationsDe has 13 methods...   │
+  │ ERR  │ must have at most 10 methods │ lib/l10n/app_localizations_en.dart   │ 7    │ AppLocalizationsEn has 13 methods...   │
+  │ ERR  │ must have at most 10 methods │ lib/l10n/app_localizations_pt.dart   │ 7    │ AppLocalizationsPt has 13 methods...   │
+  │ ERR  │ must have at most 10 methods │ lib/l10n/app_localizations_uk.dart   │ 7    │ AppLocalizationsUk has 13 methods...   │
+  │ ERR  │ must have at most 10 methods │ lib/theme/style.dart                 │ 1    │ MaterialTheme has 25 methods — ma...   │
+  └──────┴──────────────────────────────┴──────────────────────────────────────┴──────┴────────────────────────────────────────┘
+10 violation(s)  ·  🚨  0 critical(s)  ·  ✖  10 error(s)  ·  ⚠️  0 warning(s)  ·  ℹ️  0 info
 ```
 
 An HTML report is also generated at `.dartunit/report.html` after every analysis run.
@@ -135,7 +146,7 @@ Or use a preset for common patterns:
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/service', 'lib/repository'],
 );
 ```

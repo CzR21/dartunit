@@ -1,5 +1,5 @@
 const List<({String fileName, String content})> mvcRuleFiles = [
-  (fileName: 'mvc_test_arch.dart', content: _mvcArchTest),
+  (fileName: 'mvc_arch_test.dart', content: _mvcArchTest),
 ];
 
 const String _mvcArchTest = '''

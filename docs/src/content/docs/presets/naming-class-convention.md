@@ -1,18 +1,18 @@
 ---
-title: namingClassSuffix
+title: namingClassConvention
 description: Enforce that every class in a folder ends with the folder's capitalized name as a suffix. Keeps naming consistent and predictable across the project.
 sidebar:
   order: 4
 ---
 
-`namingClassSuffix` enforces that every class defined inside a given folder ends with a suffix derived from that folder's name. Classes in `lib/bloc/` must end with `Bloc`. Classes in `lib/service/` must end with `Service`. Classes in `lib/domain/repositories/` must end with `Repositories`.
+`namingClassConvention` enforces that every class defined inside a given folder ends with a suffix derived from that folder's name. Classes in `lib/bloc/` must end with `Bloc`. Classes in `lib/service/` must end with `Service`. Classes in `lib/domain/repositories/` must end with `Repositories`.
 
 This is one of the most widely applicable naming rules because it requires zero configuration of the expected suffix — the folder path carries the convention.
 
 ## Function signature
 
 ```dart
-void namingClassSuffix({
+void namingClassConvention({
   required List<String> folders,
   String? namePattern,
   String? prefix,
@@ -58,7 +58,7 @@ The preset extracts the last path segment from the folder string and capitalizes
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/bloc', 'lib/repository', 'lib/service'],
 );
 ```
@@ -70,7 +70,7 @@ void main() => namingClassSuffix(
 ```dart title="test_arch/bloc_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: [
     'lib/bloc',
     'lib/event',
@@ -104,7 +104,7 @@ class AuthService { ... }   // ✗ in lib/repository/ but doesn't end with "Repo
 ```dart title="test_arch/clean_arch_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: [
     'lib/domain/usecase',
     'lib/domain/entity',
@@ -127,7 +127,7 @@ When the auto-derived suffix doesn't match your convention (e.g., BLoC classes s
 ```dart title="test_arch/bloc_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/bloc'],
   // Override: allow both Bloc and Cubit by using a regex pattern
   namePattern: r'.*(Bloc|Cubit)$',
@@ -142,7 +142,7 @@ For projects using an `I` prefix convention for repository interfaces:
 ```dart title="test_arch/interface_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/domain/repositories'],
   prefix: 'I',
   suffix: 'Repository',
@@ -160,7 +160,7 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   // All BLoC files in any feature — suffix 'Bloc'
-  namingClassSuffix(
+  namingClassConvention(
     folders: [
       'lib/features/auth/bloc',
       'lib/features/product/bloc',
@@ -170,7 +170,7 @@ void main() {
   );
 
   // All repositories in any feature — suffix 'Repository'
-  namingClassSuffix(
+  namingClassConvention(
     folders: [
       'lib/features/auth/repository',
       'lib/features/product/repository',
@@ -188,7 +188,7 @@ Some classes legitimately cannot follow the folder suffix convention:
 ```dart title="test_arch/naming_with_exceptions_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/bloc'],
   severity: RuleSeverity.error,
   exceptions: [
@@ -235,5 +235,5 @@ If you register `lib/bloc`, all files under `lib/bloc/auth/`, `lib/bloc/product/
 
 | Preset | What it checks |
 |--------|---------------|
-| [`namingFileSuffix`](/presets/naming-file-suffix) | File names (not class names) inside a folder |
+| [`namingFileConvention`](/presets/naming-file-convention) | File names (not class names) inside a folder |
 | [`mustBeAbstract`](/presets/must-be-abstract) | Pair with this to enforce abstract interfaces in naming-controlled folders |

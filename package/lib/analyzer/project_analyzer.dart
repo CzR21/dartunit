@@ -29,12 +29,20 @@ class ProjectAnalyzer {
     );
     const classParser = ClassDeclarationParser();
 
+    final filePaths = _discoverDartFiles();
+
+    // Read all files in parallel instead of sequentially.
+    final contents = await Future.wait(
+      filePaths.map((path) => File(path).readAsString()),
+    );
+
     final graph = DependencyGraph();
     final allFiles = <AnalyzedFile>[];
     final allClasses = <dynamic>[];
 
-    for (final filePath in _discoverDartFiles()) {
-      final content = await File(filePath).readAsString();
+    for (var i = 0; i < filePaths.length; i++) {
+      final filePath = filePaths[i];
+      final content = contents[i];
       final normalizedPath = PathHelper.normalize(filePath);
       final packagePath =
           PathHelper.toPackagePath(filePath, projectRoot, packageName);
@@ -55,12 +63,14 @@ class ProjectAnalyzer {
       );
     }
 
-    return AnalysisContext(
+    final context = AnalysisContext(
       classes: List.of(allClasses.cast()),
       files: allFiles,
       dependencyGraph: graph,
       projectRoot: projectRoot,
     );
+
+    return context;
   }
 
   /// Returns all `.dart` files under `<projectRoot>/lib/` recursively.

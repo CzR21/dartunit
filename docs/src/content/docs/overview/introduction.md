@@ -13,17 +13,22 @@ It lets you encode architectural decisions as **plain Dart test files** and run 
 ┌─────────────────────────────────────────────────────────────┐
 │                        Your Project                         │
 │                                                             │
-│   lib/                        test_arch/                   │
-│   ├── domain/           ───►  ├── domain_rules_test_arch   │
-│   ├── data/             ───►  ├── naming_test_arch         │
-│   └── presentation/    ───►  └── quality_test_arch        │
+│   lib/                       test_arch/                     │
+│   ├── domain/          ───►  ├── domain_rules_test_arch     │
+│   ├── data/            ───►  ├── naming_test_arch           │
+│   └── presentation/    ───►  └── quality_test_arch          │
 │                                                             │
 │            dart run dartunit analyze                        │
 │                         │                                   │
 │                         ▼                                   │
-│   ✓ Domain must not depend on data layer                   │
-│   ✗ BLoC classes must end with Bloc                        │
-│     lib/bloc/auth_manager.dart — "AuthManager" ≠ *Bloc     │
+│ ┌──────┬────────────────┬─────────┬──────┬────────────────┐ │
+│ │      │ Description    │ File    │ Line │ Message        │ │
+│ ├──────┼────────────────┼─────────┼──────┼────────────────┤ │
+│ │ ERR  │ must have ...  │ ...     │ 18   │ MessageLoop... │ │
+│ │ ERR  │ must have ...  │ ...     │ 18   │ MessageLook... │ │
+│ └──────┴────────────────┴─────────┴──────┴────────────────┘ │
+│ 2 violation(s)  ·  2 error(s) ...                           │
+│                                                             │ 
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -82,7 +87,7 @@ Callable functions that register complete rule sets for common patterns. One lin
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/bloc', 'lib/repository', 'lib/service'],
 );
 ```

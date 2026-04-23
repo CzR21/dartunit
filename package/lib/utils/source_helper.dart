@@ -32,12 +32,12 @@ class SourceHelper {
     return lo + 1;
   }
 
+  static final _annotationRegex = RegExp(r'@(\w+)');
+
   /// Extracts annotation names (without the leading `@`) from a raw
   /// annotation block string such as `@immutable @override`.
   static List<String> extractAnnotationNames(String raw) {
-    final annotationRegex = RegExp(r'@(\w+)');
-
-    return annotationRegex
+    return _annotationRegex
         .allMatches(raw)
         .map((m) => m.group(1)!)
         .toList();

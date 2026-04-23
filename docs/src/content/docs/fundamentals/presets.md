@@ -14,7 +14,7 @@ Import `package:dartunit/dartunit.dart` and call the preset function directly fr
 ```dart title="test_arch/naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingClassSuffix(
+void main() => namingClassConvention(
   folders: ['lib/service', 'lib/repository', 'lib/bloc'],
 );
 ```
@@ -53,8 +53,8 @@ void main() {
 
 | Preset | Description |
 |--------|-------------|
-| [`namingClassSuffix`](/presets/naming-class-suffix) | Classes in a folder must end with the folder's base name capitalized (e.g., `lib/bloc` → must end with `Bloc`) |
-| [`namingFileSuffix`](/presets/naming-file-suffix) | Files in a folder must match a naming pattern (file-level naming convention) |
+| [`namingClassConvention`](/presets/naming-class-convention) | Classes in a folder must end with the folder's base name capitalized (e.g., `lib/bloc` → must end with `Bloc`) |
+| [`namingFileConvention`](/presets/naming-file-convention) | Files in a folder must match a naming pattern (file-level naming convention) |
 
 ### Structure presets
 
@@ -91,11 +91,11 @@ All presets accept `severity` (default `RuleSeverity.error`) and `projectRoot` (
 
 ```dart
 // Naming presets
-namingClassSuffix(folders: ['lib/service'])
-namingClassSuffix(folders: ['lib/bloc'], suffix: 'Bloc')
-namingClassSuffix(folders: ['lib/bloc'], namePattern: r'.*(Bloc|Cubit)$')
-namingFileSuffix(folders: ['lib/services'], suffix: '_service')
-namingFileSuffix(folders: ['lib/bloc'], namePattern: r'.*(bloc|cubit)\.dart$')
+namingClassConvention(folders: ['lib/service'])
+namingClassConvention(folders: ['lib/bloc'], suffix: 'Bloc')
+namingClassConvention(folders: ['lib/bloc'], namePattern: r'.*(Bloc|Cubit)$')
+namingFileConvention(folders: ['lib/services'], suffix: '_service')
+namingFileConvention(folders: ['lib/bloc'], namePattern: r'.*(bloc|cubit)\.dart$')
 
 // Structure presets
 mustBeAbstract(folders: ['lib/domain/repositories'])
@@ -145,6 +145,100 @@ void main() {
 }
 ```
 
+## Custom Presets
+
+Beyond the built-in presets, DartUnit allows you to define your own reusable preset functions. This is especially useful when your project or organization has well-defined internal standards — custom naming conventions, specific dependency restrictions, or architectural guidelines that apply across multiple projects sharing the same architecture.
+
+A custom preset is a plain Dart function that calls `testArch` and `testArchGroup` internally, exactly like the built-in presets. Multiple rules are grouped logically into a single reusable function.
+
+### Creating a custom preset
+
+Define the function in a separate file. The recommended location is `test_arch/custom_presets/`, which keeps custom presets organized and easy to find:
+
+```dart title="test_arch/custom_presets/clean_arch_preset.dart"
+import 'package:dartunit/dartunit.dart';
+
+/// Enforces Clean Architecture conventions for this project:
+/// - Domain layer has no external dependencies
+/// - Repository interfaces are abstract and prefixed with 'I'
+/// - Use cases expose a call() method
+void cleanArchRules({
+  RuleSeverity severity = RuleSeverity.error,
+  String projectRoot = '.',
+}) {
+  layerCannotDependOn(
+    from: 'lib/domain',
+    to: ['flutter', 'dio', 'get_it'],
+    severity: severity,
+    projectRoot: projectRoot,
+  );
+
+  mustBeAbstract(
+    folders: ['lib/domain/repositories'],
+    severity: severity,
+    projectRoot: projectRoot,
+  );
+
+  namingClassConvention(
+    folders: ['lib/domain/repositories'],
+    prefix: 'I',
+    severity: severity,
+    projectRoot: projectRoot,
+  );
+
+  testArch('Use cases must declare a call() method', (arch) {
+    expect(
+      arch.classes(folder: 'lib/domain/usecases'),
+      hasMethod('call'),
+    );
+  }, severity: severity, projectRoot: projectRoot);
+}
+```
+
+### Using a custom preset
+
+Import the file and call the function from `main()`, the same way you use built-in presets:
+
+```dart title="test_arch/architecture_test_arch.dart"
+import 'package:dartunit/dartunit.dart';
+import 'custom_presets/clean_arch_preset.dart';
+
+void main() {
+  // Your custom preset — encapsulates all project-specific rules
+  cleanArchRules(severity: RuleSeverity.error);
+
+  // Combined with built-in presets as needed
+  noCircularDependencies();
+  classSizeLimit(maxMethods: 20, folders: ['lib']);
+}
+```
+
+### Reusing across projects
+
+A custom preset can be extracted into a shared Dart package and published privately (e.g., on a private pub server or as a path dependency). Other projects with the same architecture import it like any other package:
+
+```yaml title="pubspec.yaml"
+dev_dependencies:
+  dartunit: ^1.0.0
+  my_org_arch_rules:
+    git:
+      url: https://github.com/my-org/arch-rules.git
+```
+
+```dart title="test_arch/architecture_test_arch.dart"
+import 'package:dartunit/dartunit.dart';
+import 'package:my_org_arch_rules/my_org_arch_rules.dart';
+
+void main() {
+  // One call enforces the entire organization's architecture standard
+  orgArchRules();
+}
+```
+
+:::tip[Keep custom presets focused]
+Each custom preset should enforce one coherent concern — a full layer contract, a naming standard for one module, or a set of quality rules. Avoid putting unrelated rules in the same preset; it makes violations harder to trace and the preset harder to reuse selectively.
+:::
+
 ## Architecture Templates
 
 For a complete set of rules for a specific architecture pattern, use `dartunit init --template`:
@@ -161,7 +255,7 @@ Templates generate a ready-to-run `*_test_arch.dart` file with all rules inlined
 ## Detailed Preset Documentation
 
 - [Layer Presets](/presets/layered-architecture) — `layeredArchitecture`, `layerCanOnlyDependOn`, `layerCannotDependOn`
-- [Naming Presets](/presets/naming-class-suffix) — `namingClassSuffix`, `namingFileSuffix`
+- [Naming Presets](/presets/naming-class-convention) — `namingClassConvention`, `namingFileConvention`
 - [Structure Presets](/presets/must-be-abstract) — `mustBeAbstract`, `mustBeImmutable`, `noPublicFields`, `noCircularDependencies`
 - [Metrics & Quality](/presets/class-size-limit) — `classSizeLimit`, `noBannedCalls`, `noExternalPackage`
 - [Annotation Presets](/presets/annotation-must-have) — `annotationMustHave`, `annotationMustNotHave`

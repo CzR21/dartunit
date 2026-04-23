@@ -19,33 +19,53 @@ class AnalysisContext {
   /// The root path of the analyzed project.
   final String projectRoot;
 
-  const AnalysisContext({
+  // Pre-built indexes for O(1) folder lookups instead of O(n) linear scans.
+  late final Map<String, List<AnalyzedClass>> _classesByFolder;
+  late final Map<String, List<AnalyzedFile>> _filesByFolder;
+  late final Map<String, AnalyzedClass> _classByName;
+
+  AnalysisContext({
     required this.classes,
     required this.files,
     required this.dependencyGraph,
     required this.projectRoot,
-  });
+  }) {
+    _classesByFolder = {};
+    for (final c in classes) {
+      final path = c.normalizedFilePath;
+      final segments = path.split('/');
+      // Index every ancestor folder prefix so "lib/data" matches
+      // "lib/data/repos/user_repo.dart".
+      for (var i = 1; i < segments.length; i++) {
+        final prefix = segments.sublist(0, i).join('/');
+        (_classesByFolder[prefix] ??= []).add(c);
+      }
+    }
+    _classByName = {for (final c in classes) c.name: c};
 
-  /// Returns all classes located in a folder that contains [folderPath].
-  List<AnalyzedClass> classesInFolder(String folderPath) {
-    return classes
-        .where((c) => c.normalizedFilePath.contains(folderPath.normalized))
-        .toList();
-  }
-
-  /// Returns the class with the given [name], or null.
-  AnalyzedClass? findClass(String name) {
-    try {
-      return classes.firstWhere((c) => c.name == name);
-    } catch (_) {
-      return null;
+    _filesByFolder = {};
+    for (final f in files) {
+      final path = f.filePath.normalized;
+      final segments = path.split('/');
+      for (var i = 1; i < segments.length; i++) {
+        final prefix = segments.sublist(0, i).join('/');
+        (_filesByFolder[prefix] ??= []).add(f);
+      }
     }
   }
 
+  /// Returns all classes located in a folder that contains [folderPath].
+  List<AnalyzedClass> classesInFolder(String folderPath) {
+    final key = folderPath.normalized.replaceAll(RegExp(r'/$'), '');
+    return _classesByFolder[key] ?? [];
+  }
+
+  /// Returns the class with the given [name], or null.
+  AnalyzedClass? findClass(String name) => _classByName[name];
+
   /// Returns all files located in [folderPath].
   List<AnalyzedFile> filesInFolder(String folderPath) {
-    return files
-        .where((f) => f.filePath.normalized.contains(folderPath.normalized))
-        .toList();
+    final key = folderPath.normalized.replaceAll(RegExp(r'/$'), '');
+    return _filesByFolder[key] ?? [];
   }
 }

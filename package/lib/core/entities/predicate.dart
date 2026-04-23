@@ -6,12 +6,6 @@ import '../../analyzer/context/analysis_context.dart';
 /// A predicate defines the **positive condition** that a subject satisfies.
 /// When the condition IS met, [analyze] returns [PredicateResult.pass].
 /// When the condition is NOT met, it returns [PredicateResult.fail].
-///
-/// Rules typically use [NotPredicate] to enforce that the condition is absent:
-/// ```dart
-/// // "Domain classes must NOT depend on the data layer"
-/// NotPredicate(DependOnFolderPredicate('lib/data'))
-/// ```
 abstract class Predicate {
 
   const Predicate();

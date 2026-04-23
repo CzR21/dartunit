@@ -46,7 +46,7 @@ testArchGroup('Domain layer rules', () {
 ### 3. On a preset call
 
 ```dart
-namingClassSuffix(
+namingClassConvention(
   folders: ['lib/bloc'],
   severity: RuleSeverity.warning,
 );

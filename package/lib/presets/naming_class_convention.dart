@@ -38,7 +38,7 @@ import '../utils/name_pattern_helper.dart';
 ///   namePattern: r'.*(Bloc|Cubit)$',
 /// );
 /// ```
-void namingClassSuffix({
+void namingClassConvention({
   required List<String> folders,
   String? namePattern,
   String? prefix,

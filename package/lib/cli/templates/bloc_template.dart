@@ -1,5 +1,5 @@
 const List<({String fileName, String content})> blocRuleFiles = [
-  (fileName: 'bloc_test_arch.dart', content: _blocArchTest),
+  (fileName: 'bloc_arch_test.dart', content: _blocArchTest),
 ];
 
 const String _blocArchTest = '''

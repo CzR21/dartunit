@@ -211,8 +211,8 @@ RuleSeverity.critical  // fails analysis (exit code 1), sorted first
 All presets are imported from `package:dartunit/dartunit.dart` and called directly in `main()`.
 
 ```dart
-namingClassSuffix({required List<String> folders, String? suffix, String? prefix, String? namePattern, RuleSeverity severity, List<String> exceptions})
-namingFileSuffix({required List<String> folders, String? suffix, String? prefix, String? namePattern, RuleSeverity severity, List<String> exceptions})
+namingClassConvention({required List<String> folders, String? suffix, String? prefix, String? namePattern, RuleSeverity severity, List<String> exceptions})
+namingFileConvention({required List<String> folders, String? suffix, String? prefix, String? namePattern, RuleSeverity severity, List<String> exceptions})
 mustBeAbstract({required List<String> folders, RuleSeverity severity, List<String> exceptions})
 mustBeImmutable({required List<String> folders, RuleSeverity severity, List<String> exceptions})
 noPublicFields({required List<String> folders, RuleSeverity severity, List<String> exceptions})

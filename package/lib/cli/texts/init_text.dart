@@ -4,7 +4,7 @@ const String initAlreadyExists = 'Dartunit is already initialised in this projec
 const String initSuccess = 'Project initialised successfully!';
 
 const List<String> initNextSteps = [
-  'Open    test_arch/example_test_arch.dart  and customise the rule.',
+  'Open    test_arch/example_arch_test.dart  and customise the rule.',
   'Run     dartunit analyze              to check your architecture.',
   'Run     dartunit generate <name>      to scaffold a new rule.',
 ];
@@ -17,12 +17,12 @@ List<String> initTemplateNextSteps(String templateLabel, int ruleCount) => [
 ];
 
 const String exampleRule = '''
-// test_arch/example_test_arch.dart
+// test_arch/example_arch_test.dart
 //
 // Architecture rule: UI layer must not access data layer directly.
 //
 // Run with:
-//   dart test test_arch/example_test_arch.dart
+//   dart test test_arch/example_arch_test.dart
 //   dartunit analyze
 
 import 'package:dartunit/dartunit.dart';

@@ -1,5 +1,5 @@
 const List<({String fileName, String content})> mvvmRuleFiles = [
-  (fileName: 'mvvm_test_arch.dart', content: _mvvmArchTest),
+  (fileName: 'mvvm_arch_test.dart', content: _mvvmArchTest),
 ];
 
 const String _mvvmArchTest = '''
@@ -158,6 +158,25 @@ void main() {
         expect(serviceSelector, hasAllFinalFields());
       });
     },
+    severity: RuleSeverity.error,
+  );
+
+  // ---------------------------------------------------------------------------
+  // GoRouter \u2014 dependency injection boundary
+  //
+  // Based on: https://docs.flutter.dev/app-architecture/case-study/dependency-injection
+  //
+  // The router is the only place where repositories/services are read from
+  // context and injected into ViewModels. Views must not inject repositories
+  // directly. Remove or adjust this group if you are not using GoRouter.
+  // ---------------------------------------------------------------------------
+
+  const _router = 'lib/router';
+
+  mvvmGoRouterInjection(
+    viewsFolder: _views,
+    viewModelsFolder: _viewmodels,
+    routerFolder: _router,
     severity: RuleSeverity.error,
   );
 }

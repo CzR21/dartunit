@@ -1,9 +1,9 @@
-// test_arch/example_test_arch.dart
+// test_arch/example_arch_test.dart
 //
 // Architecture rule: UI layer must not access data layer directly.
 //
 // Run with:
-//   dart test test_arch/example_test_arch.dart
+//   dart test test_arch/example_arch_test.dart
 //   dartunit analyze
 
 import 'package:dartunit/dartunit.dart';

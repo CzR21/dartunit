@@ -1,18 +1,18 @@
 ---
-title: namingFileSuffix
+title: namingFileConvention
 description: Enforce file naming conventions — files in a folder must match a naming pattern derived from the folder name, an explicit suffix, or a custom regex.
 sidebar:
   order: 5
 ---
 
-`namingFileSuffix` enforces that every `.dart` file inside a given folder ends with a suffix derived from that folder's name. Files in `lib/services/` must end with `_service.dart`. Files in `lib/repositories/` must end with `_repository.dart`. Files in `lib/bloc/` must end with `_bloc.dart` or `_cubit.dart`.
+`namingFileConvention` enforces that every `.dart` file inside a given folder ends with a suffix derived from that folder's name. Files in `lib/services/` must end with `_service.dart`. Files in `lib/repositories/` must end with `_repository.dart`. Files in `lib/bloc/` must end with `_bloc.dart` or `_cubit.dart`.
 
-This is the **file-level** counterpart to [`namingClassSuffix`](/presets/naming-class-suffix), which enforces naming at the **class** level. Use `namingFileSuffix` when you want to enforce the file name convention independent of the class names inside the file.
+This is the **file-level** counterpart to [`namingClassConvention`](/presets/naming-class-convention), which enforces naming at the **class** level. Use `namingFileConvention` when you want to enforce the file name convention independent of the class names inside the file.
 
 ## Function signature
 
 ```dart
-void namingFileSuffix({
+void namingFileConvention({
   required List<String> folders,
   String? namePattern,
   String? prefix,
@@ -59,7 +59,7 @@ The full path does not affect the derived suffix — only the last segment matte
 ```dart title="test_arch/file_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFileSuffix(
+void main() => namingFileConvention(
   folders: ['lib/services', 'lib/repositories'],
 );
 ```
@@ -75,7 +75,7 @@ Use `suffix` when the auto-derived name doesn't match your convention (e.g., you
 ```dart title="test_arch/file_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFileSuffix(
+void main() => namingFileConvention(
   folders: ['lib/services'],
   suffix: '_service',  // .dart is appended automatically
 );
@@ -90,7 +90,7 @@ Enforce both a prefix and suffix for remote data source files:
 ```dart title="test_arch/datasource_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFileSuffix(
+void main() => namingFileConvention(
   folders: ['lib/data/datasources'],
   prefix: 'remote_',
   suffix: '_datasource',
@@ -106,7 +106,7 @@ Use `namePattern` for conventions that cannot be expressed with a simple prefix/
 ```dart title="test_arch/bloc_file_naming_test_arch.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => namingFileSuffix(
+void main() => namingFileConvention(
   folders: ['lib/bloc'],
   namePattern: r'.*(bloc|cubit)\.dart$',
 );
@@ -123,21 +123,21 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   // Domain layer: entity files end with _entity.dart
-  namingFileSuffix(
+  namingFileConvention(
     folders: ['lib/domain/entities'],
     suffix: '_entity',
     severity: RuleSeverity.warning,
   );
 
   // Domain layer: repository interface files end with _repository.dart
-  namingFileSuffix(
+  namingFileConvention(
     folders: ['lib/domain/repositories'],
     suffix: '_repository',
     severity: RuleSeverity.warning,
   );
 
   // Data layer: datasource files follow remote_*_datasource.dart
-  namingFileSuffix(
+  namingFileConvention(
     folders: ['lib/data/datasources'],
     prefix: 'remote_',
     suffix: '_datasource',
@@ -146,7 +146,7 @@ void main() {
   );
 
   // Data layer: model files end with _model.dart
-  namingFileSuffix(
+  namingFileConvention(
     folders: ['lib/data/models'],
     suffix: '_model',
     severity: RuleSeverity.error,
@@ -161,7 +161,7 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   // State files: *_state.dart
-  namingFileSuffix(
+  namingFileConvention(
     folders: ['lib/bloc'],
     namePattern: r'.*(bloc|cubit|state|event)\.dart$',
     severity: RuleSeverity.warning,
@@ -169,7 +169,7 @@ void main() {
 }
 ```
 
-## Combining with namingClassSuffix
+## Combining with namingClassConvention
 
 For the most comprehensive naming enforcement, combine both file-level and class-level checks:
 
@@ -178,14 +178,14 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   // Files in lib/services must end with _service.dart
-  namingFileSuffix(
+  namingFileConvention(
     folders: ['lib/services'],
     suffix: '_service',
     severity: RuleSeverity.warning,
   );
 
   // Classes in lib/services must end with Service
-  namingClassSuffix(
+  namingClassConvention(
     folders: ['lib/services'],
     suffix: 'Service',
     severity: RuleSeverity.warning,
@@ -208,4 +208,4 @@ When a file does not match the required naming pattern:
 
 | Preset | What it checks |
 |--------|---------------|
-| [`namingClassSuffix`](/presets/naming-class-suffix) | Class names inside a folder |
+| [`namingClassConvention`](/presets/naming-class-convention) | Class names inside a folder |

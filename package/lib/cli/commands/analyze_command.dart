@@ -62,7 +62,7 @@ class AnalyzeCommand extends Command<ExitCode> {
     final ruleFiles = Directory(archTestDir)
         .listSync(recursive: false)
         .whereType<File>()
-        .where((f) => f.path.endsWith('_arch_test.dart'))
+        .where((f) => f.path.endsWith('arch_test.dart'))
         .map((f) => f.path)
         .toList()
       ..sort();

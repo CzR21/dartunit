@@ -2,7 +2,6 @@
 ///
 /// This library exposes all public APIs needed to:
 /// - Run the CLI (`DartunitCli`)
-/// - Implement custom rules (`CustomArchitectureRule`)
 /// - Build rules programmatically (`ArchitectureRule`, `RuleEngine`)
 /// - Use selectors, predicates, matchers, and presets
 
@@ -76,7 +75,6 @@ export 'analyzer/graph/dependency_graph.dart';
 // Engine
 export 'engine/rule_engine.dart';
 export 'engine/rule_executor.dart';
-export 'engine/custom_rule_loader.dart';
 
 // Runner
 export 'runner/arch_runner.dart' show testArch, testArchGroup;
@@ -87,8 +85,8 @@ export 'runner/arch_matchers.dart';
 export 'package:test/test.dart' show expect;
 
 // Rule presets
-export 'presets/naming_class_suffix.dart';
-export 'presets/naming_file_suffix.dart';
+export 'presets/naming_class_convention.dart';
+export 'presets/naming_file_convention.dart';
 export 'presets/must_be_abstract.dart';
 export 'presets/must_be_immutable.dart';
 export 'presets/no_public_fields.dart';
@@ -101,6 +99,7 @@ export 'presets/annotation_must_not_have.dart';
 export 'presets/class_size_limit.dart';
 export 'presets/no_external_package.dart';
 export 'presets/no_banned_calls.dart';
+export 'presets/mvvm_go_router_injection.dart';
 
 // Reporter
 export 'reporter/console_reporter.dart';

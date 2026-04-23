@@ -12,6 +12,7 @@ import '../../core/entities/subject.dart';
 /// ClassSelector(folder: 'lib/presentation', namePattern: r'.*Bloc$')
 /// ```
 class ClassSelector extends Selector {
+
   /// Only select classes whose file path contains this folder segment.
   final String? folder;
 

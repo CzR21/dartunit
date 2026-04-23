@@ -13,6 +13,8 @@ class FieldParser {
     multiLine: true,
   );
 
+  static final _getterSetterRegex = RegExp(r'\bget\b|\bset\b');
+
   List<AnalyzedField> parse(String classBody) {
     final fields = <AnalyzedField>[];
 
@@ -23,7 +25,7 @@ class FieldParser {
       final name     = match.group(4)!;
 
       if (dartKeywords.contains(name) || dartKeywords.contains(type)) continue;
-      if (RegExp(r'\bget\b|\bset\b').hasMatch(type)) continue;
+      if (_getterSetterRegex.hasMatch(type)) continue;
 
       fields.add(AnalyzedField(
         name: name,
