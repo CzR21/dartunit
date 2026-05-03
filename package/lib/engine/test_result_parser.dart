@@ -1,35 +1,36 @@
 import 'dart:convert';
+import 'dart:io';
 
 import '../core/entities/violation.dart';
 import '../core/enums/rule_severity.dart';
 
-/// Parses the stderr output of a `dart test` subprocess and extracts
-/// [Violation]s emitted via the `DARTUNIT_RESULT:` protocol.
+/// Reads the NDJSON results file written by [ArchMatcher] during a
+/// `dart test` subprocess and reconstructs the [Violation] list.
 ///
-/// Each compliant line has the form:
+/// Each line in the file is a self-contained JSON object:
+/// ```json
+/// {"ruleDescription":"...","severity":"error","violations":[...]}
 /// ```
-/// DARTUNIT_RESULT:{"violations":[...]}
-/// ```
-/// Lines that do not start with the prefix are ignored.
+/// Lines that fail to decode are silently skipped.
 class TestResultParser {
   const TestResultParser();
 
-  static const _prefix = 'DARTUNIT_RESULT:';
-
-  /// Parses [stderr] and returns all violations found.
+  /// Parses [file] and returns all violations found.
   ///
-  /// Also reports how many result lines were successfully decoded via
-  /// [parsedRules], which the caller uses to detect complete test failures.
-  ({List<Violation> violations, int parsedRules}) parse(String stderr) {
+  /// [parsedRules] counts how many result lines were successfully decoded.
+  /// The caller uses this to detect complete test failures (file missing or
+  /// empty means no rule ran at all).
+  ({List<Violation> violations, int parsedRules}) parseFile(File file) {
+    if (!file.existsSync()) return (violations: [], parsedRules: 0);
+
     final violations = <Violation>[];
     var parsedRules = 0;
 
-    for (final line in stderr.split('\n')) {
+    for (final line in file.readAsLinesSync()) {
       final trimmed = line.trim();
-      if (!trimmed.startsWith(_prefix)) continue;
+      if (trimmed.isEmpty) continue;
       try {
-        final json = jsonDecode(trimmed.substring(_prefix.length))
-            as Map<String, dynamic>;
+        final json = jsonDecode(trimmed) as Map<String, dynamic>;
         parsedRules++;
         for (final v in (json['violations'] as List).cast<Map<String, dynamic>>()) {
           violations.add(Violation(
@@ -47,12 +48,4 @@ class TestResultParser {
 
     return (violations: violations, parsedRules: parsedRules);
   }
-
-  /// Returns only the non-protocol lines from [stderr], used to surface
-  /// raw `dart test` errors to the user when parsing fails.
-  String extractRawError(String stderr) => stderr
-      .split('\n')
-      .where((l) => !l.trim().startsWith(_prefix))
-      .join('\n')
-      .trim();
 }

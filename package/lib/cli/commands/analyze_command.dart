@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:dartunit/core/entities/violation.dart';
 import 'package:mason_logger/mason_logger.dart' hide ExitCode;
 import 'package:path/path.dart' as p;
 
@@ -79,19 +80,32 @@ class AnalyzeCommand extends Command<ExitCode> {
 
     final evalProgress = logger.progress('Analyzing rules...');
 
-    final result = await Process.run(
-      'dart',
-      ['test', ...ruleFiles, '--reporter', 'json', '--no-color'],
-      workingDirectory: projectRoot,
-      environment: {...Platform.environment, 'DARTUNIT_PROTOCOL': '1'},
+    final tmpFile = File(
+      p.join(Directory.systemTemp.path, 'dartunit_$pid.ndjson'),
     );
 
-    final (:violations, :parsedRules) =
-        resultParser.parse(result.stderr as String);
+    late ProcessResult result;
+    late ({List<Violation> violations, int parsedRules}) parsed;
+
+    try {
+      result = await Process.run(
+        'dart',
+        ['test', ...ruleFiles, '--reporter', 'json', '--no-color'],
+        workingDirectory: projectRoot,
+        environment: {...Platform.environment, 'DARTUNIT_RESULT_FILE': tmpFile.path},
+      );
+
+      parsed = resultParser.parseFile(tmpFile);
+    } finally {
+      if (tmpFile.existsSync()) tmpFile.deleteSync();
+    }
+
+    final violations = parsed.violations;
+    final parsedRules = parsed.parsedRules;
 
     if (parsedRules == 0 && result.exitCode != 0) {
       evalProgress.fail('Analysis failed');
-      final err = resultParser.extractRawError(result.stderr as String);
+      final err = (result.stderr as String).trim();
       if (err.isNotEmpty) logger.err('dart test error:\n  $err');
       logger.info('');
       return ExitCode.error;

@@ -31,8 +31,13 @@ class ArchMatcher extends Matcher {
 
     final violations = const RuleExecutor().execute(rule, item.context);
 
-    if (Platform.environment['DARTUNIT_PROTOCOL'] == '1') {
-      stderr.writeln('DARTUNIT_RESULT:${jsonEncode(ReportHelper.serializeViolations(rule, violations))}');
+    final resultFile = Platform.environment['DARTUNIT_RESULT_FILE'];
+    if (resultFile != null) {
+      File(resultFile).writeAsStringSync(
+        '${jsonEncode(ReportHelper.serializeViolations(rule, violations))}\n',
+        mode: FileMode.append,
+        flush: true,
+      );
     }
 
     print(ReportHelper.formatTestResult(rule, violations));

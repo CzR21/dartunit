@@ -59,10 +59,9 @@ They use the `testArch` function — analogous to `testWidgets` in Flutter.
 ```dart
 // test_arch/domain_arch_test.dart
 import 'package:dartunit/dartunit.dart';
-import 'package:test/test.dart';
 
-void main() => testArch('Domain must not depend on Data', (arch) {
-  final domain = arch.classes(folder: 'lib/domain');
+void main() => testArch('Domain must not depend on Data', (selector) {
+  final domain = selector.classes(inFolder: 'lib/domain');
   expect(domain, doesNotDependOn('lib/data'));
 });
 ```
@@ -70,12 +69,14 @@ void main() => testArch('Domain must not depend on Data', (arch) {
 You can also group related rules to share a single analysis pass:
 
 ```dart
-void main() => testArchGroup('Naming conventions', (arch) {
-  testArch('Blocs must end with Bloc', (arch) {
-    expect(arch.classes(folder: 'lib/bloc'), nameEndsWith('Bloc'));
+import 'package:dartunit/dartunit.dart';
+
+void main() => testArchGroup('Naming conventions', () {
+  testArch('Blocs must end with Bloc', (selector) {
+    expect(selector.classes(inFolder: 'lib/bloc'), nameEndsWith('Bloc'));
   });
-  testArch('Repositories must end with Repository', (arch) {
-    expect(arch.classes(folder: 'lib/data'), nameEndsWith('Repository'));
+  testArch('Repositories must end with Repository', (selector) {
+    expect(selector.classes(inFolder: 'lib/data'), nameEndsWith('Repository'));
   });
 }, severity: RuleSeverity.warning);
 ```
@@ -149,27 +150,27 @@ dart run dartunit log --no-color
 
 ## Selectors
 
-Inside a `testArch` body, `arch` is an `ArchTester` that provides three selectors:
+Inside a `testArch` body, `selector` is an `ArchTester` that provides three selectors:
 
 ```dart
 // Select classes
-arch.classes(folder: 'lib/domain')
-arch.classes(suffix: 'Bloc')
-arch.classes(prefix: 'Base', folder: 'lib/core')
-arch.classes(namePattern: r'.*Impl$')
+selector.classes(inFolder: 'lib/domain')
+selector.classes(hasSuffix: 'Bloc')
+selector.classes(hasPrefix: 'Base', inFolder: 'lib/core')
+selector.classes(matchingPattern: r'.*Impl$')
 
 // Select files
-arch.files(folder: 'lib/data')
-arch.files(suffix: '_test.dart')
+selector.files(inFolder: 'lib/data')
+selector.files(hasSuffix: '_test.dart')
 
 // Select a named architectural layer
-arch.layer('Domain', folder: 'lib/domain')
+selector.layer('Domain', inFolder: 'lib/domain')
 ```
 
 All selectors accept an `exceptions` list — file path substrings exempt from the rule:
 
 ```dart
-arch.classes(folder: 'lib/ui', exceptions: ['lib/ui/legacy/'])
+selector.classes(inFolder: 'lib/ui', exceptions: ['lib/ui/legacy/'])
 ```
 
 ---
@@ -258,7 +259,7 @@ Each test inherits its severity from `testArchGroup`, or defaults to `RuleSeveri
 Override per test:
 
 ```dart
-testArch('...', (arch) { ... }, severity: RuleSeverity.warning);
+testArch('...', (selector) { ... }, severity: RuleSeverity.warning);
 ```
 
 | Severity | Fails build? | Colour |
@@ -275,30 +276,29 @@ testArch('...', (arch) { ... }, severity: RuleSeverity.warning);
 ```dart
 // test_arch/layered_arch_test.dart
 import 'package:dartunit/dartunit.dart';
-import 'package:test/test.dart';
 
-void main() => testArchGroup('Layered Architecture', (arch) {
-  testArch('Domain must not depend on Data', (arch) {
-    expect(arch.layer('Domain', folder: 'lib/domain'),
+void main() => testArchGroup('Layered Architecture', () {
+  testArch('Domain must not depend on Data', (selector) {
+    expect(selector.layer('Domain', inFolder: 'lib/domain'),
         doesNotDependOn('lib/data'));
   });
 
-  testArch('Domain must not depend on Presentation', (arch) {
-    expect(arch.layer('Domain', folder: 'lib/domain'),
+  testArch('Domain must not depend on Presentation', (selector) {
+    expect(selector.layer('Domain', inFolder: 'lib/domain'),
         doesNotDependOn('lib/presentation'));
   });
 
-  testArch('No circular dependencies', (arch) {
-    expect(arch.files(), hasNoCircularDependency());
+  testArch('No circular dependencies', (selector) {
+    expect(selector.classes(), hasNoCircularDependency());
   });
 
-  testArch('Value objects must be immutable', (arch) {
-    expect(arch.classes(folder: 'lib/domain/value_objects'),
+  testArch('Value objects must be immutable', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain/value_objects'),
         hasAllFinalFields());
   });
 
-  testArch('No print() calls in lib/', (arch) {
-    expect(arch.files(folder: 'lib'), hasNoContent(r'print\s*\('));
+  testArch('No print() calls in lib/', (selector) {
+    expect(selector.files(inFolder: 'lib'), hasNoContent(r'print\s*\('));
   });
 }, severity: RuleSeverity.error);
 ```
@@ -312,17 +312,20 @@ For common patterns you can use preset factories instead of writing matchers man
 ```dart
 import 'package:dartunit/dartunit.dart';
 
-// Naming: all classes in lib/bloc must end with "Bloc"
-final rules = namingClassSuffix(folders: ['lib/bloc', 'lib/repository']);
+void main() {
+  // Naming: all classes in lib/bloc must end with "Bloc"
+  namingClassConvention(folders: ['lib/bloc', 'lib/repository']);
 
-// Layered architecture (generates N² rules)
-final rules = layeredArchitecture(layers: [
-  LayerDef(name: 'Presentation', folder: 'lib/presentation',
-      canAccess: ['lib/bloc', 'lib/domain']),
-  LayerDef(name: 'Bloc', folder: 'lib/bloc', canAccess: ['lib/domain']),
-  LayerDef(name: 'Domain', folder: 'lib/domain', canAccess: []),
-]);
+  // Layered architecture (generates rules for every forbidden pair)
+  layeredArchitecture(layers: [
+    (name: 'presentation', folder: 'lib/presentation', canAccess: ['lib/bloc', 'lib/domain']),
+    (name: 'bloc',         folder: 'lib/bloc',         canAccess: ['lib/domain']),
+    (name: 'domain',       folder: 'lib/domain',       canAccess: []),
+  ]);
+}
 ```
+
+All 15 presets: `namingClassConvention`, `namingFileConvention`, `mustBeAbstract`, `mustBeImmutable`, `noPublicFields`, `noCircularDependencies`, `layeredArchitecture`, `layerCanOnlyDependOn`, `layerCannotDependOn`, `annotationMustHave`, `annotationMustNotHave`, `classSizeLimit`, `noExternalPackage`, `noBannedCalls`, `mvvmGoRouterInjection`.
 
 ---
 
@@ -372,9 +375,8 @@ dartunit/
 │   ├── engine/
 │   │   ├── rule_engine.dart           # Runs all rules, collects violations
 │   │   ├── rule_executor.dart         # Runs a single rule safely
-│   │   ├── analysis_logger.dart       # Persists run history to disk
-│   │   └── custom_rule_loader.dart
-│   ├── presets/                       # Preset rule factories (14 presets)
+│   │   └── analysis_logger.dart       # Persists run history to disk
+│   ├── presets/                       # 15 preset rule factories
 │   └── reporter/
 │       ├── console_reporter.dart      # Coloured table output
 │       └── html_reporter.dart         # HTML report at .dartunit/report.html
@@ -396,7 +398,7 @@ test_arch/*_arch_test.dart
         │
         ├─ expect(subject, matcher)
         │       └─ ArchMatcher → RuleExecutor → List<Violation>
-        │               └─ DARTUNIT_RESULT:{…}  (stderr, JSON)
+        │               └─ dartunit_<pid>.ndjson  (temp file, one JSON line per rule)
         │
         ▼
   AnalyzeCommand (parent process)

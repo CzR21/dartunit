@@ -1,7 +1,8 @@
 name: dartunit
 description: An architecture testing tool for Dart and Flutter projects, inspired by ArchUnit.
-version: 0.1.0
-repository: https://github.com/your-org/dartunit
+version: 1.0.0
+repository: https://github.com/CzR21/dartunit/tree/main/package
+issue_tracker: https://github.com/CzR21/dartunit/issues
 
 environment:
   sdk: ^3.0.0

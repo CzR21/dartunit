@@ -4,7 +4,7 @@ import '../core/entities/violation.dart';
 class ReportHelper {
 
   /// Serializes an [ArchitectureRule] and its [violations] into a JSON-compatible
-  /// map for the `DARTUNIT_RESULT:` protocol consumed by `dartunit analyze`.
+  /// map written as one NDJSON line to the temp file consumed by `dartunit analyze`.
   static Map<String, dynamic> serializeViolations(
       ArchitectureRule rule,
       List<Violation> violations,
