@@ -1,4 +1,4 @@
----
+﻿---
 title: dependsOn / doesNotDependOn
 description: Check whether classes import from a specific folder. The most common matchers for enforcing layer boundaries in your architecture.
 sidebar:
@@ -83,9 +83,9 @@ The most fundamental architecture rule: the domain layer defines contracts; the 
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain must not import from data layer', (arch) {
+  testArch('Domain must not import from data layer', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain'),
+      selector.classes(inFolder: 'lib/domain'),
       doesNotDependOn('lib/data'),
     );
   });
@@ -111,16 +111,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Layer boundaries', () {
-    testArch('Domain must not import from data', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Domain must not import from data', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
 
-    testArch('Domain must not import from presentation', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/presentation'));
+    testArch('Domain must not import from presentation', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/presentation'));
     });
 
-    testArch('Data must not import from presentation', (arch) {
-      expect(arch.classes(folder: 'lib/data'), doesNotDependOn('lib/presentation'));
+    testArch('Data must not import from presentation', (selector) {
+      expect(selector.classes(inFolder: 'lib/data'), doesNotDependOn('lib/presentation'));
     });
   }, severity: RuleSeverity.critical);
 }
@@ -136,9 +136,9 @@ This rule enforces that BLoC classes actually depend on the repository layer —
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC classes must use the repository layer', (arch) {
+  testArch('BLoC classes must use the repository layer', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$'),
       dependsOn('lib/domain/repositories'),
     );
   });

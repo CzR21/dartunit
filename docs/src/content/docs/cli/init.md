@@ -1,4 +1,4 @@
----
+﻿---
 title: DartUnit init
 description: Initialize the test_arch/ folder in your project with optional architecture templates.
 sidebar:
@@ -41,8 +41,8 @@ The `example_test_arch.dart` file is a working rule that you can use as a starti
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Example: UI must not depend on data', (arch) {
-    final ui = arch.classes(folder: 'lib/ui');
+  testArch('Example: UI must not depend on data', (selector) {
+    final ui = selector.classes(inFolder: 'lib/ui');
     expect(ui, doesNotDependOn('lib/data'));
   });
 }

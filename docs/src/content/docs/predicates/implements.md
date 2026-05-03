@@ -1,4 +1,4 @@
----
+﻿---
 title: implementsInterface
 description: Enforce that classes implement a specific interface. Used to ensure that implementation classes properly fulfill their declared contracts.
 sidebar:
@@ -72,9 +72,9 @@ Ensure that all classes in the data repository folder implement a repository int
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Data repositories must implement a Repository interface', (arch) {
+  testArch('Data repositories must implement a Repository interface', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+      selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
       implementsInterface('Repository'),
     );
   });
@@ -93,9 +93,9 @@ If your team defines a shared `UseCase` interface, enforce that every use case c
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Use case classes must implement the UseCase interface', (arch) {
+  testArch('Use case classes must implement the UseCase interface', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/usecases'),
+      selector.classes(inFolder: 'lib/domain/usecases'),
       implementsInterface('UseCase'),
     );
   });
@@ -113,23 +113,23 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Data repository contracts', () {
-    testArch('Data repos must implement domain repository', (arch) {
+    testArch('Data repos must implement domain repository', (selector) {
       expect(
-        arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+        selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
         implementsInterface('Repository'),
       );
     });
 
-    testArch('Data repos must depend on domain', (arch) {
+    testArch('Data repos must depend on domain', (selector) {
       expect(
-        arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+        selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
         dependsOn('lib/domain'),
       );
     });
 
-    testArch('Data repos must be concrete classes', (arch) {
+    testArch('Data repos must be concrete classes', (selector) {
       expect(
-        arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+        selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
         isConcreteClass(),
       );
     });

@@ -1,4 +1,4 @@
-import 'package:path/path.dart' as p;
+﻿import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
@@ -64,9 +64,9 @@ void namingClassConvention({
 
         final description = _buildDescription(folder, prefix, suffix, namePattern, p.basename(folder));
 
-        testArch(description, (arch) {
+        testArch(description, (selector) {
           expect(
-            arch.classes(folder: folder, exceptions: exceptions),
+            selector.classes(inFolder: folder, exceptions: exceptions),
             nameMatchesPattern(effectivePattern!),
           );
         });

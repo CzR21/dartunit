@@ -1,4 +1,4 @@
-const String initAlreadyExists = 'Dartunit is already initialised in this project.\n'
+﻿const String initAlreadyExists = 'Dartunit is already initialised in this project.\n'
     '  Run  dartunit analyze  to check your architecture.';
 
 const String initSuccess = 'Project initialised successfully!';
@@ -29,8 +29,8 @@ import 'package:dartunit/dartunit.dart';
 import 'package:test/test.dart';
 
 void main() => testArch('UI layer must not access the data layer directly',
-    (arch) {
-  final ui = arch.classes(folder: 'lib/ui');
+    (selector) {
+  final ui = selector.classes(inFolder: 'lib/ui');
   expect(ui, doesNotDependOn('lib/data'));
 });
 ''';

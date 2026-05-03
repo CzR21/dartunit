@@ -1,4 +1,4 @@
----
+﻿---
 title: Creating Custom Rules
 description: How to write architecture rule files using testArch and testArchGroup.
 sidebar:
@@ -19,9 +19,9 @@ A rule file must:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must have all final fields', (arch) {
+  testArch('Domain entities must have all final fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/entities'),
+      selector.classes(inFolder: 'lib/domain/entities'),
       hasAllFinalFields(),
     );
   });
@@ -54,11 +54,11 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain isolation', () {
-    testArch('Domain must not depend on the data layer', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Domain must not depend on the data layer', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
-    testArch('Domain must not depend on Flutter', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+    testArch('Domain must not depend on Flutter', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
     });
   }, severity: RuleSeverity.error);
 }
@@ -70,10 +70,10 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Use cases must be abstract and declare a call() method', (arch) {
-    final useCases = arch.classes(
-      folder: 'lib/domain/usecases',
-      namePattern: r'.*UseCase$',
+  testArch('Use cases must be abstract and declare a call() method', (selector) {
+    final useCases = selector.classes(
+      inFolder: 'lib/domain/usecases',
+      matchingPattern: r'.*UseCase$',
     );
     expect(useCases, isAbstractClass());
     expect(useCases, hasMethod('call'));
@@ -88,14 +88,14 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Naming conventions', () {
-    testArch('Repository implementations must end with RepositoryImpl', (arch) {
+    testArch('Repository implementations must end with RepositoryImpl', (selector) {
       expect(
-        arch.classes(folder: 'lib/data/repositories'),
+        selector.classes(inFolder: 'lib/data/repositories'),
         nameEndsWith('RepositoryImpl'),
       );
     });
-    testArch('Service classes must end with Service', (arch) {
-      expect(arch.classes(folder: 'lib/services'), nameEndsWith('Service'));
+    testArch('Service classes must end with Service', (selector) {
+      expect(selector.classes(inFolder: 'lib/services'), nameEndsWith('Service'));
     });
   }, severity: RuleSeverity.warning);
 }
@@ -108,20 +108,20 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Repository contracts', () {
-    testArch('Domain repository interfaces must be abstract', (arch) {
+    testArch('Domain repository interfaces must be abstract', (selector) {
       expect(
-        arch.classes(
-          folder: 'lib/domain/repositories',
-          namePattern: r'^(?!.*Impl).*Repository$',
+        selector.classes(
+          inFolder: 'lib/domain/repositories',
+          matchingPattern: r'^(?!.*Impl).*Repository$',
         ),
         isAbstractClass(),
       );
     });
-    testArch('Repository implementations must implement their interface', (arch) {
+    testArch('Repository implementations must implement their interface', (selector) {
       expect(
-        arch.classes(
-          folder: 'lib/data/repositories',
-          namePattern: r'.*RepositoryImpl$',
+        selector.classes(
+          inFolder: 'lib/data/repositories',
+          matchingPattern: r'.*RepositoryImpl$',
         ),
         implementsInterface('Repository'),
       );
@@ -137,17 +137,17 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Class size limits', () {
-    testArch('Classes must not exceed 25 methods', (arch) {
+    testArch('Classes must not exceed 25 methods', (selector) {
       expect(
-        arch.classes(
-          folder: 'lib',
+        selector.classes(
+          inFolder: 'lib',
           exceptions: ['lib/generated'],
         ),
         hasMaxMethods(25),
       );
     });
-    testArch('Classes must not exceed 15 fields', (arch) {
-      expect(arch.classes(folder: 'lib'), hasMaxFields(15));
+    testArch('Classes must not exceed 15 fields', (selector) {
+      expect(selector.classes(inFolder: 'lib'), hasMaxFields(15));
     });
   }, severity: RuleSeverity.warning);
 }
@@ -159,8 +159,8 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No print() or debugPrint() in production code', (arch) {
-    final files = arch.files(exceptions: ['test']);
+  testArch('No print() or debugPrint() in production code', (selector) {
+    final files = selector.files(exceptions: ['test']);
     expect(files, hasNoContent(r'print\s*\('));
     expect(files, hasNoContent(r'debugPrint\s*\('));
   }, severity: RuleSeverity.warning);
@@ -180,21 +180,21 @@ void main() {
   noPublicFields(folders: ['lib/domain']);
 
   // Mix with custom rules
-  testArch('Use cases must declare a call() method', (arch) {
-    expect(arch.classes(folder: 'lib/domain/usecases'), hasMethod('call'));
+  testArch('Use cases must declare a call() method', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain/usecases'), hasMethod('call'));
   });
 }
 ```
 
 ## Exceptions
 
-Pass `exceptions` to `arch.classes()` or `arch.files()` to exempt specific paths:
+Pass `exceptions` to `selector.classes()` or `selector.files()` to exempt specific paths:
 
 ```dart
-testArch('Domain entities must be immutable', (arch) {
+testArch('Domain entities must be immutable', (selector) {
   expect(
-    arch.classes(
-      folder: 'lib/domain/entities',
+    selector.classes(
+      inFolder: 'lib/domain/entities',
       exceptions: ['lib/domain/entities/legacy_mutable_entity.dart'],
     ),
     hasAllFinalFields(),

@@ -1,4 +1,4 @@
----
+﻿---
 title: DartUnit analyze
 description: Run all architecture rules and generate a violation report.
 sidebar:
@@ -42,7 +42,7 @@ All discovered files are passed to a single `dart test` invocation. Each `testAr
 2. Run: dart test <file1> <file2> ... --reporter json
    Each testArch registers a test that:
    └── Analyzes the project (or reuses group context)
-   └── Builds a selector via arch.classes() / arch.files()
+   └── Builds a selector via selector.classes() / selector.files()
    └── Evaluates the matcher (predicate) on each selected element
    └── Emits DARTUNIT_RESULT: to stderr for dartunit analyze
    └── Prints ✓/✗ result to stdout for direct dart test runs

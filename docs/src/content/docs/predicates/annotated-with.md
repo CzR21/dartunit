@@ -1,4 +1,4 @@
----
+﻿---
 title: hasAnnotation / doesNotHaveAnnotation
 description: Check whether classes carry a specific annotation. Used to enforce DI registration, serialization setup, or ban testing annotations from production code.
 sidebar:
@@ -89,9 +89,9 @@ All service classes must be annotated with `@injectable` so the DI container kno
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Service classes must be annotated with @injectable', (arch) {
+  testArch('Service classes must be annotated with @injectable', (selector) {
     expect(
-      arch.classes(folder: 'lib/services'),
+      selector.classes(inFolder: 'lib/services'),
       hasAnnotation('injectable'),
     );
   });
@@ -109,16 +109,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain layer must be free from persistence annotations', () {
-    testArch('Domain classes must not have @JsonSerializable', (arch) {
+    testArch('Domain classes must not have @JsonSerializable', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain'),
+        selector.classes(inFolder: 'lib/domain'),
         doesNotHaveAnnotation('JsonSerializable'),
       );
     });
 
-    testArch('Domain classes must not have @HiveType', (arch) {
+    testArch('Domain classes must not have @HiveType', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain'),
+        selector.classes(inFolder: 'lib/domain'),
         doesNotHaveAnnotation('HiveType'),
       );
     });
@@ -137,16 +137,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('No testing infrastructure in production code', () {
-    testArch('Production classes must not have @visibleForTesting', (arch) {
+    testArch('Production classes must not have @visibleForTesting', (selector) {
       expect(
-        arch.classes(folder: 'lib'),
+        selector.classes(inFolder: 'lib'),
         doesNotHaveAnnotation('visibleForTesting'),
       );
     });
 
-    testArch('Production classes must not have @deprecated', (arch) {
+    testArch('Production classes must not have @deprecated', (selector) {
       expect(
-        arch.classes(folder: 'lib'),
+        selector.classes(inFolder: 'lib'),
         doesNotHaveAnnotation('deprecated'),
       );
     });

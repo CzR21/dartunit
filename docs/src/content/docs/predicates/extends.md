@@ -1,4 +1,4 @@
----
+﻿---
 title: extendsClass
 description: Enforce that classes extend a specific parent class. Commonly used to ensure BLoC classes extend Bloc, events extend a base event, and states extend Equatable.
 sidebar:
@@ -73,9 +73,9 @@ Ensure that classes named `*Bloc` actually extend the `Bloc` base class from the
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Bloc classes must extend Bloc', (arch) {
+  testArch('Bloc classes must extend Bloc', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$'),
       extendsClass('Bloc'),
     );
   });
@@ -93,23 +93,23 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('CartBloc hierarchy', () {
-    testArch('Cart events must extend CartEvent', (arch) {
+    testArch('Cart events must extend CartEvent', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc/cart', namePattern: r'.*Event$'),
+        selector.classes(inFolder: 'lib/bloc/cart', matchingPattern: r'.*Event$'),
         extendsClass('CartEvent'),
       );
     });
 
-    testArch('Cart states must extend CartState', (arch) {
+    testArch('Cart states must extend CartState', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc/cart', namePattern: r'.*State$'),
+        selector.classes(inFolder: 'lib/bloc/cart', matchingPattern: r'.*State$'),
         extendsClass('CartState'),
       );
     });
 
-    testArch('CartBloc must extend Bloc', (arch) {
+    testArch('CartBloc must extend Bloc', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc/cart', namePattern: r'^CartBloc$'),
+        selector.classes(inFolder: 'lib/bloc/cart', matchingPattern: r'^CartBloc$'),
         extendsClass('Bloc'),
       );
     });
@@ -127,9 +127,9 @@ If your team uses `Equatable` for value equality in state classes, make it a ver
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC state classes must extend Equatable', (arch) {
+  testArch('BLoC state classes must extend Equatable', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*State$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*State$'),
       extendsClass('Equatable'),
     );
   });

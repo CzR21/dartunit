@@ -1,4 +1,4 @@
----
+﻿---
 title: Predicates Reference
 description: Complete reference for all 31 built-in predicates. Each predicate defines a positive condition — use NotPredicate to invert.
 sidebar:
@@ -13,9 +13,9 @@ In rule files, predicates are used indirectly through arch matchers in `testArch
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain must not depend on data', (arch) {
+  testArch('Domain must not depend on data', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain'),
+      selector.classes(inFolder: 'lib/domain'),
       doesNotDependOn('lib/data'),  // wraps NotPredicate(DependOnFolderPredicate('lib/data'))
     );
   });

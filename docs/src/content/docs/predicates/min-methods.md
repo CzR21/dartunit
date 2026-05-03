@@ -1,4 +1,4 @@
----
+﻿---
 title: hasMinMethods
 description: Enforce that classes declare at least N methods. Useful for catching empty shell classes or ensuring implementations fulfill their expected interface.
 sidebar:
@@ -71,9 +71,9 @@ A use case class with no methods is a stub that was never implemented:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Use case classes must have at least 1 method', (arch) {
+  testArch('Use case classes must have at least 1 method', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/usecases'),
+      selector.classes(inFolder: 'lib/domain/usecases'),
       hasMinMethods(1),
     );
   });
@@ -90,9 +90,9 @@ A repository implementation covering the minimum CRUD operations (create, read, 
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Repository implementations must have at least 3 methods', (arch) {
+  testArch('Repository implementations must have at least 3 methods', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+      selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
       hasMinMethods(3),
     );
   });
@@ -109,8 +109,8 @@ Combine `hasMinMethods` and `hasMaxMethods` in the same test using multiple `exp
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Service classes must have between 1 and 15 methods', (arch) {
-    final services = arch.classes(folder: 'lib/services');
+  testArch('Service classes must have between 1 and 15 methods', (selector) {
+    final services = selector.classes(inFolder: 'lib/services');
     expect(services, hasMinMethods(1));   // must have a purpose
     expect(services, hasMaxMethods(15));  // must not be a God Class
   });

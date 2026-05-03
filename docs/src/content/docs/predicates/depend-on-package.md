@@ -1,4 +1,4 @@
----
+﻿---
 title: dependsOnPackage / doesNotDependOnPackage
 description: Check whether classes import from a specific external package. Commonly used to keep the domain layer free from Flutter or HTTP packages.
 sidebar:
@@ -88,16 +88,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain layer must stay Flutter-agnostic', () {
-    testArch('Domain must not import Flutter', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+    testArch('Domain must not import Flutter', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
     });
 
-    testArch('Domain must not use Dio', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('dio'));
+    testArch('Domain must not use Dio', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('dio'));
     });
 
-    testArch('Domain must not use Hive', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('hive'));
+    testArch('Domain must not use Hive', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('hive'));
     });
   }, severity: RuleSeverity.critical);
 }
@@ -113,9 +113,9 @@ Ensure that your presentation layer actually uses the state management package y
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Presentation pages must use flutter_bloc', (arch) {
+  testArch('Presentation pages must use flutter_bloc', (selector) {
     expect(
-      arch.classes(folder: 'lib/presentation/pages'),
+      selector.classes(inFolder: 'lib/presentation/pages'),
       dependsOnPackage('flutter_bloc'),
     );
   });
@@ -133,8 +133,8 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Package dependency rules', () {
-    testArch('Domain must not use any infrastructure packages', (arch) {
-      final domain = arch.classes(folder: 'lib/domain');
+    testArch('Domain must not use any infrastructure packages', (selector) {
+      final domain = selector.classes(inFolder: 'lib/domain');
       expect(domain, doesNotDependOnPackage('flutter'));
       expect(domain, doesNotDependOnPackage('dio'));
       expect(domain, doesNotDependOnPackage('hive'));
@@ -142,9 +142,9 @@ void main() {
       expect(domain, doesNotDependOnPackage('get_it'));
     });
 
-    testArch('Data layer must not use Flutter UI packages', (arch) {
+    testArch('Data layer must not use Flutter UI packages', (selector) {
       expect(
-        arch.classes(folder: 'lib/data'),
+        selector.classes(inFolder: 'lib/data'),
         doesNotDependOnPackage('flutter'),
       );
     });

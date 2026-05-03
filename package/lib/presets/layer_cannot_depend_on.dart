@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -23,9 +23,9 @@ void layerCannotDependOn({
     '"$from" must not depend on: ${to.join(', ')}',
     () {
       for (final target in to) {
-        testArch('"$from" must not depend on "$target"', (arch) {
+        testArch('"$from" must not depend on "$target"', (selector) {
           expect(
-            arch.classes(folder: from, exceptions: exceptions),
+            selector.classes(inFolder: from, exceptions: exceptions),
             doesNotDependOn(target),
           );
         });

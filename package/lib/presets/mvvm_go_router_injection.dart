@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -31,10 +31,10 @@ void mvvmGoRouterInjection({
   testArchGroup(
     'MVVM + GoRouter — dependency injection rules',
     () {
-      testArch('ViewModels must extend ChangeNotifier', (arch) {
-        final viewModels = arch.classes(
-          folder: viewModelsFolder,
-          suffix: 'ViewModel',
+      testArch('ViewModels must extend ChangeNotifier', (selector) {
+        final viewModels = selector.classes(
+          inFolder: viewModelsFolder,
+          hasSuffix: 'ViewModel',
           exceptions: exceptions,
         );
 
@@ -43,10 +43,10 @@ void mvvmGoRouterInjection({
 
       testArch(
         'ViewModels must not expose injected dependencies publicly — use private final fields',
-        (arch) {
-          final viewModels = arch.classes(
-            folder: viewModelsFolder,
-            suffix: 'ViewModel',
+        (selector) {
+          final viewModels = selector.classes(
+            inFolder: viewModelsFolder,
+            hasSuffix: 'ViewModel',
             exceptions: exceptions,
           );
 
@@ -56,10 +56,10 @@ void mvvmGoRouterInjection({
 
       testArch(
         'ViewModels must not depend on go_router — navigation is the router\'s concern',
-        (arch) {
-          final viewModels = arch.classes(
-            folder: viewModelsFolder,
-            suffix: 'ViewModel',
+        (selector) {
+          final viewModels = selector.classes(
+            inFolder: viewModelsFolder,
+            hasSuffix: 'ViewModel',
             exceptions: exceptions,
           );
 
@@ -70,8 +70,8 @@ void mvvmGoRouterInjection({
       testArch(
         'Views must not inject repositories or services directly via context.read — '
         'only ViewModels may be injected into views',
-        (arch) {
-          final views = arch.files(folder: viewsFolder, exceptions: exceptions);
+        (selector) {
+          final views = selector.files(inFolder: viewsFolder, exceptions: exceptions);
 
           expect(views, hasNoContent(r'context\.read<[^>]*(?:Repository|Service)[^>]*>',),
           );
@@ -80,8 +80,8 @@ void mvvmGoRouterInjection({
 
       testArch(
         'Router must instantiate ViewModels',
-        (arch) {
-          final router = arch.files(folder: routerFolder);
+        (selector) {
+          final router = selector.files(inFolder: routerFolder);
 
           expect(router, hasContent(r'\b\w+ViewModel\(', description: 'router must instantiate ViewModels',),);
         },
@@ -89,8 +89,8 @@ void mvvmGoRouterInjection({
 
       testArch(
         'Router must inject dependencies into ViewModels via context.read()',
-        (arch) {
-          final router = arch.files(folder: routerFolder);
+        (selector) {
+          final router = selector.files(inFolder: routerFolder);
 
           expect(router, hasContent(r':\s*context\.read\(', description: 'router must pass dependencies as named args via context.read()',),);
         },

@@ -1,4 +1,4 @@
----
+﻿---
 title: Combining matchers — AND
 description: How to express "must satisfy condition A AND condition B" in DartUnit rules. Multiple expect() calls inside one testArch are automatically combined with AND.
 sidebar:
@@ -28,8 +28,8 @@ Expressing multiple conditions in a single `testArch` keeps related rules togeth
 ## Syntax
 
 ```dart
-testArch('Description of the combined rule', (arch) {
-  final subject = arch.classes(folder: 'lib/some/folder');
+testArch('Description of the combined rule', (selector) {
+  final subject = selector.classes(inFolder: 'lib/some/folder');
 
   expect(subject, conditionA());
   expect(subject, conditionB());
@@ -52,8 +52,8 @@ Services must be properly named, annotated for DI, encapsulated, and isolated fr
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Service classes must satisfy all structural rules', (arch) {
-    final services = arch.classes(folder: 'lib/services');
+  testArch('Service classes must satisfy all structural rules', (selector) {
+    final services = selector.classes(inFolder: 'lib/services');
 
     expect(services, nameEndsWith('Service'));
     expect(services, hasAnnotation('injectable'));
@@ -73,10 +73,10 @@ Repository implementations must be concrete, implement their interface, depend o
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Repository implementations must fulfill all contracts', (arch) {
-    final repos = arch.classes(
-      folder: 'lib/data/repositories',
-      namePattern: r'.*Impl$',
+  testArch('Repository implementations must fulfill all contracts', (selector) {
+    final repos = selector.classes(
+      inFolder: 'lib/data/repositories',
+      matchingPattern: r'.*Impl$',
     );
 
     expect(repos, isConcreteClass());
@@ -98,8 +98,8 @@ Domain entities must be immutable, small, and isolated:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must be immutable and well-structured', (arch) {
-    final entities = arch.classes(folder: 'lib/domain/entities');
+  testArch('Domain entities must be immutable and well-structured', (selector) {
+    final entities = selector.classes(inFolder: 'lib/domain/entities');
 
     expect(entities, hasAllFinalFields());    // must be immutable
     expect(entities, hasMinFields(1));        // must carry state
@@ -122,20 +122,20 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Clean Architecture rules', () {
-    testArch('Domain entities are immutable and isolated', (arch) {
-      final entities = arch.classes(folder: 'lib/domain/entities');
+    testArch('Domain entities are immutable and isolated', (selector) {
+      final entities = selector.classes(inFolder: 'lib/domain/entities');
       expect(entities, hasAllFinalFields());
       expect(entities, doesNotDependOn('lib/data'));
     });
 
-    testArch('Repository implementations are concrete and correct', (arch) {
-      final repos = arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$');
+    testArch('Repository implementations are concrete and correct', (selector) {
+      final repos = selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$');
       expect(repos, isConcreteClass());
       expect(repos, dependsOn('lib/domain'));
     });
 
-    testArch('BLoC classes are encapsulated and focused', (arch) {
-      final blocs = arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$');
+    testArch('BLoC classes are encapsulated and focused', (selector) {
+      final blocs = selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$');
       expect(blocs, hasNoPublicFields());
       expect(blocs, hasMaxMethods(10));
     });

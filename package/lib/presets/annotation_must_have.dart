@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -24,9 +24,9 @@ void annotationMustHave({
     () {
       for (final folder in folders) {
         testArch('Classes in "$folder" must be annotated with @$annotation',
-            (arch) {
+            (selector) {
           expect(
-            arch.classes(folder: folder, exceptions: exceptions),
+            selector.classes(inFolder: folder, exceptions: exceptions),
             hasAnnotation(annotation),
           );
         });

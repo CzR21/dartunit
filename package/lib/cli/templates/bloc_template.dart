@@ -1,4 +1,4 @@
-const List<({String fileName, String content})> blocRuleFiles = [
+﻿const List<({String fileName, String content})> blocRuleFiles = [
   (fileName: 'bloc_arch_test.dart', content: _blocArchTest),
 ];
 
@@ -16,8 +16,8 @@ void main() {
   final String data = 'lib/data';
 
   testArchGroup('Presentation layer \u2014 must not access data directly', () {
-      testArch('Presentation widgets must not import from the data layer', (arch) {
-        final presentationSelector = arch.classes(folder: presentation);
+      testArch('Presentation widgets must not import from the data layer', (selector) {
+        final presentationSelector = selector.classes(inFolder: presentation);
 
         expect(presentationSelector, doesNotDependOn(data));
       });
@@ -25,14 +25,14 @@ void main() {
   );
 
   testArchGroup('Data layer \u2014 must not reach back into presentation', () {
-      testArch('Data layer must not depend on the presentation layer', (arch) {
-        final dataSelector = arch.classes(folder: data);
+      testArch('Data layer must not depend on the presentation layer', (selector) {
+        final dataSelector = selector.classes(inFolder: data);
 
         expect(dataSelector, doesNotDependOn(presentation));
       });
 
-      testArch('Data layer must not depend on the BLoC layer', (arch) {
-        final dataSelector = arch.classes(folder: data);
+      testArch('Data layer must not depend on the BLoC layer', (selector) {
+        final dataSelector = selector.classes(inFolder: data);
 
         expect(dataSelector, doesNotDependOn(blocs));
       });
@@ -40,20 +40,20 @@ void main() {
   );
 
   testArchGroup('Repository pattern \u2014 interface vs implementation', () {
-      testArch('Repository interfaces must be abstract', (arch) {
-        final repositorySelector = arch.classes(namePattern: r'.*Repository\$');
+      testArch('Repository interfaces must be abstract', (selector) {
+        final repositorySelector = selector.classes(matchingPattern: r'.*Repository\$');
 
         expect(repositorySelector, isAbstractClass());
       });
 
-      testArch('Repository implementations must not be abstract', (arch) {
-        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+      testArch('Repository implementations must not be abstract', (selector) {
+        final repositoryImplSelector = selector.classes(matchingPattern: r'.*RepositoryImpl\$');
 
         expect(repositoryImplSelector, isConcreteClass());
       });
 
-      testArch('Repository implementations must not import from presentation', (arch) {
-        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+      testArch('Repository implementations must not import from presentation', (selector) {
+        final repositoryImplSelector = selector.classes(matchingPattern: r'.*RepositoryImpl\$');
 
         expect(repositoryImplSelector, doesNotDependOn(presentation));
       });
@@ -61,14 +61,14 @@ void main() {
   );
 
   testArchGroup('State and Event immutability', () {
-      testArch('BLoC State classes must have all-final fields', (arch) {
-        final stateSelector = arch.classes(namePattern: r'.*State\$');
+      testArch('BLoC State classes must have all-final fields', (selector) {
+        final stateSelector = selector.classes(matchingPattern: r'.*State\$');
 
         expect(stateSelector, hasAllFinalFields());
       });
 
-      testArch('BLoC Event classes must have all-final fields', (arch) {
-        final eventSelector = arch.classes(namePattern: r'.*Event\$');
+      testArch('BLoC Event classes must have all-final fields', (selector) {
+        final eventSelector = selector.classes(matchingPattern: r'.*Event\$');
 
         expect(eventSelector, hasAllFinalFields());
       });
@@ -76,8 +76,8 @@ void main() {
   );
 
   testArchGroup('Data models \u2014 immutable DTOs', () {
-      testArch('Data model classes must have all-final fields', (arch) {
-        final modelSelector = arch.classes(folder: data, namePattern: r'.*Model\$');
+      testArch('Data model classes must have all-final fields', (selector) {
+        final modelSelector = selector.classes(inFolder: data, matchingPattern: r'.*Model\$');
 
         expect(modelSelector, hasAllFinalFields());
       });
@@ -86,14 +86,14 @@ void main() {
   );
 
   testArchGroup('Coupling limits \u2014 prevent god-object BLoCs', () {
-      testArch('BLoC classes must import at most 15 dependencies', (arch) {
-        final blocSelector = arch.classes(namePattern: r'.*Bloc\$');
+      testArch('BLoC classes must import at most 15 dependencies', (selector) {
+        final blocSelector = selector.classes(matchingPattern: r'.*Bloc\$');
 
         expect(blocSelector, hasMaxImports(15));
       });
 
-      testArch('Cubit classes must import at most 15 dependencies', (arch) {
-        final cubitSelector = arch.classes(namePattern: r'.*Cubit\$');
+      testArch('Cubit classes must import at most 15 dependencies', (selector) {
+        final cubitSelector = selector.classes(matchingPattern: r'.*Cubit\$');
 
         expect(cubitSelector, hasMaxImports(15));
       });
@@ -102,14 +102,14 @@ void main() {
   );
 
   testArchGroup('BLoC isolation \u2014 no bloc-to-bloc dependencies', () {
-      testArch('BLoC classes must not depend on other BLoC classes', (arch) {
-        final blocSelector = arch.classes(namePattern: r'.*Bloc\$');
+      testArch('BLoC classes must not depend on other BLoC classes', (selector) {
+        final blocSelector = selector.classes(matchingPattern: r'.*Bloc\$');
 
         expect(blocSelector, doesNotDependOn(blocs));
       });
 
-      testArch('Cubit classes must not depend on other BLoC classes', (arch) {
-        final cubitSelector = arch.classes(namePattern: r'.*Cubit\$');
+      testArch('Cubit classes must not depend on other BLoC classes', (selector) {
+        final cubitSelector = selector.classes(matchingPattern: r'.*Cubit\$');
 
         expect(cubitSelector, doesNotDependOn(blocs));
       });

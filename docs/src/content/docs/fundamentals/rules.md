@@ -14,7 +14,7 @@ Registers a single architecture test.
 ```dart
 void testArch(
   String description,
-  FutureOr<void> Function(ArchTester arch) body, {
+  FutureOr<void> Function(ArchTester selector) body, {
   String projectRoot = '.',
   RuleSeverity? severity,
 })
@@ -26,8 +26,8 @@ The `body` receives an `ArchTester` used to build selectors, which are then pass
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain must not depend on the data layer', (arch) {
-    expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+  testArch('Domain must not depend on the data layer', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
   });
 }
 ```
@@ -35,8 +35,8 @@ void main() {
 A single `testArch` can have multiple `expect` calls, each calls a different matcher on the same or different subjects:
 
 ```dart
-testArch('Domain must not use external packages', (arch) {
-  final domain = arch.classes(folder: 'lib/domain');
+testArch('Domain must not use external packages', (selector) {
+  final domain = selector.classes(inFolder: 'lib/domain');
   expect(domain, doesNotDependOnPackage('flutter'));
   expect(domain, doesNotDependOnPackage('dio'));
   expect(domain, doesNotDependOnPackage('http'));
@@ -59,14 +59,14 @@ void testArchGroup(
 ```dart
 void main() {
   testArchGroup('Domain layer isolation', () {
-    testArch('Must not depend on data', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Must not depend on data', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
-    testArch('Must not depend on presentation', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/presentation'));
+    testArch('Must not depend on presentation', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/presentation'));
     });
-    testArch('Must be Flutter-agnostic', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+    testArch('Must be Flutter-agnostic', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
     });
   }, severity: RuleSeverity.error);
 }
@@ -81,9 +81,9 @@ Severity can be set at two levels:
 
 ```dart
 testArchGroup('Domain rules', () {
-  testArch('Must not depend on data', (arch) { ... }); // inherits error
-  testArch('Should have at most 3 methods per use case', (arch) {
-    expect(arch.classes(namePattern: r'.*UseCase$'), hasMaxMethods(3));
+  testArch('Must not depend on data', (selector) { ... }); // inherits error
+  testArch('Should have at most 3 methods per use case', (selector) {
+    expect(selector.classes(matchingPattern: r'.*UseCase$'), hasMaxMethods(3));
   }, severity: RuleSeverity.warning); // ignored — group severity wins (error)
 }, severity: RuleSeverity.error);
 ```
@@ -103,61 +103,61 @@ Only `error` and `critical` cause `dartunit analyze` to return exit code 1, whic
 
 The `ArchTester` is passed to every `testArch` body. It provides factory methods to build `ArchSubject` selectors.
 
-### `arch.classes()`
+### `selector.classes()`
 
 Selects classes from the analyzed project.
 
 ```dart
-arch.classes()                                        // all classes in lib/
-arch.classes(folder: 'lib/domain')                    // classes in folder
-arch.classes(namePattern: r'.*Repository$')           // classes by name regex
-arch.classes(folder: 'lib/domain', namePattern: r'.*Entity$') // both
-arch.classes(folder: 'lib/domain', exceptions: [
+selector.classes()                                              // all classes in lib/
+selector.classes(inFolder: 'lib/domain')                       // classes in folder
+selector.classes(matchingPattern: r'.*Repository$')            // classes by name regex
+selector.classes(inFolder: 'lib/domain', matchingPattern: r'.*Entity$') // both
+selector.classes(inFolder: 'lib/domain', exceptions: [
   'lib/domain/entities/legacy.dart',
-])                                                    // with file exceptions
+])                                                             // with file exceptions
 ```
 
-Use `suffix` or `prefix` as readable shortcuts for the most common name-filter patterns:
+Use `hasSuffix` or `hasPrefix` as readable shortcuts for the most common name-filter patterns:
 
 ```dart
-arch.classes(suffix: 'UseCase')               // .*UseCase$
-arch.classes(prefix: 'Abstract')              // ^Abstract.*
-arch.classes(suffix: 'Repository')            // .*Repository$
-arch.classes(prefix: 'I', suffix: 'Service')  // ^I.*Service$
-arch.classes(folder: 'lib/domain', suffix: 'Entity') // folder + suffix
+selector.classes(hasSuffix: 'UseCase')                        // .*UseCase$
+selector.classes(hasPrefix: 'Abstract')                       // ^Abstract.*
+selector.classes(hasSuffix: 'Repository')                     // .*Repository$
+selector.classes(hasPrefix: 'I', hasSuffix: 'Service')        // ^I.*Service$
+selector.classes(inFolder: 'lib/domain', hasSuffix: 'Entity') // folder + suffix
 ```
 
-`suffix`, `prefix`, and `namePattern` are mutually exclusive — use `namePattern` for full regex control when a simple suffix or prefix is not enough.
+`hasSuffix`, `hasPrefix`, and `matchingPattern` are mutually exclusive — use `matchingPattern` for full regex control when a simple suffix or prefix is not enough.
 
-### `arch.files()`
+### `selector.files()`
 
 Selects files (for content-based rules).
 
 ```dart
-arch.files()                              // all files in lib/
-arch.files(folder: 'lib/src')             // files in a specific folder
-arch.files(exceptions: ['lib/gen'])       // exclude generated code
-arch.files(suffix: '_datasource.dart')   // files ending with _datasource.dart
-arch.files(prefix: 'base_')              // files starting with base_
+selector.files()                               // all files in lib/
+selector.files(inFolder: 'lib/src')            // files in a specific folder
+selector.files(exceptions: ['lib/gen'])        // exclude generated code
+selector.files(hasSuffix: '_datasource.dart') // files ending with _datasource.dart
+selector.files(hasPrefix: 'base_')            // files starting with base_
 ```
 
-### `arch.layer()`
+### `selector.layer()`
 
 Selects all classes in a named layer folder.
 
 ```dart
-arch.layer('domain', folder: 'lib/domain')
+selector.layer('domain', inFolder: 'lib/domain')
 ```
 
 ## Exceptions
 
-Pass `exceptions` to `arch.classes()` or `arch.files()` to exempt specific paths:
+Pass `exceptions` to `selector.classes()` or `selector.files()` to exempt specific paths:
 
 ```dart
-testArch('Domain entities must be immutable', (arch) {
+testArch('Domain entities must be immutable', (selector) {
   expect(
-    arch.classes(
-      folder: 'lib/domain/entities',
+    selector.classes(
+      inFolder: 'lib/domain/entities',
       exceptions: ['lib/domain/entities/legacy_entity.dart'],
     ),
     hasAllFinalFields(),
@@ -172,11 +172,11 @@ testArch('Domain entities must be immutable', (arch) {
 ```dart
 void main() {
   testArchGroup('Dependency rules', () {
-    testArch('Domain must not depend on the data layer', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Domain must not depend on the data layer', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
-    testArch('Presentation must not access data directly', (arch) {
-      expect(arch.classes(folder: 'lib/presentation'), doesNotDependOn('lib/data'));
+    testArch('Presentation must not access data directly', (selector) {
+      expect(selector.classes(inFolder: 'lib/presentation'), doesNotDependOn('lib/data'));
     });
   });
 }
@@ -184,27 +184,27 @@ void main() {
 
 ### Naming convention rule
 
-Use `suffix` or `prefix` in `arch.classes()` to filter by name, and naming matchers to enforce conventions:
+Use `hasSuffix` or `hasPrefix` in `selector.classes()` to filter by name, and naming matchers to enforce conventions:
 
 ```dart
 // Select classes ending with "Bloc" in the blocs folder
-testArch('BLoC classes must not depend on data layer', (arch) {
-  final blocs = arch.classes(folder: 'lib/bloc', suffix: 'Bloc');
+testArch('BLoC classes must not depend on data layer', (selector) {
+  final blocs = selector.classes(inFolder: 'lib/bloc', hasSuffix: 'Bloc');
   expect(blocs, doesNotDependOn('lib/data'));
 });
 
 // Enforce prefix on service interfaces
-testArch('Service interfaces must start with I', (arch) {
-  final services = arch.classes(folder: 'lib/domain/services');
+testArch('Service interfaces must start with I', (selector) {
+  final services = selector.classes(inFolder: 'lib/domain/services');
   expect(services, nameStartsWith('I'));
 });
 
 // Combine prefix and suffix to select a naming convention precisely
-testArch('Abstract repository names must follow IXxxRepository pattern', (arch) {
-  final repos = arch.classes(
-    folder: 'lib/domain/repositories',
-    prefix: 'I',
-    // suffix: 'Repository',  // uncomment to also filter the selection
+testArch('Abstract repository names must follow IXxxRepository pattern', (selector) {
+  final repos = selector.classes(
+    inFolder: 'lib/domain/repositories',
+    hasPrefix: 'I',
+    // hasSuffix: 'Repository',  // uncomment to also filter the selection
   );
   expect(repos, isAbstractClass());
 });
@@ -213,9 +213,9 @@ testArch('Abstract repository names must follow IXxxRepository pattern', (arch) 
 ### Immutability rule
 
 ```dart
-testArch('Domain entities must have all final fields', (arch) {
+testArch('Domain entities must have all final fields', (selector) {
   expect(
-    arch.classes(folder: 'lib/domain/entities', namePattern: r'.*Entity$'),
+    selector.classes(inFolder: 'lib/domain/entities', matchingPattern: r'.*Entity$'),
     hasAllFinalFields(),
   );
 });
@@ -225,14 +225,14 @@ testArch('Domain entities must have all final fields', (arch) {
 
 ```dart
 testArchGroup('Repository contracts', () {
-  testArch('Repository interfaces must be abstract', (arch) {
+  testArch('Repository interfaces must be abstract', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/repositories', namePattern: r'.*Repository$'),
+      selector.classes(inFolder: 'lib/domain/repositories', matchingPattern: r'.*Repository$'),
       isAbstractClass(),
     );
   });
-  testArch('Repository implementations must not be abstract', (arch) {
-    expect(arch.classes(namePattern: r'.*RepositoryImpl$'), isConcreteClass());
+  testArch('Repository implementations must not be abstract', (selector) {
+    expect(selector.classes(matchingPattern: r'.*RepositoryImpl$'), isConcreteClass());
   });
 });
 ```
@@ -240,8 +240,8 @@ testArchGroup('Repository contracts', () {
 ### Ban debug calls rule
 
 ```dart
-testArch('No print() or debugPrint() in production code', (arch) {
-  final files = arch.files(exceptions: ['test']);
+testArch('No print() or debugPrint() in production code', (selector) {
+  final files = selector.files(exceptions: ['test']);
   expect(files, hasNoContent(r'print\s*\('));
   expect(files, hasNoContent(r'debugPrint\s*\('));
 }, severity: RuleSeverity.warning);

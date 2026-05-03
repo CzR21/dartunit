@@ -1,4 +1,4 @@
----
+﻿---
 title: hasMaxMethods
 description: Enforce that classes declare at most N methods. A high method count is a signal of a God Class — a class doing too many things at once.
 sidebar:
@@ -75,9 +75,9 @@ BLoC classes that grow beyond 10 methods are usually handling too many events or
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC classes must have at most 10 methods', (arch) {
+  testArch('BLoC classes must have at most 10 methods', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$'),
       hasMaxMethods(10),
     );
   });
@@ -94,9 +94,9 @@ Apply a generous limit across the entire codebase to catch the most extreme case
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Classes must not exceed 20 methods (God Class detection)', (arch) {
+  testArch('Classes must not exceed 20 methods (God Class detection)', (selector) {
     expect(
-      arch.classes(folder: 'lib'),
+      selector.classes(inFolder: 'lib'),
       hasMaxMethods(20),
     );
   });
@@ -114,16 +114,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Simple types must stay small', () {
-    testArch('Use cases must have at most 3 methods', (arch) {
+    testArch('Use cases must have at most 3 methods', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/usecases'),
+        selector.classes(inFolder: 'lib/domain/usecases'),
         hasMaxMethods(3),
       );
     });
 
-    testArch('Value objects must have at most 5 methods', (arch) {
+    testArch('Value objects must have at most 5 methods', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/value_objects'),
+        selector.classes(inFolder: 'lib/domain/value_objects'),
         hasMaxMethods(5),
       );
     });

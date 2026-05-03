@@ -1,4 +1,4 @@
----
+﻿---
 title: Quick Start
 description: Set up DartUnit and run your first architecture rule in under 5 minutes.
 sidebar:
@@ -62,8 +62,8 @@ Every rule file is a Dart `main()` that uses `testArch()`:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain must not depend on the data layer', (arch) {
-    expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+  testArch('Domain must not depend on the data layer', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
   });
 }
 ```
@@ -75,11 +75,11 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain layer rules', () {
-    testArch('Must not depend on the data layer', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Must not depend on the data layer', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
-    testArch('Must be Flutter-agnostic', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+    testArch('Must be Flutter-agnostic', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
     });
   }, severity: RuleSeverity.error);
 }

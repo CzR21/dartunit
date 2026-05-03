@@ -1,4 +1,4 @@
----
+﻿---
 title: isEnumType
 description: Enforce that declarations in a folder are enums. Useful to keep enum-only folders clean and prevent accidental class or mixin declarations.
 sidebar:
@@ -65,9 +65,9 @@ Ensure that nothing other than enums ends up in your enum folder:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('The enums folder must contain only enum declarations', (arch) {
+  testArch('The enums folder must contain only enum declarations', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/enums'),
+      selector.classes(inFolder: 'lib/domain/enums'),
       isEnumType(),
     );
   });
@@ -84,9 +84,9 @@ If your team uses the `*Status` suffix to name status types, enforce that they'r
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Declarations ending with Status must be enums', (arch) {
+  testArch('Declarations ending with Status must be enums', (selector) {
     expect(
-      arch.classes(folder: 'lib', namePattern: r'.*Status$'),
+      selector.classes(inFolder: 'lib', matchingPattern: r'.*Status$'),
       isEnumType(),
     );
   });
@@ -120,13 +120,13 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Enum folder rules', () {
-    testArch('Enum folder must contain only enums', (arch) {
-      expect(arch.classes(folder: 'lib/shared/enums'), isEnumType());
+    testArch('Enum folder must contain only enums', (selector) {
+      expect(selector.classes(inFolder: 'lib/shared/enums'), isEnumType());
     });
 
-    testArch('Enum declarations must use PascalCase naming', (arch) {
+    testArch('Enum declarations must use PascalCase naming', (selector) {
       expect(
-        arch.classes(folder: 'lib/shared/enums'),
+        selector.classes(inFolder: 'lib/shared/enums'),
         nameMatchesPattern(r'^[A-Z][a-zA-Z]+$'),
       );
     });

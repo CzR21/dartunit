@@ -1,4 +1,4 @@
-part of 'arch_runner.dart';
+﻿part of 'arch_runner.dart';
 
 /// Registers a single architecture test, analogous to [testWidgets].
 ///
@@ -6,8 +6,8 @@ part of 'arch_runner.dart';
 /// then passed to [expect] with arch matchers:
 ///
 /// ```dart
-/// void main() => testArch('UI must not depend on data', (arch) {
-///   final ui = arch.classes(folder: 'lib/ui');
+/// void main() => testArch('UI must not depend on data', (selector) {
+///   final ui = selector.classes(inFolder: 'lib/ui');
 ///   expect(ui, doesNotDependOn('lib/data'));
 /// });
 /// ```
@@ -20,7 +20,7 @@ part of 'arch_runner.dart';
 /// [RuleSeverity.error] when called outside a group.
 void testArch(
   String description,
-  FutureOr<void> Function(ArchTester arch) body, {
+  FutureOr<void> Function(ArchTester selector) body, {
   String projectRoot = '.',
   RuleSeverity? severity,
 }) {

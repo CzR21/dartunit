@@ -1,4 +1,4 @@
----
+﻿---
 title: How It Works
 description: The DartUnit rule execution lifecycle — from rule files to reported violations.
 sidebar:
@@ -20,7 +20,7 @@ dart run dartunit analyze
   ├─ 2. Run: dart test <file1> <file2> ... --reporter json
   │         └─ Each testArch call:
   │              ├─ Analyzes project source (or reuses group context)
-  │              ├─ Selects elements via arch.classes() / arch.files()
+  │              ├─ Selects elements via selector.classes() / selector.files()
   │              ├─ Evaluates matcher (predicate) on each element
   │              ├─ Emits DARTUNIT_RESULT:{json} to stderr
   │              └─ Prints ✓ or ✗ result to stdout
@@ -39,16 +39,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Repository contracts', () {
-    testArch('Repository interfaces in domain must be abstract', (arch) {
+    testArch('Repository interfaces in domain must be abstract', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/repositories', namePattern: r'.*Repository$'),
+        selector.classes(inFolder: 'lib/domain/repositories', matchingPattern: r'.*Repository$'),
         isAbstractClass(),
       );
     });
 
-    testArch('Repository implementations must not be abstract', (arch) {
+    testArch('Repository implementations must not be abstract', (selector) {
       expect(
-        arch.classes(namePattern: r'.*RepositoryImpl$'),
+        selector.classes(matchingPattern: r'.*RepositoryImpl$'),
         isConcreteClass(),
       );
     });
@@ -67,13 +67,13 @@ For each `testArch`, execution follows three stages:
 
 ### Stage 1: Select
 
-`arch.classes(folder: 'lib/domain/repositories', namePattern: r'.*Repository$')` produces an `ArchSubject` wrapping:
+`selector.classes(inFolder: 'lib/domain/repositories', matchingPattern: r'.*Repository$')` produces an `ArchSubject` wrapping:
 - The `Selector` — which classes or files match
 - The shared `AnalysisContext` — the pre-analyzed project graph
 - The effective `RuleSeverity`
 
 ```
-arch.classes(folder: 'lib/domain/repositories', namePattern: r'.*Repository$')
+selector.classes(inFolder: 'lib/domain/repositories', matchingPattern: r'.*Repository$')
   │
   ▼
 ArchSubject → [UserRepository, AuthRepository, ProductRepository]
@@ -116,9 +116,9 @@ A key performance feature: `testArchGroup` analyzes the project **once** and sha
 testArchGroup('Domain layer', () {
   // All three rules share the SAME AnalysisContext.
   // The project is parsed only once for the entire group.
-  testArch('Must not depend on data', (arch) { ... });
-  testArch('Must not depend on presentation', (arch) { ... });
-  testArch('Must be Flutter-agnostic', (arch) { ... });
+  testArch('Must not depend on data', (selector) { ... });
+  testArch('Must not depend on presentation', (selector) { ... });
+  testArch('Must be Flutter-agnostic', (selector) { ... });
 }, severity: RuleSeverity.error, projectRoot: '.');
 ```
 
@@ -137,10 +137,10 @@ Severity can be set at two levels:
 
 ```dart
 testArchGroup('Domain rules', () {
-  testArch('Must not depend on data', (arch) { ... });  // inherits error
+  testArch('Must not depend on data', (selector) { ... });  // inherits error
 
-  testArch('Should have at most 3 methods per use case', (arch) {
-    expect(arch.classes(namePattern: r'.*UseCase$'), hasMaxMethods(3));
+  testArch('Should have at most 3 methods per use case', (selector) {
+    expect(selector.classes(matchingPattern: r'.*UseCase$'), hasMaxMethods(3));
   }, severity: RuleSeverity.warning);  // override to warning
 }, severity: RuleSeverity.error);
 ```

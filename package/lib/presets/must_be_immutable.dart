@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -21,9 +21,9 @@ void mustBeImmutable({
     'Structure — must be immutable',
     () {
       for (final folder in folders) {
-        testArch('Classes in "$folder" must have all-final fields', (arch) {
+        testArch('Classes in "$folder" must have all-final fields', (selector) {
           expect(
-            arch.classes(folder: folder, exceptions: exceptions),
+            selector.classes(inFolder: folder, exceptions: exceptions),
             hasAllFinalFields(),
           );
         });

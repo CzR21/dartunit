@@ -1,4 +1,4 @@
-import '../analyzer/context/analysis_context.dart';
+﻿import '../analyzer/context/analysis_context.dart';
 import '../core/entities/violation.dart';
 import '../core/enums/rule_severity.dart';
 import '../core/selectors/class_selector.dart';
@@ -13,8 +13,8 @@ import '../utils/name_pattern_helper.dart';
 /// to build [ArchSubject]s (the "finders") that are then passed to [expect].
 ///
 /// ```dart
-/// testArch('UI must not depend on data', (arch) {
-///   final ui = arch.classes(folder: 'lib/ui');
+/// testArch('UI must not depend on data', (selector) {
+///   final ui = selector.classes(inFolder: 'lib/ui');
 ///   expect(ui, doesNotDependOn('lib/data'));
 /// });
 /// ```
@@ -31,32 +31,32 @@ class ArchTester {
 
   /// Selects classes matching [folder] and/or a name filter.
   ///
-  /// Name filtering accepts either a raw [namePattern] (regex) for advanced
-  /// use, or the friendlier [prefix]/[suffix] shortcuts — but not both.
+  /// Name filtering accepts either a raw [matchingPattern] (regex) for advanced
+  /// use, or the friendlier [hasPrefix]/[hasSuffix] shortcuts — but not both.
   ///
   /// ```dart
-  /// arch.classes(suffix: 'Bloc')           // .*Bloc$
-  /// arch.classes(prefix: 'Base')           // ^Base.*
-  /// arch.classes(prefix: 'I', suffix: 'Repository') // ^I.*Repository$
-  /// arch.classes(namePattern: r'.*Bloc$')  // raw regex
+  /// selector.classes(hasSuffix: 'Bloc')                          // .*Bloc$
+  /// selector.classes(hasPrefix: 'Base')                          // ^Base.*
+  /// selector.classes(hasPrefix: 'I', hasSuffix: 'Repository')    // ^I.*Repository$
+  /// selector.classes(matchingPattern: r'.*Bloc$')                // raw regex
   /// ```
   ///
   /// [exceptions] is a list of file path substrings that are exempt from
   /// the rule (e.g. `['lib/ui/legacy/']`).
   ArchSubject classes({
-    String? folder,
-    String? namePattern,
-    String? prefix,
-    String? suffix,
+    String? inFolder,
+    String? matchingPattern,
+    String? hasPrefix,
+    String? hasSuffix,
     List<String> exceptions = const [],
   }) {
     return ArchSubject(
       selector: ClassSelector(
-        folder: folder,
+        folder: inFolder,
         namePattern: resolveNamePattern(
-          namePattern: namePattern,
-          prefix: prefix,
-          suffix: suffix,
+          namePattern: matchingPattern,
+          prefix: hasPrefix,
+          suffix: hasSuffix,
         ),
       ),
       context: _context,
@@ -68,30 +68,30 @@ class ArchTester {
 
   /// Selects files matching [folder] and/or a name filter.
   ///
-  /// Name filtering accepts either a raw [namePattern] (regex) for advanced
-  /// use, or the friendlier [prefix]/[suffix] shortcuts — but not both.
+  /// Name filtering accepts either a raw [matchingPattern] (regex) for advanced
+  /// use, or the friendlier [hasPrefix]/[hasSuffix] shortcuts — but not both.
   ///
   /// ```dart
-  /// arch.files(suffix: '_test.dart')       // .*_test\.dart$
-  /// arch.files(prefix: 'base_')            // ^base_.*
-  /// arch.files(namePattern: r'.*_impl\.dart$') // raw regex
+  /// selector.files(hasSuffix: '_test.dart')                      // .*_test\.dart$
+  /// selector.files(hasPrefix: 'base_')                           // ^base_.*
+  /// selector.files(matchingPattern: r'.*_impl\.dart$')           // raw regex
   /// ```
   ///
   /// [exceptions] is a list of folder path substrings to exclude.
   ArchSubject files({
-    String? folder,
-    String? namePattern,
-    String? prefix,
-    String? suffix,
+    String? inFolder,
+    String? matchingPattern,
+    String? hasPrefix,
+    String? hasSuffix,
     List<String> exceptions = const [],
   }) {
     return ArchSubject(
       selector: FileSelector(
-        folder: folder,
+        folder: inFolder,
         namePattern: resolveNamePattern(
-          namePattern: namePattern,
-          prefix: prefix,
-          suffix: suffix,
+          namePattern: matchingPattern,
+          prefix: hasPrefix,
+          suffix: hasSuffix,
         ),
         excludeFolders: exceptions,
       ),
@@ -108,11 +108,11 @@ class ArchTester {
   /// [exceptions] is a list of file path substrings to exempt.
   ArchSubject layer(
     String name, {
-    required String folder,
+    required String inFolder,
     List<String> exceptions = const [],
   }) {
     return ArchSubject(
-      selector: LayerSelector(layerName: name, layerFolder: folder),
+      selector: LayerSelector(layerName: name, layerFolder: inFolder),
       context: _context,
       defaultSeverity: defaultSeverity,
       exceptions: exceptions,

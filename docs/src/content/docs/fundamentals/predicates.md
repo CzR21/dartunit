@@ -1,4 +1,4 @@
----
+﻿---
 title: Predicates
 description: Conditions that selected elements must satisfy in DartUnit rules.
 sidebar:
@@ -8,8 +8,8 @@ sidebar:
 A **predicate** defines the condition that each selected element must satisfy. In `testArch` and `testArchGroup`, predicates are expressed through **arch matchers** — the functions you pass to `expect()`.
 
 ```dart
-testArch('Domain must not depend on data', (arch) {
-  expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+testArch('Domain must not depend on data', (selector) {
+  expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
   //                                         ^^^^ arch matcher
 });
 ```
@@ -83,7 +83,7 @@ When the matcher's condition is not met for an element, DartUnit records a `Viol
 | `hasNoContent(pattern)` | File content does NOT match the regex `pattern` |
 
 :::note
-`hasContent` and `hasNoContent` are used with `arch.files()`, not `arch.classes()`.
+`hasContent` and `hasNoContent` are used with `selector.files()`, not `selector.classes()`.
 :::
 
 ## Expressing Logic
@@ -93,8 +93,8 @@ When the matcher's condition is not met for an element, DartUnit records a `Viol
 Multiple `expect()` calls inside one `testArch` are combined with AND: every condition must pass. This is the most common pattern.
 
 ```dart
-testArch('BLoC classes must be clean', (arch) {
-  final blocs = arch.classes(suffix: 'Bloc');
+testArch('BLoC classes must be clean', (selector) {
+  final blocs = selector.classes(hasSuffix: 'Bloc');
   expect(blocs, doesNotDependOn('lib/data'));   // AND
   expect(blocs, hasAllFinalFields());           // AND
   expect(blocs, hasMaxImports(15));             // AND
@@ -119,18 +119,18 @@ For OR conditions on names, use `nameMatchesPattern()` with a regex alternation,
 
 ```dart
 // "Must end with 'Bloc' OR 'Cubit'"
-testArch('State managers must be Bloc or Cubit', (arch) {
-  final stateManagers = arch.classes(folder: 'lib/blocs');
+testArch('State managers must be Bloc or Cubit', (selector) {
+  final stateManagers = selector.classes(inFolder: 'lib/blocs');
   expect(stateManagers, nameMatchesPattern(r'.*(Bloc|Cubit)$'));
 });
 ```
 
 ```dart
 // Use namePattern in the selector to restrict which classes are evaluated
-testArch('Bloc/Cubit must not access data directly', (arch) {
-  final blocs = arch.classes(
-    folder: 'lib/blocs',
-    namePattern: r'.*(Bloc|Cubit)$',  // selects Blocs OR Cubits
+testArch('Bloc/Cubit must not access data directly', (selector) {
+  final blocs = selector.classes(
+    inFolder: 'lib/blocs',
+    matchingPattern: r'.*(Bloc|Cubit)$',  // selects Blocs OR Cubits
   );
   expect(blocs, doesNotDependOn('lib/data'));
 });

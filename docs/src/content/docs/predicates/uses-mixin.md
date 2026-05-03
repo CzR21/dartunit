@@ -1,4 +1,4 @@
----
+﻿---
 title: usesMixin
 description: Enforce that classes apply a specific mixin using the with keyword. Commonly used to require Equatable, JsonSerializable, or other shared behavior mixins.
 sidebar:
@@ -73,9 +73,9 @@ BLoC rebuilds the UI only when the state changes. For this to work, `==` compari
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC state classes must use EquatableMixin', (arch) {
+  testArch('BLoC state classes must use EquatableMixin', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*State$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*State$'),
       usesMixin('EquatableMixin'),
     );
   });
@@ -92,9 +92,9 @@ Domain entities represent business concepts. Two entities with the same identity
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must use EquatableMixin for value equality', (arch) {
+  testArch('Domain entities must use EquatableMixin for value equality', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/entities'),
+      selector.classes(inFolder: 'lib/domain/entities'),
       usesMixin('EquatableMixin'),
     );
   });
@@ -111,9 +111,9 @@ Ensure all data model classes are set up for JSON serialization:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Data models must apply JsonSerializableMixin', (arch) {
+  testArch('Data models must apply JsonSerializableMixin', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/models'),
+      selector.classes(inFolder: 'lib/data/models'),
       usesMixin('JsonSerializableMixin'),
     );
   });

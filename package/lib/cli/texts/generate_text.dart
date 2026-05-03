@@ -1,4 +1,4 @@
-String generateMissingArchTest(String projectRoot) =>
+﻿String generateMissingArchTest(String projectRoot) =>
     'test_arch/ not found in $projectRoot — run  dartunit init  first.';
 
 String generateCreatedFile(String fileName) => 'Created  test_arch/$fileName';
@@ -20,9 +20,9 @@ import 'package:test/test.dart';
 /// Run with:
 ///   dart test test_arch/${ruleName}_arch_test.dart
 ///   dartunit analyze
-void main() => testArch('${_toDescription(ruleName)}', (arch) {
-  final subject = arch.classes(
-    folder: 'lib/', // TODO: restrict to the correct folder
+void main() => testArch('${_toDescription(ruleName)}', (selector) {
+  final subject = selector.classes(
+    inFolder: 'lib/', // TODO: restrict to the correct folder
   );
   expect(subject, hasMaxMethods(10)); // TODO: replace with actual matcher
 });

@@ -1,4 +1,4 @@
-const List<({String fileName, String content})> mvcRuleFiles = [
+﻿const List<({String fileName, String content})> mvcRuleFiles = [
   (fileName: 'mvc_arch_test.dart', content: _mvcArchTest),
 ];
 
@@ -16,20 +16,20 @@ void main() {
   const _services    = 'lib/services';
 
   testArchGroup('Model layer \u2014 must not know about View or Controller', () {
-      testArch('Models must not depend on controllers', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Models must not depend on controllers', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, doesNotDependOn(_controllers));
       });
 
-      testArch('Models must not depend on views', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Models must not depend on views', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, doesNotDependOn(_views));
       });
 
-      testArch('Models must be Flutter-agnostic', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Models must be Flutter-agnostic', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, doesNotDependOnPackage('flutter'));
       }, severity: RuleSeverity.warning);
@@ -38,14 +38,14 @@ void main() {
   );
 
   testArchGroup('View layer \u2014 must communicate through Controller', () {
-      testArch('Views must not access models directly', (arch) {
-        final viewSelector = arch.classes(folder: _views);
+      testArch('Views must not access models directly', (selector) {
+        final viewSelector = selector.classes(inFolder: _views);
 
         expect(viewSelector, doesNotDependOn(_models));
       });
 
-      testArch('Views must not access services directly', (arch) {
-        final viewSelector = arch.classes(folder: _views);
+      testArch('Views must not access services directly', (selector) {
+        final viewSelector = selector.classes(inFolder: _views);
 
         expect(viewSelector, doesNotDependOn(_services));
       });
@@ -54,20 +54,20 @@ void main() {
   );
 
   testArchGroup('Service layer \u2014 must be UI-agnostic', () {
-      testArch('Services must not depend on views', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Services must not depend on views', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, doesNotDependOn(_views));
       });
 
-      testArch('Services must not depend on controllers', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Services must not depend on controllers', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, doesNotDependOn(_controllers));
       });
 
-      testArch('Services must not depend on models', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Services must not depend on models', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, doesNotDependOn(_models));
       });
@@ -76,14 +76,14 @@ void main() {
   );
 
   testArchGroup('Model immutability \u2014 explicit state changes via copyWith', () {
-      testArch('Model classes must have all-final fields', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Model classes must have all-final fields', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, hasAllFinalFields());
       });
 
-      testArch('Model classes must not expose public mutable fields', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Model classes must not expose public mutable fields', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, hasNoPublicFields());
       });
@@ -92,14 +92,14 @@ void main() {
   );
 
   testArchGroup('Controller cohesion \u2014 avoid the massive controller', () {
-      testArch('Controller classes must have at most 15 public methods', (arch) {
-        final controllerSelector = arch.classes(namePattern: r'.*Controller\$');
+      testArch('Controller classes must have at most 15 public methods', (selector) {
+        final controllerSelector = selector.classes(matchingPattern: r'.*Controller\$');
 
         expect(controllerSelector, hasMaxMethods(15));
       });
 
-      testArch('Controller classes must import at most 12 dependencies', (arch) {
-        final controllerSelector = arch.classes(namePattern: r'.*Controller\$');
+      testArch('Controller classes must import at most 12 dependencies', (selector) {
+        final controllerSelector = selector.classes(matchingPattern: r'.*Controller\$');
 
         expect(controllerSelector, hasMaxImports(12));
       });
@@ -108,8 +108,8 @@ void main() {
   );
 
   testArchGroup('Controller isolation \u2014 no controller-to-controller dependencies', () {
-      testArch('Controllers must not depend on other controllers', (arch) {
-        final controllerSelector = arch.classes(namePattern: r'.*Controller\$');
+      testArch('Controllers must not depend on other controllers', (selector) {
+        final controllerSelector = selector.classes(matchingPattern: r'.*Controller\$');
 
         expect(controllerSelector, doesNotDependOn(_controllers));
       });
@@ -118,8 +118,8 @@ void main() {
   );
 
   testArchGroup('Services \u2014 stateless and injectable', () {
-      testArch('Service classes must have all-final fields', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Service classes must have all-final fields', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, hasAllFinalFields());
       });

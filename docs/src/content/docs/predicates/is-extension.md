@@ -1,4 +1,4 @@
----
+﻿---
 title: isExtensionType
 description: Enforce that declarations in a folder are extensions. Covers unnamed extensions, named extensions, and Dart 3 extension types.
 sidebar:
@@ -66,9 +66,9 @@ Enforce that your extension folder stays clean and organized:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('The extensions folder must contain only extension declarations', (arch) {
+  testArch('The extensions folder must contain only extension declarations', (selector) {
     expect(
-      arch.classes(folder: 'lib/core/extensions'),
+      selector.classes(inFolder: 'lib/core/extensions'),
       isExtensionType(),
     );
   });
@@ -85,9 +85,9 @@ Ensure naming-declaration consistency:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Declarations ending with Extension must use the extension keyword', (arch) {
+  testArch('Declarations ending with Extension must use the extension keyword', (selector) {
     expect(
-      arch.classes(folder: 'lib', namePattern: r'.*Extension$'),
+      selector.classes(inFolder: 'lib', matchingPattern: r'.*Extension$'),
       isExtensionType(),
     );
   });
@@ -105,20 +105,20 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Extension folder rules', () {
-    testArch('Extensions folder must contain only extensions', (arch) {
-      expect(arch.classes(folder: 'lib/core/extensions'), isExtensionType());
+    testArch('Extensions folder must contain only extensions', (selector) {
+      expect(selector.classes(inFolder: 'lib/core/extensions'), isExtensionType());
     });
 
-    testArch('Extensions must not depend on domain-specific classes', (arch) {
+    testArch('Extensions must not depend on domain-specific classes', (selector) {
       expect(
-        arch.classes(folder: 'lib/core/extensions'),
+        selector.classes(inFolder: 'lib/core/extensions'),
         doesNotDependOn('lib/domain'),
       );
     });
 
-    testArch('Extensions must not depend on UI code', (arch) {
+    testArch('Extensions must not depend on UI code', (selector) {
       expect(
-        arch.classes(folder: 'lib/core/extensions'),
+        selector.classes(inFolder: 'lib/core/extensions'),
         doesNotDependOn('lib/presentation'),
       );
     });

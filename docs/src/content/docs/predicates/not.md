@@ -1,4 +1,4 @@
----
+﻿---
 title: Combining matchers — NOT
 description: How to express "must NOT satisfy a condition" in DartUnit rules. DartUnit provides dedicated doesNot/hasNo matchers for every common NOT condition.
 sidebar:
@@ -51,16 +51,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Layer isolation rules', () {
-    testArch('Domain must not import from data', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Domain must not import from data', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
 
-    testArch('Domain must not import from presentation', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/presentation'));
+    testArch('Domain must not import from presentation', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/presentation'));
     });
 
-    testArch('Data must not import from presentation', (arch) {
-      expect(arch.classes(folder: 'lib/data'), doesNotDependOn('lib/presentation'));
+    testArch('Data must not import from presentation', (selector) {
+      expect(selector.classes(inFolder: 'lib/data'), doesNotDependOn('lib/presentation'));
     });
   }, severity: RuleSeverity.critical);
 }
@@ -75,16 +75,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain must be infrastructure-free', () {
-    testArch('Domain must not use Flutter', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+    testArch('Domain must not use Flutter', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
     });
 
-    testArch('Domain must not use Dio', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('dio'));
+    testArch('Domain must not use Dio', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('dio'));
     });
 
-    testArch('Domain must not use Hive', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('hive'));
+    testArch('Domain must not use Hive', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('hive'));
     });
   }, severity: RuleSeverity.critical);
 }
@@ -98,8 +98,8 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain classes must not have persistence annotations', (arch) {
-    final domain = arch.classes(folder: 'lib/domain');
+  testArch('Domain classes must not have persistence annotations', (selector) {
+    final domain = selector.classes(inFolder: 'lib/domain');
     expect(domain, doesNotHaveAnnotation('JsonSerializable'));
     expect(domain, doesNotHaveAnnotation('HiveType'));
   });
@@ -114,8 +114,8 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No circular dependencies anywhere in the codebase', (arch) {
-    expect(arch.classes(folder: 'lib'), hasNoCircularDependency());
+  testArch('No circular dependencies anywhere in the codebase', (selector) {
+    expect(selector.classes(inFolder: 'lib'), hasNoCircularDependency());
   });
 }
 ```
@@ -129,16 +129,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Code quality — banned patterns', () {
-    testArch('No print() calls in production', (arch) {
-      expect(arch.files(folder: 'lib'), hasNoContent(r'print\s*\('));
+    testArch('No print() calls in production', (selector) {
+      expect(selector.files(inFolder: 'lib'), hasNoContent(r'print\s*\('));
     });
 
-    testArch('No TODO comments in production', (arch) {
-      expect(arch.files(folder: 'lib'), hasNoContent(r'//\s*TODO'));
+    testArch('No TODO comments in production', (selector) {
+      expect(selector.files(inFolder: 'lib'), hasNoContent(r'//\s*TODO'));
     });
 
-    testArch('No hardcoded URLs', (arch) {
-      expect(arch.files(folder: 'lib'), hasNoContent(r'https?://[^\s\'"]+'));
+    testArch('No hardcoded URLs', (selector) {
+      expect(selector.files(inFolder: 'lib'), hasNoContent(r'https?://[^\s\'"]+'));
     });
   }, severity: RuleSeverity.warning);
 }
@@ -152,9 +152,9 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC classes must not expose public state fields', (arch) {
+  testArch('BLoC classes must not expose public state fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc'),
+      selector.classes(inFolder: 'lib/bloc'),
       hasNoPublicFields(),
     );
   });

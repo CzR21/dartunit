@@ -1,4 +1,4 @@
----
+﻿---
 title: isAbstractClass
 description: Enforce that classes are declared abstract. Used to ensure that interface/contract folders contain no concrete implementations.
 sidebar:
@@ -76,9 +76,9 @@ The canonical Clean Architecture rule — the domain layer defines repository co
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain repositories must be declared abstract', (arch) {
+  testArch('Domain repositories must be declared abstract', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/repositories'),
+      selector.classes(inFolder: 'lib/domain/repositories'),
       isAbstractClass(),
     );
   });
@@ -104,16 +104,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain contract folders must be all-abstract', () {
-    testArch('Repository interfaces must be abstract', (arch) {
-      expect(arch.classes(folder: 'lib/domain/repositories'), isAbstractClass());
+    testArch('Repository interfaces must be abstract', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/repositories'), isAbstractClass());
     });
 
-    testArch('Use case contracts must be abstract', (arch) {
-      expect(arch.classes(folder: 'lib/domain/usecases'), isAbstractClass());
+    testArch('Use case contracts must be abstract', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/usecases'), isAbstractClass());
     });
 
-    testArch('Service contracts must be abstract', (arch) {
-      expect(arch.classes(folder: 'lib/domain/services'), isAbstractClass());
+    testArch('Service contracts must be abstract', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/services'), isAbstractClass());
     });
   }, severity: RuleSeverity.error);
 }
@@ -130,19 +130,19 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain repository contracts', () {
-    testArch('Repository interfaces must be abstract', (arch) {
-      expect(arch.classes(folder: 'lib/domain/repositories'), isAbstractClass());
+    testArch('Repository interfaces must be abstract', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/repositories'), isAbstractClass());
     });
 
-    testArch('Repository interfaces must follow naming convention', (arch) {
+    testArch('Repository interfaces must follow naming convention', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/repositories'),
+        selector.classes(inFolder: 'lib/domain/repositories'),
         nameMatchesPattern(r'^[A-Z][a-zA-Z]+Repository$'),
       );
     });
 
-    testArch('Repository interfaces must not import from data layer', (arch) {
-      expect(arch.classes(folder: 'lib/domain/repositories'), doesNotDependOn('lib/data'));
+    testArch('Repository interfaces must not import from data layer', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/repositories'), doesNotDependOn('lib/data'));
     });
   });
 }

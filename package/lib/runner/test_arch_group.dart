@@ -1,4 +1,4 @@
-part of 'arch_runner.dart';
+﻿part of 'arch_runner.dart';
 
 /// Groups related [testArch] calls, analyzing the project **once** for all of
 /// them — analogous to [group] wrapping multiple tests with a shared setup.
@@ -6,11 +6,11 @@ part of 'arch_runner.dart';
 /// ```dart
 /// void main() {
 ///   testArchGroup('Domain isolation', () {
-///     testArch('must not depend on data', (arch) {
-///       expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+///     testArch('must not depend on data', (selector) {
+///       expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
 ///     });
-///     testArch('must be Flutter-agnostic', (arch) {
-///       expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+///     testArch('must be Flutter-agnostic', (selector) {
+///       expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
 ///     });
 ///   }, severity: RuleSeverity.error);
 /// }

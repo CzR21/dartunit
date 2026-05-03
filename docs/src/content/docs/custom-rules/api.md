@@ -12,7 +12,7 @@ Registers a single architecture test. Analogous to `test()` in `package:test`.
 ```dart
 void testArch(
   String description,
-  FutureOr<void> Function(ArchTester arch) body, {
+  FutureOr<void> Function(ArchTester selector) body, {
   String projectRoot = '.',
   RuleSeverity? severity,
 })
@@ -26,8 +26,8 @@ void testArch(
 | `severity` | `RuleSeverity?` | Overrides group severity; defaults to `RuleSeverity.error` if outside a group |
 
 ```dart
-testArch('Domain must not depend on data', (arch) {
-  expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+testArch('Domain must not depend on data', (selector) {
+  expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
 });
 ```
 
@@ -55,8 +55,8 @@ void testArchGroup(
 
 ```dart
 testArchGroup('Domain layer rules', () {
-  testArch('Must not depend on data', (arch) { ... });
-  testArch('Must be Flutter-agnostic', (arch) { ... });
+  testArch('Must not depend on data', (selector) { ... });
+  testArch('Must be Flutter-agnostic', (selector) { ... });
 }, severity: RuleSeverity.error);
 ```
 
@@ -66,12 +66,14 @@ testArchGroup('Domain layer rules', () {
 
 Passed to every `testArch` body. Provides factory methods that return `ArchSubject` objects for use with `expect()`.
 
-### `arch.classes()`
+### `selector.classes()`
 
 ```dart
 ArchSubject classes({
-  String? folder,
-  String? namePattern,
+  String? inFolder,
+  String? matchingPattern,
+  String? hasPrefix,
+  String? hasSuffix,
   List<String> exceptions = const [],
 })
 ```
@@ -79,18 +81,29 @@ ArchSubject classes({
 Selects classes from the analyzed project.
 
 ```dart
-arch.classes()                                              // all classes in lib/
-arch.classes(folder: 'lib/domain')                         // by folder
-arch.classes(namePattern: r'.*Repository$')                // by name regex
-arch.classes(folder: 'lib/domain', namePattern: r'.*Entity$') // both
-arch.classes(folder: 'lib/domain', exceptions: ['lib/domain/entities/legacy.dart'])
+selector.classes()                                                        // all classes in lib/
+selector.classes(inFolder: 'lib/domain')                                  // by folder
+selector.classes(matchingPattern: r'.*Repository$')                       // by name regex
+selector.classes(inFolder: 'lib/domain', matchingPattern: r'.*Entity$')   // both
+selector.classes(inFolder: 'lib/domain', exceptions: ['lib/domain/entities/legacy.dart'])
 ```
 
-### `arch.files()`
+Use `hasPrefix` or `hasSuffix` as readable shortcuts instead of a raw `matchingPattern`:
+
+```dart
+selector.classes(hasSuffix: 'Bloc')                           // .*Bloc$
+selector.classes(hasPrefix: 'I', hasSuffix: 'Repository')     // ^I.*Repository$
+selector.classes(inFolder: 'lib/domain', hasSuffix: 'Entity') // folder + suffix
+```
+
+### `selector.files()`
 
 ```dart
 ArchSubject files({
-  String? folder,
+  String? inFolder,
+  String? matchingPattern,
+  String? hasPrefix,
+  String? hasSuffix,
   List<String> exceptions = const [],
 })
 ```
@@ -98,21 +111,22 @@ ArchSubject files({
 Selects files for content-based rules.
 
 ```dart
-arch.files()                        // all files in lib/
-arch.files(folder: 'lib/src')
-arch.files(exceptions: ['lib/gen']) // exclude generated code
+selector.files()                         // all files in lib/
+selector.files(inFolder: 'lib/src')
+selector.files(exceptions: ['lib/gen'])  // exclude generated code
+selector.files(hasSuffix: '_test.dart') // files ending with _test.dart
 ```
 
-### `arch.layer()`
+### `selector.layer()`
 
 ```dart
-ArchSubject layer(String name, {required String folder})
+ArchSubject layer(String name, {required String inFolder})
 ```
 
 Selects all classes in a named layer folder.
 
 ```dart
-arch.layer('domain', folder: 'lib/domain')
+selector.layer('domain', inFolder: 'lib/domain')
 ```
 
 ---
@@ -236,23 +250,23 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Service layer contracts', () {
-    testArch('Services must end with Service', (arch) {
-      expect(arch.classes(folder: 'lib/service'), nameEndsWith('Service'));
+    testArch('Services must end with Service', (selector) {
+      expect(selector.classes(inFolder: 'lib/service'), nameEndsWith('Service'));
     });
-    testArch('Services must be injectable', (arch) {
+    testArch('Services must be injectable', (selector) {
       expect(
-        arch.classes(
-          folder: 'lib/service',
+        selector.classes(
+          inFolder: 'lib/service',
           exceptions: ['lib/service/abstract_service.dart'],
         ),
         hasAnnotation('injectable'),
       );
     });
-    testArch('Services must have no public fields', (arch) {
-      expect(arch.classes(folder: 'lib/service'), hasNoPublicFields());
+    testArch('Services must have no public fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/service'), hasNoPublicFields());
     });
-    testArch('Services must not depend on UI', (arch) {
-      expect(arch.classes(folder: 'lib/service'), doesNotDependOn('lib/ui'));
+    testArch('Services must not depend on UI', (selector) {
+      expect(selector.classes(inFolder: 'lib/service'), doesNotDependOn('lib/ui'));
     });
   }, severity: RuleSeverity.error);
 }

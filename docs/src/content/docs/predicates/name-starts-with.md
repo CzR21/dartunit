@@ -1,4 +1,4 @@
----
+﻿---
 title: nameStartsWith
 description: Enforce that class names begin with a specific prefix. Commonly used for interface conventions like the "I" prefix.
 sidebar:
@@ -66,9 +66,9 @@ Many teams prefix interface classes with `I` to make it immediately clear that a
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Interface classes must be prefixed with I', (arch) {
+  testArch('Interface classes must be prefixed with I', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/contracts'),
+      selector.classes(inFolder: 'lib/domain/contracts'),
       nameStartsWith('I'),
     );
   });
@@ -88,12 +88,12 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('No test doubles in production code', () {
-    testArch('No Mock-prefixed classes in lib/', (arch) {
+    testArch('No Mock-prefixed classes in lib/', (selector) {
       // Classes starting with Mock must not exist in lib/
       // If nameStartsWith('Mock') passes → violation
       // We select all classes and expect none to start with Mock
       expect(
-        arch.classes(folder: 'lib'),
+        selector.classes(inFolder: 'lib'),
         nameMatchesPattern(r'^(?!Mock|Fake).*'),
       );
     });
@@ -111,9 +111,9 @@ Ensure that all base classes in a shared base folder follow the naming conventio
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Abstract base classes must start with Base', (arch) {
+  testArch('Abstract base classes must start with Base', (selector) {
     expect(
-      arch.classes(folder: 'lib/core/base'),
+      selector.classes(inFolder: 'lib/core/base'),
       nameStartsWith('Base'),
     );
   });

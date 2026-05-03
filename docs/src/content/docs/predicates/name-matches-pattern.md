@@ -1,4 +1,4 @@
----
+﻿---
 title: nameMatchesPattern
 description: Enforce naming conventions using a full regular expression. The most flexible naming matcher — use when prefix/suffix/contains are not expressive enough.
 sidebar:
@@ -74,9 +74,9 @@ BLoC classes must be in PascalCase and end with `Bloc`. This rejects names like 
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC classes must follow PascalCase and end with Bloc', (arch) {
+  testArch('BLoC classes must follow PascalCase and end with Bloc', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$'),
       nameMatchesPattern(r'^[A-Z][a-zA-Z]+Bloc$'),
     );
   });
@@ -93,9 +93,9 @@ Your team uses both BLoC and Cubit. Express this as an OR condition using regex 
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('State managers must end with Bloc or Cubit', (arch) {
+  testArch('State managers must end with Bloc or Cubit', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc'),
+      selector.classes(inFolder: 'lib/bloc'),
       nameMatchesPattern(r'^[A-Z][a-zA-Z]+(Bloc|Cubit)$'),
     );
   });
@@ -112,9 +112,9 @@ Interfaces must follow the `I` prefix convention with PascalCase: `ICartReposito
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Interface classes must follow I + PascalCase naming', (arch) {
+  testArch('Interface classes must follow I + PascalCase naming', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/contracts'),
+      selector.classes(inFolder: 'lib/domain/contracts'),
       // I followed by an uppercase letter followed by more letters
       nameMatchesPattern(r'^I[A-Z][a-zA-Z]+$'),
     );
@@ -133,30 +133,30 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Naming conventions', () {
-    testArch('Domain repositories follow naming', (arch) {
+    testArch('Domain repositories follow naming', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/repositories'),
+        selector.classes(inFolder: 'lib/domain/repositories'),
         nameMatchesPattern(r'^[A-Z][a-zA-Z]+Repository$'),
       );
     });
 
-    testArch('Domain entities follow naming', (arch) {
+    testArch('Domain entities follow naming', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/entities'),
+        selector.classes(inFolder: 'lib/domain/entities'),
         nameMatchesPattern(r'^[A-Z][a-zA-Z]+Entity$'),
       );
     });
 
-    testArch('Use cases follow naming', (arch) {
+    testArch('Use cases follow naming', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/usecases'),
+        selector.classes(inFolder: 'lib/domain/usecases'),
         nameMatchesPattern(r'^[A-Z][a-zA-Z]+(UseCase|Interactor)$'),
       );
     });
 
-    testArch('Data models follow naming', (arch) {
+    testArch('Data models follow naming', (selector) {
       expect(
-        arch.classes(folder: 'lib/data/models'),
+        selector.classes(inFolder: 'lib/data/models'),
         nameMatchesPattern(r'^[A-Z][a-zA-Z]+(Model|Dto)$'),
       );
     });

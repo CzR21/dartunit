@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -21,9 +21,9 @@ void mustBeAbstract({
     'Structure — must be abstract',
     () {
       for (final folder in folders) {
-        testArch('Classes in "$folder" must be abstract', (arch) {
+        testArch('Classes in "$folder" must be abstract', (selector) {
           expect(
-            arch.classes(folder: folder, exceptions: exceptions),
+            selector.classes(inFolder: folder, exceptions: exceptions),
             isAbstractClass(),
           );
         });

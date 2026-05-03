@@ -1,4 +1,4 @@
----
+﻿---
 title: hasAllFinalFields
 description: Enforce that all instance fields in a class are declared final or const. The standard way to enforce immutability in domain entities, value objects, and BLoC states.
 sidebar:
@@ -72,9 +72,9 @@ This is the most important use of `hasAllFinalFields()`. Mutable state in BLoC l
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC state classes must have all final fields', (arch) {
+  testArch('BLoC state classes must have all final fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*State$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*State$'),
       hasAllFinalFields(),
     );
   });
@@ -114,17 +114,17 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain layer must be immutable', () {
-    testArch('Domain entities must have all final fields', (arch) {
-      expect(arch.classes(folder: 'lib/domain/entities'), hasAllFinalFields());
+    testArch('Domain entities must have all final fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/entities'), hasAllFinalFields());
     });
 
-    testArch('Value objects must have all final fields', (arch) {
-      expect(arch.classes(folder: 'lib/domain/value_objects'), hasAllFinalFields());
+    testArch('Value objects must have all final fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/value_objects'), hasAllFinalFields());
     });
 
-    testArch('Event classes must have all final fields', (arch) {
+    testArch('Event classes must have all final fields', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc', namePattern: r'.*Event$'),
+        selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Event$'),
         hasAllFinalFields(),
       );
     });
@@ -142,8 +142,8 @@ Enforce both immutability and size limits:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must be immutable and focused', (arch) {
-    final entities = arch.classes(folder: 'lib/domain/entities');
+  testArch('Domain entities must be immutable and focused', (selector) {
+    final entities = selector.classes(inFolder: 'lib/domain/entities');
     expect(entities, hasAllFinalFields());  // immutable
     expect(entities, hasMaxFields(10));     // focused
     expect(entities, hasMinFields(1));      // has substance

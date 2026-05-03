@@ -1,4 +1,4 @@
----
+﻿---
 title: Severities
 description: The four severity levels in DartUnit and when to use each one.
 sidebar:
@@ -25,8 +25,8 @@ Severity can be set at three levels, each overriding the one above it:
 ### 1. On a testArch call
 
 ```dart
-testArch('Domain must not depend on data', (arch) {
-  expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+testArch('Domain must not depend on data', (selector) {
+  expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
 }, severity: RuleSeverity.error);
 ```
 
@@ -34,11 +34,11 @@ testArch('Domain must not depend on data', (arch) {
 
 ```dart
 testArchGroup('Domain layer rules', () {
-  testArch('Must not depend on data', (arch) { ... });       // inherits error
-  testArch('Must not depend on presentation', (arch) { ... }); // inherits error
+  testArch('Must not depend on data', (selector) { ... });       // inherits error
+  testArch('Must not depend on presentation', (selector) { ... }); // inherits error
 
-  testArch('Should have at most 5 methods', (arch) {
-    expect(arch.classes(folder: 'lib/domain'), hasMaxMethods(5));
+  testArch('Should have at most 5 methods', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain'), hasMaxMethods(5));
   }, severity: RuleSeverity.warning); // overrides to warning
 }, severity: RuleSeverity.error);
 ```
@@ -65,9 +65,9 @@ layerCannotDependOn(
 Use `info` for observations you want to track without any impact on CI. Suitable for metrics that inform but do not enforce.
 
 ```dart
-testArch('Import count — coupling indicator', (arch) {
+testArch('Import count — coupling indicator', (selector) {
   expect(
-    arch.classes(folder: 'lib'),
+    selector.classes(inFolder: 'lib'),
     hasMaxImports(15),
   );
 }, severity: RuleSeverity.info);
@@ -84,9 +84,9 @@ Use `warning` for conventions that should be followed but where legitimate excep
 
 ```dart
 testArchGroup('Naming conventions', () {
-  testArch('BLoC classes must end with Bloc or Cubit', (arch) {
+  testArch('BLoC classes must end with Bloc or Cubit', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc'),
+      selector.classes(inFolder: 'lib/bloc'),
       nameMatchesPattern(r'.*(Bloc|Cubit)$'),
     );
   });
@@ -105,11 +105,11 @@ Use `error` for architectural rules that must not be violated in production code
 
 ```dart
 testArchGroup('Domain isolation', () {
-  testArch('Domain must not depend on data layer', (arch) {
-    expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+  testArch('Domain must not depend on data layer', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
   });
-  testArch('Domain must not depend on Flutter', (arch) {
-    expect(arch.classes(folder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+  testArch('Domain must not depend on Flutter', (selector) {
+    expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
   });
 }, severity: RuleSeverity.error);
 ```

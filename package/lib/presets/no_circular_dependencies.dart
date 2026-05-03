@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -15,8 +15,8 @@ void noCircularDependencies({
 }) {
   testArch(
     'No circular dependencies allowed',
-    (arch) {
-      expect(arch.classes(), hasNoCircularDependency());
+    (selector) {
+      expect(selector.classes(), hasNoCircularDependency());
     },
     severity: severity,
     projectRoot: projectRoot,

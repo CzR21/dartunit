@@ -1,4 +1,4 @@
----
+﻿---
 title: hasNoCircularDependency / hasCircularDependency
 description: Detect circular import chains in your codebase. Almost always used as hasNoCircularDependency to ban cycles.
 sidebar:
@@ -52,14 +52,14 @@ These matchers take **no parameters**. Cycle detection is performed automaticall
 Apply `hasNoCircularDependency()` to every layer in your application. There is almost never a valid reason for circular imports in a well-structured codebase. A common starting point is to scan the entire `lib/` folder:
 
 ```dart
-expect(arch.classes(folder: 'lib'), hasNoCircularDependency());
+expect(selector.classes(inFolder: 'lib'), hasNoCircularDependency());
 ```
 
 You can also scope it to specific layers if you want tighter control over the error message:
 
 ```dart
-expect(arch.classes(folder: 'lib/domain'), hasNoCircularDependency());
-expect(arch.classes(folder: 'lib/data'), hasNoCircularDependency());
+expect(selector.classes(inFolder: 'lib/domain'), hasNoCircularDependency());
+expect(selector.classes(inFolder: 'lib/data'), hasNoCircularDependency());
 ```
 
 ---
@@ -83,9 +83,9 @@ The simplest and most comprehensive rule — check the entire codebase at once:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No circular dependencies allowed anywhere', (arch) {
+  testArch('No circular dependencies allowed anywhere', (selector) {
     expect(
-      arch.classes(folder: 'lib'),
+      selector.classes(inFolder: 'lib'),
       hasNoCircularDependency(),
     );
   });
@@ -113,20 +113,20 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('No circular dependencies per layer', () {
-    testArch('Domain layer has no cycles', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), hasNoCircularDependency());
+    testArch('Domain layer has no cycles', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), hasNoCircularDependency());
     });
 
-    testArch('Data layer has no cycles', (arch) {
-      expect(arch.classes(folder: 'lib/data'), hasNoCircularDependency());
+    testArch('Data layer has no cycles', (selector) {
+      expect(selector.classes(inFolder: 'lib/data'), hasNoCircularDependency());
     });
 
-    testArch('BLoC layer has no cycles', (arch) {
-      expect(arch.classes(folder: 'lib/bloc'), hasNoCircularDependency());
+    testArch('BLoC layer has no cycles', (selector) {
+      expect(selector.classes(inFolder: 'lib/bloc'), hasNoCircularDependency());
     });
 
-    testArch('Presentation layer has no cycles', (arch) {
-      expect(arch.classes(folder: 'lib/presentation'), hasNoCircularDependency());
+    testArch('Presentation layer has no cycles', (selector) {
+      expect(selector.classes(inFolder: 'lib/presentation'), hasNoCircularDependency());
     });
   }, severity: RuleSeverity.critical);
 }
@@ -143,16 +143,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain structural integrity', () {
-    testArch('Domain does not import from data', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/data'));
+    testArch('Domain does not import from data', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
     });
 
-    testArch('Domain does not import from presentation', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), doesNotDependOn('lib/presentation'));
+    testArch('Domain does not import from presentation', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/presentation'));
     });
 
-    testArch('Domain has no circular dependencies', (arch) {
-      expect(arch.classes(folder: 'lib/domain'), hasNoCircularDependency());
+    testArch('Domain has no circular dependencies', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), hasNoCircularDependency());
     });
   }, severity: RuleSeverity.critical);
 }

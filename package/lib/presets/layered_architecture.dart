@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -30,9 +30,9 @@ void layeredArchitecture({
           if (from.folder == to.folder) continue;
           if (from.canAccess.contains(to.folder)) continue;
           testArch('Layer "${from.name}" must not depend on layer "${to.name}"',
-              (arch) {
+              (selector) {
             expect(
-              arch.classes(folder: from.folder, exceptions: exceptions),
+              selector.classes(inFolder: from.folder, exceptions: exceptions),
               doesNotDependOn(to.folder),
             );
           });

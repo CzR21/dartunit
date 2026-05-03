@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -25,9 +25,9 @@ void noBannedCalls({
     'Quality — no banned calls',
     () {
       for (final pattern in patterns) {
-        testArch('Files must not contain banned pattern: $pattern', (arch) {
+        testArch('Files must not contain banned pattern: $pattern', (selector) {
           expect(
-            arch.files(exceptions: excludeFolders),
+            selector.files(exceptions: excludeFolders),
             hasNoContent(pattern),
           );
         });

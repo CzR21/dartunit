@@ -1,4 +1,4 @@
----
+﻿---
 title: hasMethod
 description: Enforce that a class declares a method with a specific name. Used to verify that classes fulfill interface contracts or follow behavioral conventions.
 sidebar:
@@ -70,9 +70,9 @@ By convention, use cases in Dart expose their logic through `call()`, which allo
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Use case classes must declare a call() method', (arch) {
+  testArch('Use case classes must declare a call() method', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/usecases'),
+      selector.classes(inFolder: 'lib/domain/usecases'),
       hasMethod('call'),
     );
   });
@@ -89,9 +89,9 @@ Repositories often hold open streams, HTTP connections, or database cursors. Enf
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Repository implementations must declare a dispose() method', (arch) {
+  testArch('Repository implementations must declare a dispose() method', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+      selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
       hasMethod('dispose'),
     );
   });
@@ -108,9 +108,9 @@ Immutable domain entities need a `copyWith()` method to create modified copies w
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities should declare a copyWith() method', (arch) {
+  testArch('Domain entities should declare a copyWith() method', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/entities'),
+      selector.classes(inFolder: 'lib/domain/entities'),
       hasMethod('copyWith'),
     );
   });
@@ -130,18 +130,18 @@ void main() {
   // Check that use cases have at least one of: call() or execute()
   // Use nameMatchesPattern to split the selection
   testArchGroup('Use case entry point', () {
-    testArch('Call-style use cases must have call()', (arch) {
+    testArch('Call-style use cases must have call()', (selector) {
       // Use cases following the call() convention
       expect(
-        arch.classes(folder: 'lib/domain/usecases', namePattern: r'Get.*UseCase$'),
+        selector.classes(inFolder: 'lib/domain/usecases', matchingPattern: r'Get.*UseCase$'),
         hasMethod('call'),
       );
     });
 
-    testArch('Execute-style use cases must have execute()', (arch) {
+    testArch('Execute-style use cases must have execute()', (selector) {
       // Use cases following the execute() convention
       expect(
-        arch.classes(folder: 'lib/domain/usecases', namePattern: r'.*Interactor$'),
+        selector.classes(inFolder: 'lib/domain/usecases', matchingPattern: r'.*Interactor$'),
         hasMethod('execute'),
       );
     });

@@ -1,4 +1,4 @@
----
+﻿---
 title: hasNoPublicFields
 description: Enforce that all instance fields are private — every field name starts with underscore. The standard encapsulation rule for services, BLoC classes, and repositories.
 sidebar:
@@ -91,9 +91,9 @@ BLoC classes should only expose state through the BLoC stream, not through direc
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('BLoC classes must not expose public fields', (arch) {
+  testArch('BLoC classes must not expose public fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$'),
+      selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$'),
       hasNoPublicFields(),
     );
   });
@@ -110,9 +110,9 @@ Services often hold internal resources (HTTP clients, database connections, cach
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Service classes must not expose public fields', (arch) {
+  testArch('Service classes must not expose public fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/services'),
+      selector.classes(inFolder: 'lib/services'),
       hasNoPublicFields(),
     );
   });
@@ -130,17 +130,17 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Encapsulation rules', () {
-    testArch('BLoC classes must not have public fields', (arch) {
-      expect(arch.classes(folder: 'lib/bloc'), hasNoPublicFields());
+    testArch('BLoC classes must not have public fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/bloc'), hasNoPublicFields());
     });
 
-    testArch('Services must not have public fields', (arch) {
-      expect(arch.classes(folder: 'lib/services'), hasNoPublicFields());
+    testArch('Services must not have public fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/services'), hasNoPublicFields());
     });
 
-    testArch('Repository implementations must not have public fields', (arch) {
+    testArch('Repository implementations must not have public fields', (selector) {
       expect(
-        arch.classes(folder: 'lib/data/repositories', namePattern: r'.*Impl$'),
+        selector.classes(inFolder: 'lib/data/repositories', matchingPattern: r'.*Impl$'),
         hasNoPublicFields(),
       );
     });

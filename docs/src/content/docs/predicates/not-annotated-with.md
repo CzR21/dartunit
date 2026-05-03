@@ -1,4 +1,4 @@
----
+﻿---
 title: doesNotHaveAnnotation
 description: Passes when a class does not carry the specified annotation. See hasAnnotation / doesNotHaveAnnotation for the complete reference.
 sidebar:
@@ -20,12 +20,12 @@ Common uses:
 
 ```dart
 // Domain must not have serialization annotations
-expect(arch.classes(folder: 'lib/domain'), doesNotHaveAnnotation('JsonSerializable'));
-expect(arch.classes(folder: 'lib/domain'), doesNotHaveAnnotation('HiveType'));
+expect(selector.classes(inFolder: 'lib/domain'), doesNotHaveAnnotation('JsonSerializable'));
+expect(selector.classes(inFolder: 'lib/domain'), doesNotHaveAnnotation('HiveType'));
 
 // Production code must not have test infrastructure annotations
-expect(arch.classes(folder: 'lib'), doesNotHaveAnnotation('visibleForTesting'));
-expect(arch.classes(folder: 'lib'), doesNotHaveAnnotation('deprecated'));
+expect(selector.classes(inFolder: 'lib'), doesNotHaveAnnotation('visibleForTesting'));
+expect(selector.classes(inFolder: 'lib'), doesNotHaveAnnotation('deprecated'));
 ```
 
 ---

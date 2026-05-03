@@ -1,4 +1,4 @@
----
+﻿---
 title: hasMinFields
 description: Enforce that classes declare at least N instance fields. Useful for catching empty placeholder classes that were never filled in.
 sidebar:
@@ -58,9 +58,9 @@ An entity with no fields doesn't represent anything. At minimum it should have a
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must have at least 1 field', (arch) {
+  testArch('Domain entities must have at least 1 field', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/entities'),
+      selector.classes(inFolder: 'lib/domain/entities'),
       hasMinFields(1),
     );
   });
@@ -77,9 +77,9 @@ A data model with only one field is barely useful. Require at least 2:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Data models must have at least 2 fields', (arch) {
+  testArch('Data models must have at least 2 fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/models'),
+      selector.classes(inFolder: 'lib/data/models'),
       hasMinFields(2),
     );
   });
@@ -96,8 +96,8 @@ Combine `hasMinFields` and `hasMaxFields` in the same test with multiple `expect
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must have between 1 and 10 fields', (arch) {
-    final entities = arch.classes(folder: 'lib/domain/entities');
+  testArch('Domain entities must have between 1 and 10 fields', (selector) {
+    final entities = selector.classes(inFolder: 'lib/domain/entities');
     expect(entities, hasMinFields(1));    // must carry state
     expect(entities, hasMaxFields(10));   // must not become God Objects
   });

@@ -1,4 +1,4 @@
----
+﻿---
 title:  Violations
 description: How Violation represent the elements under evaluation and the breaches found.
 sidebar:
@@ -38,11 +38,11 @@ A violation's severity comes from the rule that produced it. When a `testArch` i
 ```dart
 testArchGroup('Domain rules', () {
 
-  testArch('Must not depend on data', (arch) {
+  testArch('Must not depend on data', (selector) {
     // ...
   }, severity: RuleSeverity.warning);   // ← ignored, group overrides
 
-  testArch('Must be Flutter-agnostic', (arch) {
+  testArch('Must be Flutter-agnostic', (selector) {
     // ...
   });                                   // ← also inherits group severity
 

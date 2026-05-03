@@ -1,4 +1,4 @@
----
+﻿---
 title: hasContent / hasNoContent
 description: Check whether file source content matches a regular expression. Used to ban print() calls, hardcoded URLs, TODO comments, and other patterns from production code.
 sidebar:
@@ -11,7 +11,7 @@ sidebar:
 
 `hasNoContent(pattern)` is the inverse — it passes when the file's source text **does not match** the pattern.
 
-These matchers operate on the **raw file content** as a string — they scan every character of the file, not just class declarations. They must be used with `arch.files()`, not `arch.classes()`.
+These matchers operate on the **raw file content** as a string — they scan every character of the file, not just class declarations. They must be used with `selector.files()`, not `selector.classes()`.
 
 ---
 
@@ -25,7 +25,7 @@ Some code quality rules cannot be expressed in terms of class structure — they
 - `debugPrint` calls are another logging anti-pattern.
 - Hardcoded secrets or API keys in source code are a security risk.
 
-None of these can be detected by looking at class structure alone. `hasNoContent` (combined with `arch.files()`) fills this gap.
+None of these can be detected by looking at class structure alone. `hasNoContent` (combined with `selector.files()`) fills this gap.
 
 ---
 
@@ -33,14 +33,14 @@ None of these can be detected by looking at class structure alone. `hasNoContent
 
 ```dart
 // File must match the pattern
-expect(arch.files(folder: 'lib'), hasContent(r'pattern'));
+expect(selector.files(inFolder: 'lib'), hasContent(r'pattern'));
 
 // File must NOT match the pattern
-expect(arch.files(folder: 'lib'), hasNoContent(r'pattern'));
+expect(selector.files(inFolder: 'lib'), hasNoContent(r'pattern'));
 ```
 
 :::caution
-Use `arch.files()` (not `arch.classes()`) with these matchers. They operate at the file level, not the class level.
+Use `selector.files()` (not `selector.classes()`) with these matchers. They operate at the file level, not the class level.
 :::
 
 ---
@@ -99,9 +99,9 @@ This is the most common use of `hasNoContent`. Every production file must be fre
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No print() calls in production code', (arch) {
+  testArch('No print() calls in production code', (selector) {
     expect(
-      arch.files(folder: 'lib'),
+      selector.files(inFolder: 'lib'),
       hasNoContent(r'print\s*\('),
     );
   });
@@ -126,9 +126,9 @@ URLs hardcoded in source files are a configuration management problem — they c
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No hardcoded HTTP URLs in production code', (arch) {
+  testArch('No hardcoded HTTP URLs in production code', (selector) {
     expect(
-      arch.files(folder: 'lib'),
+      selector.files(inFolder: 'lib'),
       hasNoContent(
         r'https?://[^\s\'"]+',
         description: 'contains a hardcoded URL',
@@ -149,31 +149,31 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Code quality rules', () {
-    testArch('No print() calls', (arch) {
-      expect(arch.files(folder: 'lib'), hasNoContent(r'print\s*\('));
+    testArch('No print() calls', (selector) {
+      expect(selector.files(inFolder: 'lib'), hasNoContent(r'print\s*\('));
     });
 
-    testArch('No debugPrint() calls', (arch) {
-      expect(arch.files(folder: 'lib'), hasNoContent(r'debugPrint\s*\('));
+    testArch('No debugPrint() calls', (selector) {
+      expect(selector.files(inFolder: 'lib'), hasNoContent(r'debugPrint\s*\('));
     });
 
-    testArch('No TODO comments', (arch) {
+    testArch('No TODO comments', (selector) {
       expect(
-        arch.files(folder: 'lib'),
+        selector.files(inFolder: 'lib'),
         hasNoContent(r'//\s*TODO', description: 'contains a TODO comment'),
       );
     });
 
-    testArch('No FIXME comments', (arch) {
+    testArch('No FIXME comments', (selector) {
       expect(
-        arch.files(folder: 'lib'),
+        selector.files(inFolder: 'lib'),
         hasNoContent(r'//\s*FIXME'),
       );
     });
 
-    testArch('No hardcoded URLs', (arch) {
+    testArch('No hardcoded URLs', (selector) {
       expect(
-        arch.files(folder: 'lib'),
+        selector.files(inFolder: 'lib'),
         hasNoContent(r'https?://[^\s\'"]+', description: 'contains a hardcoded URL'),
       );
     });
@@ -188,8 +188,8 @@ void main() {
 - The regex is matched against the **entire raw file content as a single string**. Multiline patterns and `^`/`$` anchors behave accordingly.
 - Always use raw strings (`r'...'`) in Dart to avoid double-escaping backslashes.
 - The `description` parameter in `hasContent` improves the violation message when your regex is complex. Use it to describe what the pattern detects in plain language.
-- These matchers operate at the **file level** — use them with `arch.files()`, not `arch.classes()`.
-- Files excluded via the `exceptions` parameter of `arch.files()` are not checked.
+- These matchers operate at the **file level** — use them with `selector.files()`, not `selector.classes()`.
+- Files excluded via the `exceptions` parameter of `selector.files()` are not checked.
 
 ---
 

@@ -1,4 +1,4 @@
----
+﻿---
 title: hasMaxImports
 description: Enforce that a file has at most N import directives. A high import count is a strong signal of poor separation of concerns or a God Class.
 sidebar:
@@ -73,9 +73,9 @@ Domain entities should be self-contained and minimally coupled. A high import co
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must have at most 3 imports (low coupling)', (arch) {
+  testArch('Domain entities must have at most 3 imports (low coupling)', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/entities'),
+      selector.classes(inFolder: 'lib/domain/entities'),
       hasMaxImports(3),
     );
   });
@@ -92,9 +92,9 @@ A broad ceiling to catch the most obviously over-coupled classes:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Classes with more than 15 imports are likely God Classes', (arch) {
+  testArch('Classes with more than 15 imports are likely God Classes', (selector) {
     expect(
-      arch.classes(folder: 'lib'),
+      selector.classes(inFolder: 'lib'),
       hasMaxImports(15),
     );
   });
@@ -111,9 +111,9 @@ Use cases should be focused on a single business operation. If a use case is imp
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Use case files must stay focused — at most 5 imports', (arch) {
+  testArch('Use case files must stay focused — at most 5 imports', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/usecases'),
+      selector.classes(inFolder: 'lib/domain/usecases'),
       hasMaxImports(5),
     );
   });

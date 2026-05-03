@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -38,17 +38,17 @@ void classSizeLimit({
       for (final folder in targets) {
         final scope = folder == null ? 'Classes' : 'Classes in "$folder"';
         if (maxMethods != null) {
-          testArch('$scope must have at most $maxMethods methods', (arch) {
+          testArch('$scope must have at most $maxMethods methods', (selector) {
             expect(
-              arch.classes(folder: folder, exceptions: exceptions),
+              selector.classes(inFolder: folder, exceptions: exceptions),
               hasMaxMethods(maxMethods),
             );
           });
         }
         if (maxFields != null) {
-          testArch('$scope must have at most $maxFields fields', (arch) {
+          testArch('$scope must have at most $maxFields fields', (selector) {
             expect(
-              arch.classes(folder: folder, exceptions: exceptions),
+              selector.classes(inFolder: folder, exceptions: exceptions),
               hasMaxFields(maxFields),
             );
           });

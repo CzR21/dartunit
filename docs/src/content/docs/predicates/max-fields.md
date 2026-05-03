@@ -1,4 +1,4 @@
----
+﻿---
 title: hasMaxFields
 description: Enforce that classes declare at most N instance fields. High field count signals God Objects or poor data modeling — classes that hold too much state.
 sidebar:
@@ -74,9 +74,9 @@ Value objects represent a single concept like `Money`, `Address`, or `DateRange`
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Value objects must have at most 5 fields', (arch) {
+  testArch('Value objects must have at most 5 fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/value_objects'),
+      selector.classes(inFolder: 'lib/domain/value_objects'),
       hasMaxFields(5),
     );
   });
@@ -93,9 +93,9 @@ Entities can have more fields, but a limit prevents them from growing indefinite
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain entities must not declare more than 10 fields', (arch) {
+  testArch('Domain entities must not declare more than 10 fields', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/entities'),
+      selector.classes(inFolder: 'lib/domain/entities'),
       hasMaxFields(10),
     );
   });
@@ -113,12 +113,12 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Domain entity quality rules', () {
-    testArch('Domain entities must be immutable', (arch) {
-      expect(arch.classes(folder: 'lib/domain/entities'), hasAllFinalFields());
+    testArch('Domain entities must be immutable', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/entities'), hasAllFinalFields());
     });
 
-    testArch('Domain entities must not have more than 10 fields', (arch) {
-      expect(arch.classes(folder: 'lib/domain/entities'), hasMaxFields(10));
+    testArch('Domain entities must not have more than 10 fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/entities'), hasMaxFields(10));
     });
   });
 }

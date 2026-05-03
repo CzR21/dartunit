@@ -1,4 +1,4 @@
----
+﻿---
 title: Presets
 description: Built-in preset functions that register complete rule sets for common architectural patterns.
 sidebar:
@@ -136,9 +136,9 @@ void main() {
   noPublicFields(folders: ['lib/domain']);
 
   // Custom rule — fine-grained control
-  testArch('Use cases must declare a call() method', (arch) {
+  testArch('Use cases must declare a call() method', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/usecases'),
+      selector.classes(inFolder: 'lib/domain/usecases'),
       hasMethod('call'),
     );
   });
@@ -186,9 +186,9 @@ void cleanArchRules({
     projectRoot: projectRoot,
   );
 
-  testArch('Use cases must declare a call() method', (arch) {
+  testArch('Use cases must declare a call() method', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/usecases'),
+      selector.classes(inFolder: 'lib/domain/usecases'),
       hasMethod('call'),
     );
   }, severity: severity, projectRoot: projectRoot);

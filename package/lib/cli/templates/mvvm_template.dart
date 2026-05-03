@@ -1,4 +1,4 @@
-const List<({String fileName, String content})> mvvmRuleFiles = [
+﻿const List<({String fileName, String content})> mvvmRuleFiles = [
   (fileName: 'mvvm_arch_test.dart', content: _mvvmArchTest),
 ];
 
@@ -19,20 +19,20 @@ void main() {
   const _data          = 'lib/data';
 
   testArchGroup('View layer \u2014 must bind to ViewModel only', () {
-      testArch('Views must not access the data layer directly', (arch) {
-        final viewSelector = arch.classes(folder: _views);
+      testArch('Views must not access the data layer directly', (selector) {
+        final viewSelector = selector.classes(inFolder: _views);
 
         expect(viewSelector, doesNotDependOn(_data));
       });
 
-      testArch('Views must not access models directly', (arch) {
-        final viewSelector = arch.classes(folder: _views);
+      testArch('Views must not access models directly', (selector) {
+        final viewSelector = selector.classes(inFolder: _views);
 
         expect(viewSelector, doesNotDependOn(_models));
       });
 
-      testArch('Views must not depend on services directly', (arch) {
-        final viewSelector = arch.classes(folder: _views);
+      testArch('Views must not depend on services directly', (selector) {
+        final viewSelector = selector.classes(inFolder: _views);
 
         expect(viewSelector, doesNotDependOn(_services));
       });
@@ -41,14 +41,14 @@ void main() {
   );
 
   testArchGroup('ViewModel layer \u2014 no direct data access, no cross-VM dependencies', () {
-      testArch('ViewModels must not access the data layer directly', (arch) {
-        final viewModelSelector = arch.classes(namePattern: r'.*ViewModel\$');
+      testArch('ViewModels must not access the data layer directly', (selector) {
+        final viewModelSelector = selector.classes(matchingPattern: r'.*ViewModel\$');
 
         expect(viewModelSelector, doesNotDependOn(_data));
       });
 
-      testArch('ViewModels must not depend on other ViewModels', (arch) {
-        final viewModelSelector = arch.classes(namePattern: r'.*ViewModel\$');
+      testArch('ViewModels must not depend on other ViewModels', (selector) {
+        final viewModelSelector = selector.classes(matchingPattern: r'.*ViewModel\$');
 
         expect(viewModelSelector, doesNotDependOn(_viewmodels));
       });
@@ -57,20 +57,20 @@ void main() {
   );
 
   testArchGroup('Repository layer \u2014 must not reach into UI or depend on siblings', () {
-      testArch('Repositories must not depend on views', (arch) {
-        final repositorySelector = arch.classes(namePattern: r'.*Repository\$');
+      testArch('Repositories must not depend on views', (selector) {
+        final repositorySelector = selector.classes(matchingPattern: r'.*Repository\$');
 
         expect(repositorySelector, doesNotDependOn(_views));
       });
 
-      testArch('Repositories must not depend on viewmodels', (arch) {
-        final repositorySelector = arch.classes(namePattern: r'.*Repository\$');
+      testArch('Repositories must not depend on viewmodels', (selector) {
+        final repositorySelector = selector.classes(matchingPattern: r'.*Repository\$');
 
         expect(repositorySelector, doesNotDependOn(_viewmodels));
       });
 
-      testArch('Repositories must not depend on other repositories', (arch) {
-        final repositorySelector = arch.classes(namePattern: r'.*Repository\$');
+      testArch('Repositories must not depend on other repositories', (selector) {
+        final repositorySelector = selector.classes(matchingPattern: r'.*Repository\$');
 
         expect(repositorySelector, doesNotDependOn(_repositories));
       });
@@ -79,20 +79,20 @@ void main() {
   );
 
   testArchGroup('Service layer \u2014 must not reach into UI or repositories', () {
-      testArch('Services must not depend on views', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Services must not depend on views', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, doesNotDependOn(_views));
       });
 
-      testArch('Services must not depend on viewmodels', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Services must not depend on viewmodels', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, doesNotDependOn(_viewmodels));
       });
 
-      testArch('Services must not depend on repositories', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Services must not depend on repositories', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, doesNotDependOn(_repositories));
       });
@@ -101,17 +101,17 @@ void main() {
   );
 
   testArchGroup('Repository contracts \u2014 abstract interfaces for testability', () {
-      testArch('Repository interfaces must be abstract', (arch) {
-        final repositorySelector = arch.classes(
-          folder: _repositories,
-          namePattern: r'(?!.*Impl\$).*Repository\$',
+      testArch('Repository interfaces must be abstract', (selector) {
+        final repositorySelector = selector.classes(
+          inFolder: _repositories,
+          matchingPattern: r'(?!.*Impl\$).*Repository\$',
         );
 
         expect(repositorySelector, isAbstractClass());
       });
 
-      testArch('Repository implementations must not be abstract', (arch) {
-        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+      testArch('Repository implementations must not be abstract', (selector) {
+        final repositoryImplSelector = selector.classes(matchingPattern: r'.*RepositoryImpl\$');
 
         expect(repositoryImplSelector, isConcreteClass());
       });
@@ -120,14 +120,14 @@ void main() {
   );
 
   testArchGroup('ViewModel cohesion \u2014 focused responsibility', () {
-      testArch('ViewModels must have at most 10 public methods', (arch) {
-        final viewModelSelector = arch.classes(namePattern: r'.*ViewModel\$');
+      testArch('ViewModels must have at most 10 public methods', (selector) {
+        final viewModelSelector = selector.classes(matchingPattern: r'.*ViewModel\$');
 
         expect(viewModelSelector, hasMaxMethods(10));
       });
 
-      testArch('ViewModels must have at most 15 imports', (arch) {
-        final viewModelSelector = arch.classes(namePattern: r'.*ViewModel\$');
+      testArch('ViewModels must have at most 15 imports', (selector) {
+        final viewModelSelector = selector.classes(matchingPattern: r'.*ViewModel\$');
 
         expect(viewModelSelector, hasMaxImports(15));
       });
@@ -136,14 +136,14 @@ void main() {
   );
 
   testArchGroup('Models \u2014 immutable value objects', () {
-      testArch('Model classes must have all-final fields', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Model classes must have all-final fields', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, hasAllFinalFields());
       });
 
-      testArch('Model classes must not expose public mutable fields', (arch) {
-        final modelSelector = arch.classes(folder: _models);
+      testArch('Model classes must not expose public mutable fields', (selector) {
+        final modelSelector = selector.classes(inFolder: _models);
 
         expect(modelSelector, hasNoPublicFields());
       });
@@ -152,8 +152,8 @@ void main() {
   );
 
   testArchGroup('Services \u2014 stateless and injectable', () {
-      testArch('Service classes must have all-final fields', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Service classes must have all-final fields', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, hasAllFinalFields());
       });

@@ -1,4 +1,4 @@
----
+﻿---
 title: DartUnit generate
 description: Scaffold a new rule file with a pre-filled template ready to customize.
 sidebar:
@@ -36,9 +36,9 @@ Running `dart run dartunit generate no_god_classes` creates `test_arch/no_god_cl
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No God Classes', (arch) {
+  testArch('No God Classes', (selector) {
     expect(
-      arch.classes(folder: 'lib'),
+      selector.classes(inFolder: 'lib'),
       hasMaxMethods(20), // TODO: configure your rule
     );
   });
@@ -60,18 +60,18 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Class size limits', () {
-    testArch('Classes must not exceed 25 methods', (arch) {
+    testArch('Classes must not exceed 25 methods', (selector) {
       expect(
-        arch.classes(
-          folder: 'lib',
+        selector.classes(
+          inFolder: 'lib',
           exceptions: ['lib/generated', 'lib/mocks'],
         ),
         hasMaxMethods(25),
       );
     }, severity: RuleSeverity.warning);
 
-    testArch('Classes must not exceed 15 fields', (arch) {
-      expect(arch.classes(folder: 'lib'), hasMaxFields(15));
+    testArch('Classes must not exceed 15 fields', (selector) {
+      expect(selector.classes(inFolder: 'lib'), hasMaxFields(15));
     }, severity: RuleSeverity.warning);
   });
 }

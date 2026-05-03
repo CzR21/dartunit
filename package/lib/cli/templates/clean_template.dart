@@ -1,4 +1,4 @@
-const List<({String fileName, String content})> cleanRuleFiles = [
+﻿const List<({String fileName, String content})> cleanRuleFiles = [
   (fileName: 'clean_arch_test.dart', content: _cleanArchTest),
 ];
 
@@ -17,26 +17,26 @@ void main() {
   const _services     = 'lib/services';
 
   testArchGroup('Domain layer \u2014 isolated from all outer layers', () {
-      testArch('Domain must not depend on the data layer', (arch) {
-        final domainSelector = arch.classes(folder: _domain);
+      testArch('Domain must not depend on the data layer', (selector) {
+        final domainSelector = selector.classes(inFolder: _domain);
 
         expect(domainSelector, doesNotDependOn(_data));
       });
 
-      testArch('Domain must not depend on the presentation layer', (arch) {
-        final domainSelector = arch.classes(folder: _domain);
+      testArch('Domain must not depend on the presentation layer', (selector) {
+        final domainSelector = selector.classes(inFolder: _domain);
 
         expect(domainSelector, doesNotDependOn(_presentation));
       });
 
-      testArch('Domain must be Flutter-agnostic', (arch) {
-        final domainSelector = arch.classes(folder: _domain);
+      testArch('Domain must be Flutter-agnostic', (selector) {
+        final domainSelector = selector.classes(inFolder: _domain);
 
         expect(domainSelector, doesNotDependOnPackage('flutter'));
       });
 
-      testArch('Domain must not use HTTP packages directly', (arch) {
-        final domainSelector = arch.classes(folder: _domain);
+      testArch('Domain must not use HTTP packages directly', (selector) {
+        final domainSelector = selector.classes(inFolder: _domain);
 
         expect(domainSelector, doesNotDependOnPackage('dio'));
         expect(domainSelector, doesNotDependOnPackage('http'));
@@ -46,8 +46,8 @@ void main() {
   );
 
   testArchGroup('Presentation layer \u2014 must go through domain', () {
-      testArch('Presentation must not access the data layer directly', (arch) {
-        final presentationSelector = arch.classes(folder: _presentation);
+      testArch('Presentation must not access the data layer directly', (selector) {
+        final presentationSelector = selector.classes(inFolder: _presentation);
 
         expect(presentationSelector, doesNotDependOn(_data));
       });
@@ -56,8 +56,8 @@ void main() {
   );
 
   testArchGroup('Data layer \u2014 must not reach into presentation', () {
-      testArch('Data layer must not depend on the presentation layer', (arch) {
-        final dataSelector = arch.classes(folder: _data);
+      testArch('Data layer must not depend on the presentation layer', (selector) {
+        final dataSelector = selector.classes(inFolder: _data);
 
         expect(dataSelector, doesNotDependOn(_presentation));
       });
@@ -66,20 +66,20 @@ void main() {
   );
 
   testArchGroup('Repository contract \u2014 interface in domain, impl in data', () {
-      testArch('Repository interfaces in domain must be abstract', (arch) {
-        final repositorySelector = arch.classes(folder: _domain, namePattern: r'.*Repository\$');
+      testArch('Repository interfaces in domain must be abstract', (selector) {
+        final repositorySelector = selector.classes(inFolder: _domain, matchingPattern: r'.*Repository\$');
 
         expect(repositorySelector, isAbstractClass());
       });
 
-      testArch('Repository implementations must not be abstract', (arch) {
-        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+      testArch('Repository implementations must not be abstract', (selector) {
+        final repositoryImplSelector = selector.classes(matchingPattern: r'.*RepositoryImpl\$');
 
         expect(repositoryImplSelector, isConcreteClass());
       });
 
-      testArch('Repository implementations must not access presentation', (arch) {
-        final repositoryImplSelector = arch.classes(namePattern: r'.*RepositoryImpl\$');
+      testArch('Repository implementations must not access presentation', (selector) {
+        final repositoryImplSelector = selector.classes(matchingPattern: r'.*RepositoryImpl\$');
 
         expect(repositoryImplSelector, doesNotDependOn(_presentation));
       });
@@ -88,26 +88,26 @@ void main() {
   );
 
   testArchGroup('Use cases \u2014 single responsibility, pure Dart', () {
-      testArch('Use cases must not depend on the data layer', (arch) {
-        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+      testArch('Use cases must not depend on the data layer', (selector) {
+        final useCaseSelector = selector.classes(matchingPattern: r'.*UseCase\$');
 
         expect(useCaseSelector, doesNotDependOn(_data));
       });
 
-      testArch('Use cases must not depend on the presentation layer', (arch) {
-        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+      testArch('Use cases must not depend on the presentation layer', (selector) {
+        final useCaseSelector = selector.classes(matchingPattern: r'.*UseCase\$');
 
         expect(useCaseSelector, doesNotDependOn(_presentation));
       });
 
-      testArch('Use cases must be Flutter-agnostic', (arch) {
-        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+      testArch('Use cases must be Flutter-agnostic', (selector) {
+        final useCaseSelector = selector.classes(matchingPattern: r'.*UseCase\$');
 
         expect(useCaseSelector, doesNotDependOnPackage('flutter'));
       });
 
-      testArch('Use cases must have at most 3 methods', (arch) {
-        final useCaseSelector = arch.classes(namePattern: r'.*UseCase\$');
+      testArch('Use cases must have at most 3 methods', (selector) {
+        final useCaseSelector = selector.classes(matchingPattern: r'.*UseCase\$');
 
         expect(useCaseSelector, hasMaxMethods(3));
       }, severity: RuleSeverity.warning);
@@ -116,14 +116,14 @@ void main() {
   );
 
   testArchGroup('Domain entities \u2014 immutable value objects', () {
-      testArch('Domain entities must have all-final fields', (arch) {
-        final entitySelector = arch.classes(folder: _domain, namePattern: r'.*Entity\$');
+      testArch('Domain entities must have all-final fields', (selector) {
+        final entitySelector = selector.classes(inFolder: _domain, matchingPattern: r'.*Entity\$');
 
         expect(entitySelector, hasAllFinalFields());
       });
 
-      testArch('Domain entities must not expose public mutable fields', (arch) {
-        final entitySelector = arch.classes(folder: _domain, namePattern: r'.*Entity\$');
+      testArch('Domain entities must not expose public mutable fields', (selector) {
+        final entitySelector = selector.classes(inFolder: _domain, matchingPattern: r'.*Entity\$');
 
         expect(entitySelector, hasNoPublicFields());
       });
@@ -132,8 +132,8 @@ void main() {
   );
 
   testArchGroup('Repository isolation \u2014 repos must not know each other', () {
-      testArch('Repositories must not depend on other repositories', (arch) {
-        final repositorySelector = arch.classes(namePattern: r'.*Repository\$');
+      testArch('Repositories must not depend on other repositories', (selector) {
+        final repositorySelector = selector.classes(matchingPattern: r'.*Repository\$');
 
         expect(repositorySelector, doesNotDependOn(_data));
       });
@@ -142,26 +142,26 @@ void main() {
   );
 
   testArchGroup('Services layer \u2014 thin wrappers, no upstream dependencies', () {
-      testArch('Services must not depend on the presentation layer', (arch) {
-        final serviceSelector = arch.classes(folder: _services);
+      testArch('Services must not depend on the presentation layer', (selector) {
+        final serviceSelector = selector.classes(inFolder: _services);
 
         expect(serviceSelector, doesNotDependOn(_presentation));
       });
 
-      testArch('Services must not depend on repositories', (arch) {
-        final serviceSelector = arch.classes(folder: _services);
+      testArch('Services must not depend on repositories', (selector) {
+        final serviceSelector = selector.classes(inFolder: _services);
 
         expect(serviceSelector, doesNotDependOn(_data));
       });
 
-      testArch('Services must not depend on the domain layer', (arch) {
-        final serviceSelector = arch.classes(folder: _services);
+      testArch('Services must not depend on the domain layer', (selector) {
+        final serviceSelector = selector.classes(inFolder: _services);
 
         expect(serviceSelector, doesNotDependOn(_domain));
       });
 
-      testArch('Service classes must have all-final fields', (arch) {
-        final serviceSelector = arch.classes(namePattern: r'.*Service\$');
+      testArch('Service classes must have all-final fields', (selector) {
+        final serviceSelector = selector.classes(matchingPattern: r'.*Service\$');
 
         expect(serviceSelector, hasAllFinalFields());
       });
@@ -170,14 +170,14 @@ void main() {
   );
 
   testArchGroup('Data models \u2014 immutable DTOs', () {
-      testArch('Data model classes must have all-final fields', (arch) {
-        final modelSelector = arch.classes(folder: _data, namePattern: r'.*Model\$');
+      testArch('Data model classes must have all-final fields', (selector) {
+        final modelSelector = selector.classes(inFolder: _data, matchingPattern: r'.*Model\$');
 
         expect(modelSelector, hasAllFinalFields());
       });
 
-      testArch('Data models must not expose public mutable fields', (arch) {
-        final modelSelector = arch.classes(folder: _data, namePattern: r'.*Model\$');
+      testArch('Data models must not expose public mutable fields', (selector) {
+        final modelSelector = selector.classes(inFolder: _data, matchingPattern: r'.*Model\$');
 
         expect(modelSelector, hasNoPublicFields());
       });

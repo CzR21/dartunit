@@ -1,4 +1,4 @@
----
+﻿---
 title: Introduction to DartUnit
 description: What DartUnit is and why architecture testing matters for Dart and Flutter projects.
 sidebar:
@@ -49,14 +49,14 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('BLoC layer rules', () {
-    testArch('BLoC classes must not depend on the view layer', (arch) {
-      final blocSelector = arch.classes(namePattern: r'.*Bloc$');
+    testArch('BLoC classes must not depend on the view layer', (selector) {
+      final blocSelector = selector.classes(matchingPattern: r'.*Bloc$');
 
       expect(blocSelector, doesNotDependOn('lib/view'));
     });
 
-    testArch('BLoC classes must end with Bloc', (arch) {
-      final blocSelector = arch.classes(folder: 'lib/bloc');
+    testArch('BLoC classes must end with Bloc', (selector) {
+      final blocSelector = selector.classes(inFolder: 'lib/bloc');
 
       expect(blocSelector, nameEndsWith('Bloc'));
     });

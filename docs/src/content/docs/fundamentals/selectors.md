@@ -162,9 +162,9 @@ FileSelector(
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('No print() calls in production code', (arch) {
+  testArch('No print() calls in production code', (selector) {
     expect(
-      arch.files(folder: 'lib'),
+      selector.files(inFolder: 'lib'),
       hasNoContent(r'print\s*\('),
     );
   }, severity: RuleSeverity.warning);
@@ -201,9 +201,9 @@ LayerSelector('lib/presentation')
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain layer must not depend on data layer', (arch) {
+  testArch('Domain layer must not depend on data layer', (selector) {
     expect(
-      arch.layer('domain', folder: 'lib/domain'),
+      selector.layer('domain', inFolder: 'lib/domain'),
       doesNotDependOn('lib/data'),
     );
   }, severity: RuleSeverity.error);

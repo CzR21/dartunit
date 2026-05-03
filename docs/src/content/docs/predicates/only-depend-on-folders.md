@@ -1,4 +1,4 @@
----
+﻿---
 title: onlyDependsOnFolders
 description: Enforce that a layer can only import from an explicit whitelist of folders. Stricter than doesNotDependOn — checks every single import, not just one.
 sidebar:
@@ -74,9 +74,9 @@ The domain layer should be completely self-contained — pure business logic wit
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain layer can only import from itself', (arch) {
+  testArch('Domain layer can only import from itself', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain'),
+      selector.classes(inFolder: 'lib/domain'),
       onlyDependsOnFolders(['lib/domain']),
     );
   });
@@ -101,9 +101,9 @@ Many projects have a `lib/core` or `lib/shared` folder with utilities (extension
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain may only import from itself and shared core', (arch) {
+  testArch('Domain may only import from itself and shared core', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain'),
+      selector.classes(inFolder: 'lib/domain'),
       onlyDependsOnFolders([
         'lib/domain',   // its own files
         'lib/shared',   // shared utilities
@@ -125,23 +125,23 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Strict layer boundaries', () {
-    testArch('Domain only knows itself', (arch) {
+    testArch('Domain only knows itself', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain'),
+        selector.classes(inFolder: 'lib/domain'),
         onlyDependsOnFolders(['lib/domain', 'lib/core']),
       );
     });
 
-    testArch('Data only knows domain and itself', (arch) {
+    testArch('Data only knows domain and itself', (selector) {
       expect(
-        arch.classes(folder: 'lib/data'),
+        selector.classes(inFolder: 'lib/data'),
         onlyDependsOnFolders(['lib/data', 'lib/domain', 'lib/core']),
       );
     });
 
-    testArch('BLoC only knows domain and itself', (arch) {
+    testArch('BLoC only knows domain and itself', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc'),
+        selector.classes(inFolder: 'lib/bloc'),
         onlyDependsOnFolders(['lib/bloc', 'lib/domain', 'lib/core']),
       );
     });

@@ -1,4 +1,4 @@
----
+﻿---
 title: nameEndsWith
 description: Enforce that class names end with a specific suffix. The most common naming matcher — used for Repository, Bloc, Service, Impl, and similar conventions.
 sidebar:
@@ -74,9 +74,9 @@ All classes in the domain repository folder must end with `Repository` — this 
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Domain repositories must end with Repository', (arch) {
+  testArch('Domain repositories must end with Repository', (selector) {
     expect(
-      arch.classes(folder: 'lib/domain/repositories'),
+      selector.classes(inFolder: 'lib/domain/repositories'),
       nameEndsWith('Repository'),
     );
   });
@@ -93,9 +93,9 @@ Your team uses both BLoC and Cubit. Both are valid — the rule should accept ei
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('State managers must end with Bloc or Cubit', (arch) {
+  testArch('State managers must end with Bloc or Cubit', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc'),
+      selector.classes(inFolder: 'lib/bloc'),
       // For OR conditions with names, use nameMatchesPattern with regex alternation
       nameMatchesPattern(r'.*(Bloc|Cubit)$'),
     );
@@ -114,23 +114,23 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('BLoC layer naming conventions', () {
-    testArch('BLoC classes must end with Bloc', (arch) {
+    testArch('BLoC classes must end with Bloc', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc', namePattern: r'.*Bloc$'),
+        selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Bloc$'),
         nameEndsWith('Bloc'),
       );
     });
 
-    testArch('Event classes must end with Event', (arch) {
+    testArch('Event classes must end with Event', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc', namePattern: r'.*Event$'),
+        selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*Event$'),
         nameEndsWith('Event'),
       );
     });
 
-    testArch('State classes must end with State', (arch) {
+    testArch('State classes must end with State', (selector) {
       expect(
-        arch.classes(folder: 'lib/bloc', namePattern: r'.*State$'),
+        selector.classes(inFolder: 'lib/bloc', matchingPattern: r'.*State$'),
         nameEndsWith('State'),
       );
     });

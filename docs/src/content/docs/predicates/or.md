@@ -1,4 +1,4 @@
----
+﻿---
 title: Combining matchers — OR
 description: How to express "must satisfy condition A OR condition B" in DartUnit rules. OR conditions on names use nameMatchesPattern with regex alternation.
 sidebar:
@@ -9,7 +9,7 @@ sidebar:
 
 In DartUnit, the **OR** combination is expressed through **regex alternation** in `nameMatchesPattern()`. The pattern `r'.*(Bloc|Cubit)$'` means "must end with `Bloc` OR `Cubit`".
 
-For structural OR conditions (e.g., "must implement InterfaceA OR InterfaceB"), use the `namePattern` parameter in `arch.classes()` to split the selection into separate rules.
+For structural OR conditions (e.g., "must implement InterfaceA OR InterfaceB"), use the `namePattern` parameter in `selector.classes()` to split the selection into separate rules.
 
 ---
 
@@ -44,20 +44,20 @@ expect(subject, nameMatchesPattern(r'^(Cart|Order|Payment)[A-Z].*'));
 
 ## Syntax for structural OR conditions
 
-For structural OR (e.g., implements one interface OR another), use the `namePattern` parameter in `arch.classes()` to select each group separately and apply a specific rule to each:
+For structural OR (e.g., implements one interface OR another), use the `namePattern` parameter in `selector.classes()` to select each group separately and apply a specific rule to each:
 
 ```dart
 testArchGroup('Use case entry points', () {
-  testArch('Call-style use cases must have call()', (arch) {
+  testArch('Call-style use cases must have call()', (selector) {
     expect(
-      arch.classes(folder: 'lib/usecases', namePattern: r'Get.*UseCase$'),
+      selector.classes(inFolder: 'lib/usecases', matchingPattern: r'Get.*UseCase$'),
       hasMethod('call'),
     );
   });
 
-  testArch('Execute-style interactors must have execute()', (arch) {
+  testArch('Execute-style interactors must have execute()', (selector) {
     expect(
-      arch.classes(folder: 'lib/usecases', namePattern: r'.*Interactor$'),
+      selector.classes(inFolder: 'lib/usecases', matchingPattern: r'.*Interactor$'),
       hasMethod('execute'),
     );
   });
@@ -74,9 +74,9 @@ testArchGroup('Use case entry points', () {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('State management classes must end with Bloc or Cubit', (arch) {
+  testArch('State management classes must end with Bloc or Cubit', (selector) {
     expect(
-      arch.classes(folder: 'lib/bloc'),
+      selector.classes(inFolder: 'lib/bloc'),
       nameMatchesPattern(r'^[A-Z][a-zA-Z]+(Bloc|Cubit)$'),
     );
   });
@@ -91,9 +91,9 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Data classes must end with Model or Dto', (arch) {
+  testArch('Data classes must end with Model or Dto', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/models'),
+      selector.classes(inFolder: 'lib/data/models'),
       nameMatchesPattern(r'^[A-Z][a-zA-Z]+(Model|Dto)$'),
     );
   });
@@ -108,9 +108,9 @@ void main() {
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Base classes must start with Abstract or Base', (arch) {
+  testArch('Base classes must start with Abstract or Base', (selector) {
     expect(
-      arch.classes(folder: 'lib/core/base'),
+      selector.classes(inFolder: 'lib/core/base'),
       nameMatchesPattern(r'^(Abstract|Base)[A-Z][a-zA-Z]+$'),
     );
   });
@@ -129,17 +129,17 @@ import 'package:dartunit/dartunit.dart';
 void main() {
   testArchGroup('Use case entry points', () {
     // Group 1: classes following the call() convention
-    testArch('UseCase-named classes must have call()', (arch) {
+    testArch('UseCase-named classes must have call()', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/usecases', namePattern: r'.*UseCase$'),
+        selector.classes(inFolder: 'lib/domain/usecases', matchingPattern: r'.*UseCase$'),
         hasMethod('call'),
       );
     });
 
     // Group 2: classes following the execute() convention
-    testArch('Interactor-named classes must have execute()', (arch) {
+    testArch('Interactor-named classes must have execute()', (selector) {
       expect(
-        arch.classes(folder: 'lib/domain/usecases', namePattern: r'.*Interactor$'),
+        selector.classes(inFolder: 'lib/domain/usecases', matchingPattern: r'.*Interactor$'),
         hasMethod('execute'),
       );
     });

@@ -1,4 +1,4 @@
----
+﻿---
 title: nameContains
 description: Enforce that class names contain a specific keyword anywhere in the name. Useful for feature-scoped naming conventions.
 sidebar:
@@ -63,9 +63,9 @@ In feature-based architectures, all classes within a feature folder should refer
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Cart feature classes must reference Cart in their name', (arch) {
+  testArch('Cart feature classes must reference Cart in their name', (selector) {
     expect(
-      arch.classes(folder: 'lib/features/cart'),
+      selector.classes(inFolder: 'lib/features/cart'),
       nameContains('Cart'),
     );
   });
@@ -84,9 +84,9 @@ Enforce that all classes in the mapper folder actually have `Mapper` in their na
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Mapper classes must contain Mapper in their name', (arch) {
+  testArch('Mapper classes must contain Mapper in their name', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/mappers'),
+      selector.classes(inFolder: 'lib/data/mappers'),
       nameContains('Mapper'),
     );
   });
@@ -104,16 +104,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('No test doubles in production code', () {
-    testArch('Production classes must not contain Mock', (arch) {
+    testArch('Production classes must not contain Mock', (selector) {
       expect(
-        arch.classes(folder: 'lib'),
+        selector.classes(inFolder: 'lib'),
         nameMatchesPattern(r'^(?!.*Mock).*$'),
       );
     });
 
-    testArch('Production classes must not contain Fake', (arch) {
+    testArch('Production classes must not contain Fake', (selector) {
       expect(
-        arch.classes(folder: 'lib'),
+        selector.classes(inFolder: 'lib'),
         nameMatchesPattern(r'^(?!.*Fake).*$'),
       );
     });

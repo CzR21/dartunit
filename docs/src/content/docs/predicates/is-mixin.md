@@ -1,4 +1,4 @@
----
+﻿---
 title: isMixinType
 description: Enforce that declarations in a folder are mixins. Useful to keep mixin-only folders clean and validate that Mixin-suffixed names are actual mixins.
 sidebar:
@@ -62,9 +62,9 @@ Ensure your dedicated mixin folder stays clean:
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('The mixins folder must contain only mixin declarations', (arch) {
+  testArch('The mixins folder must contain only mixin declarations', (selector) {
     expect(
-      arch.classes(folder: 'lib/core/mixins'),
+      selector.classes(inFolder: 'lib/core/mixins'),
       isMixinType(),
     );
   });
@@ -81,9 +81,9 @@ Enforce the naming-declaration consistency: if a declaration is named `*Mixin`, 
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Declarations ending with Mixin must use the mixin keyword', (arch) {
+  testArch('Declarations ending with Mixin must use the mixin keyword', (selector) {
     expect(
-      arch.classes(folder: 'lib', namePattern: r'.*Mixin$'),
+      selector.classes(inFolder: 'lib', matchingPattern: r'.*Mixin$'),
       isMixinType(),
     );
   });
@@ -118,16 +118,16 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Mixin folder rules', () {
-    testArch('Mixin folder must contain only mixins', (arch) {
-      expect(arch.classes(folder: 'lib/core/mixins'), isMixinType());
+    testArch('Mixin folder must contain only mixins', (selector) {
+      expect(selector.classes(inFolder: 'lib/core/mixins'), isMixinType());
     });
 
-    testArch('Mixins must not import from UI layer', (arch) {
-      expect(arch.classes(folder: 'lib/core/mixins'), doesNotDependOn('lib/presentation'));
+    testArch('Mixins must not import from UI layer', (selector) {
+      expect(selector.classes(inFolder: 'lib/core/mixins'), doesNotDependOn('lib/presentation'));
     });
 
-    testArch('Mixins must not depend on domain-specific code', (arch) {
-      expect(arch.classes(folder: 'lib/core/mixins'), doesNotDependOn('lib/domain'));
+    testArch('Mixins must not depend on domain-specific code', (selector) {
+      expect(selector.classes(inFolder: 'lib/core/mixins'), doesNotDependOn('lib/domain'));
     });
   });
 }

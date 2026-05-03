@@ -1,4 +1,4 @@
----
+﻿---
 title: hasNoPublicMethods
 description: Enforce that all methods are private — every method name starts with underscore. Used for fully internal implementation classes that should expose no public API.
 sidebar:
@@ -59,9 +59,9 @@ Internal processing classes that are meant to be used only through a specific or
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Internal classes must not expose a public API', (arch) {
+  testArch('Internal classes must not expose a public API', (selector) {
     expect(
-      arch.classes(folder: 'lib/internal'),
+      selector.classes(inFolder: 'lib/internal'),
       hasNoPublicMethods(),
     );
   });
@@ -79,12 +79,12 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Strategy implementations must be fully private', () {
-    testArch('Strategy classes must not expose public fields', (arch) {
-      expect(arch.classes(folder: 'lib/internal/strategies'), hasNoPublicFields());
+    testArch('Strategy classes must not expose public fields', (selector) {
+      expect(selector.classes(inFolder: 'lib/internal/strategies'), hasNoPublicFields());
     });
 
-    testArch('Strategy classes must not expose public methods', (arch) {
-      expect(arch.classes(folder: 'lib/internal/strategies'), hasNoPublicMethods());
+    testArch('Strategy classes must not expose public methods', (selector) {
+      expect(selector.classes(inFolder: 'lib/internal/strategies'), hasNoPublicMethods());
     });
   }, severity: RuleSeverity.info);
 }

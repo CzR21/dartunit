@@ -1,4 +1,4 @@
----
+﻿---
 title: isConcreteClass
 description: Enforce that declarations are plain concrete classes — not abstract, not mixin, not enum, not extension. Used to validate implementation folders.
 sidebar:
@@ -69,9 +69,9 @@ Ensure that the repository implementation folder does not accidentally contain a
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Data repositories must be concrete classes', (arch) {
+  testArch('Data repositories must be concrete classes', (selector) {
     expect(
-      arch.classes(folder: 'lib/data/repositories'),
+      selector.classes(inFolder: 'lib/data/repositories'),
       isConcreteClass(),
     );
   });
@@ -88,9 +88,9 @@ Any class ending with `Impl` is by definition an implementation — it should ne
 import 'package:dartunit/dartunit.dart';
 
 void main() {
-  testArch('Classes named *Impl must be concrete', (arch) {
+  testArch('Classes named *Impl must be concrete', (selector) {
     expect(
-      arch.classes(namePattern: r'.*Impl$'),
+      selector.classes(matchingPattern: r'.*Impl$'),
       isConcreteClass(),
     );
   });
@@ -108,12 +108,12 @@ import 'package:dartunit/dartunit.dart';
 
 void main() {
   testArchGroup('Repository layer structure', () {
-    testArch('Domain repositories (interfaces) must be abstract', (arch) {
-      expect(arch.classes(folder: 'lib/domain/repositories'), isAbstractClass());
+    testArch('Domain repositories (interfaces) must be abstract', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain/repositories'), isAbstractClass());
     });
 
-    testArch('Data repositories (implementations) must be concrete', (arch) {
-      expect(arch.classes(folder: 'lib/data/repositories'), isConcreteClass());
+    testArch('Data repositories (implementations) must be concrete', (selector) {
+      expect(selector.classes(inFolder: 'lib/data/repositories'), isConcreteClass());
     });
   });
 }

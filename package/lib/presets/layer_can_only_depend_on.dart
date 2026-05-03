@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+﻿import 'package:test/test.dart';
 
 import '../core/enums/rule_severity.dart';
 import '../runner/arch_runner.dart';
@@ -21,9 +21,9 @@ void layerCanOnlyDependOn({
 }) {
   testArch(
     '"$layer" can only depend on: ${allowed.join(', ')}',
-    (arch) {
+    (selector) {
       expect(
-        arch.classes(folder: layer, exceptions: exceptions),
+        selector.classes(inFolder: layer, exceptions: exceptions),
         onlyDependsOnFolders(allowed),
       );
     },
