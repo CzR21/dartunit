@@ -46,6 +46,26 @@ class HtmlReporter {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DartUnit — Architecture Report — $ts</title>
+    <script>
+    (function(){
+      var s=localStorage.getItem('du-theme');
+      var light=s?s==='light':window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;
+      if(light) document.documentElement.setAttribute('data-theme','light');
+      document.addEventListener('DOMContentLoaded',function(){
+        var c=document.getElementById('theme-switch');
+        if(c) c.checked=light;
+      });
+    })();
+    function toggleTheme(c){
+      if(c.checked){
+        document.documentElement.setAttribute('data-theme','light');
+        localStorage.setItem('du-theme','light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('du-theme','dark');
+      }
+    }
+    </script>
     <style>
     ${HtmlCssTheme.stylesheet}
     </style>
@@ -61,7 +81,15 @@ class HtmlReporter {
   <p class="subtitle">Architecture Analysis Report</p>
   <p class="meta">$root &bull; $ts &bull; $rulesCount rule${rulesCount == 1 ? '' : 's'}</p>
 </div>
-<div class="status $statusClass">$statusLabel</div>
+<div class="header-right">
+  <label class="theme-toggle" title="Toggle light/dark mode">
+    <span class="toggle-icon">🌙</span>
+    <input type="checkbox" id="theme-switch" onchange="toggleTheme(this)">
+    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    <span class="toggle-icon">☀️</span>
+  </label>
+  <div class="status $statusClass">$statusLabel</div>
+</div>
 </header>
 ''';
 

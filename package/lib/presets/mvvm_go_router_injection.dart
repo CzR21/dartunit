@@ -37,6 +37,7 @@ void mvvmGoRouterInjection({
           suffix: 'ViewModel',
           exceptions: exceptions,
         );
+
         expect(viewModels, extendsClass('ChangeNotifier'));
       });
 
@@ -48,19 +49,8 @@ void mvvmGoRouterInjection({
             suffix: 'ViewModel',
             exceptions: exceptions,
           );
-          expect(viewModels, hasNoPublicFields());
-        },
-      );
 
-      testArch(
-        'ViewModels must have all-final fields — dependencies are immutable after injection',
-        (arch) {
-          final viewModels = arch.classes(
-            folder: viewModelsFolder,
-            suffix: 'ViewModel',
-            exceptions: exceptions,
-          );
-          expect(viewModels, hasAllFinalFields());
+          expect(viewModels, hasNoPublicFields());
         },
       );
 
@@ -72,6 +62,7 @@ void mvvmGoRouterInjection({
             suffix: 'ViewModel',
             exceptions: exceptions,
           );
+
           expect(viewModels, doesNotDependOnPackage('go_router'));
         },
       );
@@ -81,12 +72,18 @@ void mvvmGoRouterInjection({
         'only ViewModels may be injected into views',
         (arch) {
           final views = arch.files(folder: viewsFolder, exceptions: exceptions);
-          expect(
-            views,
-            hasNoContent(
-              r'context\.read<[^>]*(?:Repository|Service)[^>]*>',
-            ),
+
+          expect(views, hasNoContent(r'context\.read<[^>]*(?:Repository|Service)[^>]*>',),
           );
+        },
+      );
+
+      testArch(
+        'Router must instantiate ViewModels',
+        (arch) {
+          final router = arch.files(folder: routerFolder);
+
+          expect(router, hasContent(r'\b\w+ViewModel\(', description: 'router must instantiate ViewModels',),);
         },
       );
 
@@ -94,13 +91,8 @@ void mvvmGoRouterInjection({
         'Router must inject dependencies into ViewModels via context.read()',
         (arch) {
           final router = arch.files(folder: routerFolder);
-          expect(
-            router,
-            hasContent(
-              r'context\.read\(',
-              description: 'router must inject dependencies via context.read()',
-            ),
-          );
+
+          expect(router, hasContent(r':\s*context\.read\(', description: 'router must pass dependencies as named args via context.read()',),);
         },
       );
     },
