@@ -1,12 +1,12 @@
-# dartunit
+# DartUnit
 
 Architecture testing tool for Dart and Flutter projects, inspired by [ArchUnit](https://www.archunit.org/) and [ArchUnitNET](https://archunitnet.readthedocs.io/).
 
 ---
 
-## What is dartunit?
+## What is DartUnit?
 
-dartunit lets you define **architecture rules** as Dart tests and validates them against your project's source code. Violations are reported to the console (and an HTML report), making it easy to enforce architectural boundaries in your CI pipeline.
+DartUnit lets you define **architecture rules** as Dart tests and validates them against your project's source code. Violations are reported to the console (and an HTML report), making it easy to enforce architectural boundaries in your CI pipeline.
 
 Typical use cases:
 
