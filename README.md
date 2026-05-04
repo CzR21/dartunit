@@ -6,7 +6,7 @@ Architecture testing tool for Dart and Flutter projects, inspired by [ArchUnit](
 
 ## What is dartunit?
 
-dartunit lets you define **architecture rules** in YAML (or pure Dart) and validates them against your project's source code. Violations are reported to the console, making it easy to enforce architectural boundaries in your CI pipeline.
+dartunit lets you define **architecture rules** as Dart tests and validates them against your project's source code. Violations are reported to the console (and an HTML report), making it easy to enforce architectural boundaries in your CI pipeline.
 
 Typical use cases:
 
@@ -26,7 +26,7 @@ Add as a dev dependency:
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  dartunit: ^0.1.0
+  dartunit: ^1.0.0
 ```
 
 Or activate globally to use the CLI without `dart run`:
@@ -40,10 +40,10 @@ dart pub global activate dartunit
 ## Quick Start
 
 ```bash
-# 1. Scaffold the configuration folder
+# 1. Scaffold the test_arch/ folder
 dart run dartunit init
 
-# 2. Edit .dartunit/dartunit.yaml with your rules
+# 2. Edit test_arch/example_arch_test.dart with your rules
 
 # 3. Run the analysis
 dart run dartunit analyze
@@ -55,14 +55,20 @@ dart run dartunit analyze
 
 ### `dartunit init`
 
-Creates the `.dartunit/` scaffold inside the target project:
+Creates the `test_arch/` scaffold inside the target project:
 
 ```
-.dartunit/
-├── dartunit.yaml          # Rule configuration
-├── README.md              # Quick-reference documentation
-└── custom_rules/
-    └── example_rule.dart  # Example custom rule
+test_arch/
+└── example_arch_test.dart   # Ready-to-edit example rule
+```
+
+Use `--template` to scaffold a set of pre-built rules for a common architecture:
+
+```bash
+dart run dartunit init --template clean   # Clean Architecture
+dart run dartunit init --template bloc    # BLoC pattern
+dart run dartunit init --template mvc     # MVC
+dart run dartunit init --template mvvm    # MVVM
 ```
 
 Options:
@@ -70,15 +76,15 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `-p, --path` | Path to the target project (default: `.`) |
+| `-t, --template` | Architecture template: `bloc`, `clean`, `mvc`, `mvvm` |
 
 ### `dartunit analyze`
 
-Analyzes the project source code against all configured rules.
+Discovers all `*_arch_test.dart` files in `test_arch/`, runs them with `dart test`, and reports violations.
 
 ```bash
 dart run dartunit analyze
 dart run dartunit analyze --path /path/to/project
-dart run dartunit analyze --config /path/to/dartunit.yaml
 dart run dartunit analyze --no-color
 ```
 
@@ -87,7 +93,6 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `-p, --path` | Path to the target project (default: `.`) |
-| `-c, --config` | Path to `dartunit.yaml` (default: `.dartunit/dartunit.yaml`) |
 | `--no-color` | Disable coloured output |
 
 Exit codes:
@@ -98,295 +103,446 @@ Exit codes:
 | `1` | One or more `error` or `critical` violations found |
 | `2` | Configuration error or unexpected exception |
 
+An HTML report is written to `.dartunit/report.html` after every run.
+
 ### `dartunit generate <rule_name>`
 
-Scaffolds a new custom rule file and appends a placeholder entry to `dartunit.yaml`.
+Scaffolds a new rule file in `test_arch/`.
 
 ```bash
 dart run dartunit generate no_repository_in_ui
 ```
 
-Creates `.dartunit/custom_rules/no_repository_in_ui_rule.dart` with a ready-to-implement template.
+Creates `test_arch/no_repository_in_ui_arch_test.dart` with a ready-to-implement template.
+
+### `dartunit log`
+
+Shows the history of the last analysis runs stored in `.dartunit/log.ndjson`.
+
+```bash
+dart run dartunit log
+dart run dartunit log --path /path/to/project
+```
+
+Options:
+
+| Flag | Description |
+|------|-------------|
+| `-p, --path` | Path to the target project (default: `.`) |
+| `--no-color` | Disable coloured output |
 
 ---
 
-## YAML Rule Format
+## Writing Architecture Tests
 
-```yaml
-# .dartunit/dartunit.yaml
-rules:
-  - id: R001
-    description: Domain layer must not depend on Data layer
-    severity: error        # info | warning | error | critical
-    selector:
-      type: class          # class | file | layer
-      where:
-        folder: lib/domain
-    predicate:
-      not:
-        type: dependOnFolder
-        value: lib/data
+Rule files live in `test_arch/` and must end in `_arch_test.dart`. Each file is a standard Dart test file.
+
+### Single test — `testArch`
+
+```dart
+// test_arch/domain_isolation_arch_test.dart
+import 'package:dartunit/dartunit.dart';
+import 'package:test/test.dart';
+
+void main() => testArch('Domain must not depend on data layer', (selector) {
+  final domain = selector.classes(inFolder: 'lib/domain');
+  expect(domain, doesNotDependOn('lib/data'));
+});
+```
+
+### Grouped tests — `testArchGroup`
+
+Groups analyze the project **once** and share the context across all inner tests — faster than running each test independently.
+
+```dart
+void main() {
+  testArchGroup('Domain isolation', () {
+    testArch('must not depend on data', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOn('lib/data'));
+    });
+    testArch('must be Flutter-agnostic', (selector) {
+      expect(selector.classes(inFolder: 'lib/domain'), doesNotDependOnPackage('flutter'));
+    });
+  }, severity: RuleSeverity.error);
+}
+```
+
+### `testArch` signature
+
+```dart
+void testArch(
+  String description,
+  FutureOr<void> Function(ArchTester selector) body, {
+  String projectRoot = '.',
+  RuleSeverity? severity,
+})
+```
+
+### `testArchGroup` signature
+
+```dart
+void testArchGroup(
+  String groupName,
+  void Function() body, {
+  String projectRoot = '.',
+  RuleSeverity severity = RuleSeverity.error,
+})
 ```
 
 ---
 
 ## Selectors
 
-Selectors determine **which subjects** a rule applies to.
+`ArchTester` (the `selector` parameter) provides three factory methods.
 
-### Selector types
+### `selector.classes()`
 
-| type | Description |
-|------|-------------|
-| `class` | Selects Dart classes matching the `where` criteria |
-| `file` | Selects Dart source files matching the `where` criteria |
-| `layer` | Selects all classes inside a named layer folder |
+Selects Dart classes:
 
-### `where` options
+```dart
+selector.classes(inFolder: 'lib/domain')
+selector.classes(hasSuffix: 'Bloc')
+selector.classes(hasPrefix: 'I', hasSuffix: 'Repository')
+selector.classes(matchingPattern: r'.*Bloc$')
+selector.classes(inFolder: 'lib/ui', exceptions: ['lib/ui/legacy/'])
+```
 
-| Option | Description |
-|--------|-------------|
-| `folder` | Match subjects inside this folder path |
-| `namePattern` | Regex matched against the class name |
-| `annotatedWith` | Class must carry this annotation |
-| `extends` | Class must extend this type |
-| `implements` | Class must implement this interface |
+| Parameter | Description |
+|-----------|-------------|
+| `inFolder` | Only classes inside this folder path |
+| `hasPrefix` | Class name starts with this string |
+| `hasSuffix` | Class name ends with this string |
+| `matchingPattern` | Raw regex matched against the class name |
+| `exceptions` | File path substrings exempt from the rule |
+
+### `selector.files()`
+
+Selects Dart source files:
+
+```dart
+selector.files(inFolder: 'lib')
+selector.files(hasSuffix: '_service.dart')
+selector.files(exceptions: ['test/'])
+```
+
+Same parameters as `classes()`.
+
+### `selector.layer()`
+
+Selects all classes belonging to a named architectural layer:
+
+```dart
+selector.layer('domain', inFolder: 'lib/domain')
+selector.layer('ui', inFolder: 'lib/ui', exceptions: ['lib/ui/legacy/'])
+```
 
 ---
 
-## Predicates
+## Matchers
 
-Predicates express **positive conditions** — they pass when the condition IS met. Use `not` to invert.
+Pass the subject to `expect()` with one of these matchers.
 
 ### Dependency
 
-| type | value | Description |
-|------|-------|-------------|
-| `dependOnFolder` | `String` | Passes when the class has at least one import from the given folder path. Use with `not` to forbid a dependency. |
-| `dependOnPackage` | `String` | Passes when the class imports any path starting with `package:<name>/`. |
-| `onlyDependOnFolders` | `List<String>` | Passes when every import belongs to one of the listed folders. Fails and reports any forbidden import. |
-| `maxImports` | `int` | Passes when the total number of imports is at most N. |
-| `hasCircularDependency` | — | Passes when the file is part of a circular import chain. Use with `not` to forbid cycles. |
+| Matcher | Description |
+|---------|-------------|
+| `doesNotDependOn(folder)` | Classes must NOT import from `folder` |
+| `dependsOn(folder)` | Classes must import from `folder` |
+| `doesNotDependOnTransitive(folder)` | Classes must NOT transitively import from `folder` |
+| `dependsOnTransitive(folder)` | Classes must transitively import from `folder` |
+| `doesNotDependOnPackage(pkg)` | Classes must NOT import `package:<pkg>/` |
+| `dependsOnPackage(pkg)` | Classes must import `package:<pkg>/` |
+| `onlyDependsOnFolders(folders)` | Classes may only import from the listed `folders` |
+| `hasMaxImports(max)` | Classes have at most `max` imports |
+
+### Circular dependencies
+
+| Matcher | Description |
+|---------|-------------|
+| `hasNoCircularDependency()` | Files are NOT part of a circular import chain |
+| `hasCircularDependency()` | Files ARE part of a circular import chain |
 
 ### Naming
 
-| type | value | Description |
-|------|-------|-------------|
-| `nameEndsWith` | `String` | Class name ends with the given suffix. |
-| `nameStartsWith` | `String` | Class name starts with the given prefix. |
-| `nameContains` | `String` | Class name contains the given substring. |
-| `nameMatchesPattern` | `String` (regex) | Class name matches the regular expression. |
+| Matcher | Description |
+|---------|-------------|
+| `nameEndsWith(suffix)` | Name ends with `suffix` |
+| `nameStartsWith(prefix)` | Name starts with `prefix` |
+| `nameContains(substring)` | Name contains `substring` |
+| `nameMatchesPattern(regex)` | Name matches the regular expression |
 
 ### Annotations
 
-| type | value | Description |
-|------|-------|-------------|
-| `annotatedWith` | `String` | Class carries the given annotation (without the leading `@`). |
-| `notAnnotatedWith` | `String` | Class does NOT carry the given annotation. |
+| Matcher | Description |
+|---------|-------------|
+| `hasAnnotation(name)` | Class carries `@name` |
+| `doesNotHaveAnnotation(name)` | Class does NOT carry `@name` |
 
 ### Inheritance
 
-| type | value | Description |
-|------|-------|-------------|
-| `extends` | `String` | Class extends the given type. |
-| `implements` | `String` | Class implements the given interface. |
-| `usesMixin` | `String` | Class uses the given mixin. |
+| Matcher | Description |
+|---------|-------------|
+| `extendsClass(name)` | Class extends `name` |
+| `implementsInterface(name)` | Class implements `name` |
+| `usesMixin(name)` | Class uses mixin `name` |
 
 ### Structural kind
 
-| type | value | Description |
-|------|-------|-------------|
-| `isAbstract` | — | Class is declared `abstract`. |
-| `isMixin` | — | Declared as a `mixin`. |
-| `isExtension` | — | Declared as an `extension`. |
-| `isEnum` | — | Declared as an `enum`. |
-| `isConcrete` | — | Concrete class: not abstract, mixin, enum, or extension. |
+| Matcher | Description |
+|---------|-------------|
+| `isAbstractClass()` | Class is declared `abstract` |
+| `isConcreteClass()` | Class is not abstract, mixin, enum, or extension |
+| `isEnumType()` | Declared as an `enum` |
+| `isMixinType()` | Declared as a `mixin` |
+| `isExtensionType()` | Declared as an `extension` |
 
 ### Metrics
 
-| type | value | Description |
-|------|-------|-------------|
-| `maxMethods` | `int` | Class has at most N methods. |
-| `minMethods` | `int` | Class has at least N methods. |
-| `maxFields` | `int` | Class has at most N fields. |
-| `minFields` | `int` | Class has at least N fields. |
+| Matcher | Description |
+|---------|-------------|
+| `hasMaxMethods(max)` | At most `max` methods |
+| `hasMinMethods(min)` | At least `min` methods |
+| `hasMaxFields(max)` | At most `max` fields |
+| `hasMinFields(min)` | At least `min` fields |
 
-### Fields
+### Fields & methods
 
-| type | value | Description |
-|------|-------|-------------|
-| `hasAllFinalFields` | — | All instance fields are `final` or `const` (no mutable state). |
-| `hasNoPublicFields` | — | No public (non-`_`) instance fields exposed. |
-
-### Methods
-
-| type | value | Description |
-|------|-------|-------------|
-| `hasMethod` | `String` | Class declares a method with the given name. |
-| `hasNoPublicMethods` | — | No public (non-`_`) methods exposed. |
+| Matcher | Description |
+|---------|-------------|
+| `hasAllFinalFields()` | All instance fields are `final` |
+| `hasNoPublicFields()` | No public instance fields |
+| `hasMethod(name)` | Class declares a method named `name` |
+| `hasNoPublicMethods()` | No public methods |
 
 ### File content
 
-| type | value | Description |
-|------|-------|-------------|
-| `fileContentMatches` | `String` (regex) | Raw file source matches the pattern. Designed for use with `FileSelector`. Use with `not` to ban patterns such as `print(`. |
+| Matcher | Description |
+|---------|-------------|
+| `hasContent(pattern, {description})` | File source matches the regex `pattern` |
+| `hasNoContent(pattern)` | File source does NOT match the regex `pattern` |
 
 ---
 
-## Composite Predicates
+## Rule Severity
 
-```yaml
-# Negation — passes when inner predicate FAILS
-predicate:
-  not:
-    type: dependOnFolder
-    value: lib/data
+Every `testArch` / `testArchGroup` call accepts a `severity` parameter.
 
-# AND — all conditions must pass
-predicate:
-  and:
-    - type: nameEndsWith
-      value: Repository
-    - type: dependOnFolder
-      value: lib/data
+| Level | Failing? | Description |
+|-------|----------|-------------|
+| `RuleSeverity.info` | No | Informational notice |
+| `RuleSeverity.warning` | No | Should be fixed but does not fail the build |
+| `RuleSeverity.error` | Yes | Fails the analysis run (default) |
+| `RuleSeverity.critical` | Yes | Fundamental architecture breach |
 
-# OR — at least one condition must pass
-predicate:
-  or:
-    - type: nameEndsWith
-      value: Bloc
-    - type: nameEndsWith
-      value: Cubit
-```
+`info` and `warning` violations are shown in the report but do not affect the exit code.
 
 ---
 
-## Example Rules
+## Presets
 
-```yaml
-rules:
+Presets are one-call functions that register one or more `testArch` rules using a common pattern. Use them as your `main()` body.
 
-  # Domain layer must not import Data layer
-  - id: R001
-    description: Domain layer must not depend on Data layer
-    severity: error
-    selector:
-      type: class
-      where:
-        folder: lib/domain
-    predicate:
-      not:
-        type: dependOnFolder
-        value: lib/data
+### `layeredArchitecture`
 
-  # No circular imports anywhere
-  - id: R002
-    description: No circular dependencies allowed
-    severity: critical
-    selector:
-      type: file
-    predicate:
-      not:
-        type: hasCircularDependency
-
-  # Value objects must be immutable
-  - id: R003
-    description: Value objects must have all final fields
-    severity: warning
-    selector:
-      type: class
-      where:
-        folder: lib/domain/value_objects
-    predicate:
-      type: hasAllFinalFields
-
-  # God-class guard
-  - id: R004
-    description: Classes must not exceed 10 methods
-    severity: warning
-    selector:
-      type: class
-    predicate:
-      type: maxMethods
-      value: 10
-
-  # Ban print() in production code
-  - id: R005
-    description: No print() calls in lib/
-    severity: error
-    selector:
-      type: file
-      where:
-        folder: lib
-    predicate:
-      not:
-        type: fileContentMatches
-        value: "print\\("
-```
-
----
-
-## Custom Rules
-
-For rules that require logic beyond what YAML supports, implement `CustomArchitectureRule` in Dart.
-
-### Generate a scaffold
-
-```bash
-dart run dartunit generate no_repository_in_ui
-```
-
-### Implement the rule
+Declares all layers and generates "must not depend on" rules for every forbidden pair:
 
 ```dart
-// .dartunit/custom_rules/no_repository_in_ui_rule.dart
-import 'package:dartunit/dartunit.dart';
-
-class NoRepositoryInUiRule implements CustomArchitectureRule {
-  @override
-  String get id => 'CUSTOM_NO_REPOSITORY_IN_UI';
-
-  @override
-  String get description => 'UI layer must not access repositories directly';
-
-  @override
-  ArchitectureRule build() {
-    return ArchitectureRule(
-      id: id,
-      description: description,
-      severity: RuleSeverity.error,
-      selector: ClassSelector(folder: 'lib/ui'),
-      predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-    );
-  }
-}
+void main() => layeredArchitecture(
+  layers: [
+    (name: 'ui',     folder: 'lib/ui',     canAccess: ['lib/bloc', 'lib/domain']),
+    (name: 'bloc',   folder: 'lib/bloc',   canAccess: ['lib/domain']),
+    (name: 'domain', folder: 'lib/domain', canAccess: []),
+  ],
+);
 ```
 
-### Register in `dartunit.yaml`
+### `layerCannotDependOn`
 
-```yaml
-rules:
-  - id: CUSTOM_NO_REPOSITORY_IN_UI
-    type: custom
-    implementation: no_repository_in_ui_rule.dart
-    description: UI must not access repositories directly
+A layer must NOT import from any of the listed folders:
+
+```dart
+void main() => layerCannotDependOn(
+  from: 'lib/domain',
+  to: ['lib/data', 'lib/ui'],
+);
 ```
+
+### `layerCanOnlyDependOn`
+
+A layer may ONLY import from the listed folders:
+
+```dart
+void main() => layerCanOnlyDependOn(
+  layer: 'lib/domain',
+  allowed: ['lib/domain', 'lib/shared'],
+);
+```
+
+### `noCircularDependencies`
+
+No file in the project may be part of a circular import chain:
+
+```dart
+void main() => noCircularDependencies();
+```
+
+### `namingClassConvention`
+
+Classes in each folder must match a naming pattern. By default the expected suffix is derived from the capitalised folder basename (`lib/service` → must end with `Service`):
+
+```dart
+// Auto-suffix from folder name
+void main() => namingClassConvention(
+  folders: ['lib/service', 'lib/repository'],
+);
+
+// Explicit suffix
+void main() => namingClassConvention(
+  folders: ['lib/bloc'],
+  suffix: 'Bloc',
+);
+
+// Prefix + suffix
+void main() => namingClassConvention(
+  folders: ['lib/domain/repository'],
+  prefix: 'I',
+  suffix: 'Repository',
+);
+
+// Raw regex
+void main() => namingClassConvention(
+  folders: ['lib/bloc'],
+  namePattern: r'.*(Bloc|Cubit)$',
+);
+```
+
+### `namingFileConvention`
+
+Files in each folder must match a naming pattern. By default the expected suffix is derived from the folder basename in snake_case (`lib/services` → must end with `_services.dart`):
+
+```dart
+void main() => namingFileConvention(
+  folders: ['lib/services', 'lib/repositories'],
+);
+```
+
+### `mustBeAbstract`
+
+All classes in the listed folders must be declared `abstract`:
+
+```dart
+void main() => mustBeAbstract(
+  folders: ['lib/domain/repository'],
+);
+```
+
+### `mustBeImmutable`
+
+All instance fields of classes in the listed folders must be `final`:
+
+```dart
+void main() => mustBeImmutable(
+  folders: ['lib/domain/entities'],
+);
+```
+
+### `noPublicFields`
+
+Classes in the listed folders must not expose public instance fields:
+
+```dart
+void main() => noPublicFields(
+  folders: ['lib/domain'],
+);
+```
+
+### `annotationMustHave`
+
+Classes in the listed folders must carry the given annotation:
+
+```dart
+void main() => annotationMustHave(
+  annotation: 'injectable',
+  folders: ['lib/data/repository'],
+);
+```
+
+### `annotationMustNotHave`
+
+Classes in the listed folders must NOT carry the given annotation:
+
+```dart
+void main() => annotationMustNotHave(
+  annotation: 'deprecated',
+  folders: ['lib/ui'],
+);
+```
+
+### `classSizeLimit`
+
+Limits the number of methods and/or fields per class. When `folders` is empty, applies to all classes:
+
+```dart
+void main() => classSizeLimit(
+  maxMethods: 20,
+  maxFields: 15,
+  folders: ['lib'],
+);
+```
+
+### `noExternalPackage`
+
+Classes in the listed folders must not import any of the listed packages:
+
+```dart
+void main() => noExternalPackage(
+  packages: ['http', 'dio'],
+  folders: ['lib/domain'],
+);
+```
+
+### `noBannedCalls`
+
+No file in the project may contain any of the listed regex patterns. Suitable for banning `print()`, `debugPrint()`, TODO comments, etc.:
+
+```dart
+void main() => noBannedCalls(
+  patterns: [r'print\s*\(', r'debugPrint\s*\('],
+  excludeFolders: ['test'],
+);
+```
+
+### `mvvmGoRouterInjection`
+
+Enforces the MVVM + GoRouter dependency injection pattern described in the [Flutter app architecture case study](https://docs.flutter.dev/app-architecture/case-study/dependency-injection):
+
+```dart
+void main() => mvvmGoRouterInjection(
+  viewsFolder:      'lib/ui/views',
+  viewModelsFolder: 'lib/ui/viewmodels',
+  routerFolder:     'lib/router',
+);
+```
+
+This preset enforces:
+- `*ViewModel` classes extend `ChangeNotifier`
+- ViewModels have no public fields (dependencies are private)
+- ViewModels do not import `go_router`
+- Views do not inject repositories/services via `context.read`
+- The router file instantiates ViewModels
+- The router passes dependencies via `context.read()`
 
 ---
 
-## Predicate Semantics
+## Common Preset Options
 
-Predicates express **positive conditions** (the condition IS met):
+All presets accept these optional named parameters:
 
-- `DependOnFolderPredicate('lib/data')` **passes** when the class imports from `lib/data`.
-- Wrap with `NotPredicate` to enforce "must NOT":
-
-```dart
-// Violation when a domain class imports lib/data
-NotPredicate(DependOnFolderPredicate('lib/data'))
-```
-
-`PredicateResult.pass(message)` carries a description that `NotPredicate` reuses as the violation message, so the output is always informative.
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `severity` | `RuleSeverity.error` | Violation severity level |
+| `exceptions` | `[]` | File/folder path substrings to exempt |
+| `projectRoot` | `'.'` | Root of the project to analyze |
 
 ---
 
@@ -398,7 +554,7 @@ NotPredicate(DependOnFolderPredicate('lib/data'))
   run: dart run dartunit analyze
 ```
 
-Returns exit code `1` if any `error` or `critical` violations are found, making the CI step fail automatically.
+Returns exit code `1` if any `error` or `critical` violations are found.
 
 ---
 
@@ -410,71 +566,65 @@ dartunit/
 │   └── dartunit.dart              # CLI entry point
 ├── lib/
 │   ├── dartunit.dart              # Barrel export — public API
-│   ├── cli/
-│   │   ├── dartunit_cli.dart      # CommandRunner wrapper
-│   │   └── commands/
-│   │       ├── init_command.dart      # dartunit init
-│   │       ├── analyze_command.dart   # dartunit analyze
-│   │       └── generate_command.dart  # dartunit generate
-│   ├── core/
-│   │   ├── rule/
-│   │   │   ├── architecture_rule.dart # Rule model + evaluation logic
-│   │   │   ├── rule_violation.dart    # Violation model
-│   │   │   └── rule_severity.dart     # Severity enum
-│   │   ├── selector/
-│   │   │   ├── selector.dart          # Selector base + Subject
-│   │   │   ├── class_selector.dart    # Filters by class attributes
-│   │   │   ├── file_selector.dart     # Filters by file attributes
-│   │   │   └── layer_selector.dart    # Filters by layer folder
-│   │   └── predicate/
-│   │       ├── predicate.dart         # Predicate base + PredicateResult
-│   │       ├── dependency_predicate.dart
-│   │       ├── naming_predicate.dart
-│   │       ├── annotation_predicate.dart
-│   │       ├── inheritance_predicate.dart
-│   │       ├── metrics_predicate.dart
-│   │       └── composite/
-│   │           ├── and_predicate.dart
-│   │           ├── or_predicate.dart
-│   │           └── not_predicate.dart
 │   ├── analyzer/
-│   │   ├── project_analyzer.dart      # Regex-based Dart source parser
-│   │   ├── analysis_context.dart      # Query facade over analysis results
+│   │   ├── context/
+│   │   │   └── analysis_context.dart    # Query facade over analysis results
+│   │   ├── graph/
+│   │   │   └── dependency_graph.dart    # Directed import graph + cycle detection
 │   │   ├── models/
 │   │   │   ├── analyzed_class.dart
+│   │   │   ├── analyzed_field.dart
 │   │   │   ├── analyzed_file.dart
-│   │   │   ├── analyzed_method.dart
-│   │   │   └── analyzed_field.dart
-│   │   └── graph/
-│   │       └── dependency_graph.dart  # Directed import graph + cycle detection
+│   │   │   └── analyzed_method.dart
+│   │   ├── parsers/                     # Regex-based Dart source parsers
+│   │   └── project_analyzer.dart        # Orchestrates analysis
+│   ├── cli/
+│   │   ├── commands/
+│   │   │   ├── init_command.dart        # dartunit init
+│   │   │   ├── analyze_command.dart     # dartunit analyze
+│   │   │   ├── generate_command.dart    # dartunit generate
+│   │   │   └── log_command.dart         # dartunit log
+│   │   └── templates/                   # Architecture rule templates
+│   ├── core/
+│   │   ├── entities/                    # Rule, Violation, Predicate, Selector…
+│   │   ├── enums/                       # RuleSeverity, ExitCode…
+│   │   ├── predicates/                  # 30+ predicate implementations
+│   │   └── selectors/                   # ClassSelector, FileSelector, LayerSelector
 │   ├── engine/
-│   │   ├── rule_engine.dart           # Runs all rules, collects violations
-│   │   ├── rule_executor.dart         # Runs a single rule safely
-│   │   └── custom_rule_loader.dart    # Discovers custom rule files
-│   ├── yaml/
-│   │   └── yaml_rule_parser.dart      # Parses dartunit.yaml into rule objects
-│   └── reporter/
-│       └── console_reporter.dart      # Coloured console output
+│   │   ├── rule_engine.dart             # Runs all rules, collects violations
+│   │   ├── rule_executor.dart           # Runs a single rule safely
+│   │   ├── analysis_logger.dart         # Persists run history
+│   │   └── test_result_parser.dart      # Parses dart test JSON output
+│   ├── presets/                         # 15 preset functions
+│   ├── reporter/
+│   │   ├── console_reporter.dart        # Coloured console output
+│   │   └── html_report_writer.dart      # HTML report generator
+│   └── runner/
+│       ├── arch_runner.dart             # testArch + testArchGroup
+│       ├── arch_tester.dart             # ArchTester + ArchSubject
+│       └── arch_matchers.dart           # All matcher functions
 └── test/
-    └── ...                            # 54 unit tests
 ```
 
 ### Data flow
 
 ```
-dartunit.yaml
-      |
-      v
- YamlRuleParser  -->  List<ArchitectureRule>
-                                |
-                                v
- ProjectAnalyzer -->  AnalysisContext (classes, files, graph)
-                                |
-                                v
-     RuleEngine  -->  List<RuleViolation>
-                                |
-                                v
-   ConsoleReporter  -->  stdout / exit code
+test_arch/*_arch_test.dart
+         |
+         v
+   dart test (JSON reporter)
+         |
+         v
+  TestResultParser  -->  List<Violation>
+         |
+         v
+  ConsoleReporter   -->  stdout
+         |
+         v
+  HtmlReportWriter  -->  .dartunit/report.html
+         |
+         v
+  AnalysisLogger    -->  .dartunit/log.ndjson
 ```
 
 ---
@@ -482,8 +632,7 @@ dartunit.yaml
 ## Known Limitations
 
 - The analyzer uses **regex-based parsing**, which may over-count methods whose names appear in string literals.
-- Custom rules are **discovered but not dynamically loaded** at runtime (Dart does not support `dart:mirrors` in AOT mode). Register rules in a custom runner instead.
-- SDK version is pinned to `^3.0.0` to match the available `analyzer` package version.
+- Transitive dependency analysis traverses the full import graph and may be slow on very large projects.
 
 ---
 
