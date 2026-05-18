@@ -1,4 +1,4 @@
----
+﻿---
 title: Presets — Complete Reference
 description: Overview of all 15 built-in presets with links to detailed documentation.
 sidebar:
@@ -7,7 +7,7 @@ sidebar:
 
 Presets are functions that internally call `testArchGroup` and `testArch` to register complete rule sets from a minimal configuration. Import `package:dartunit/dartunit.dart` and call them directly in `main()`.
 
-## All 14 Presets
+## All 15 Presets
 
 | Preset | Category | What it enforces |
 |--------|----------|-------------------|
@@ -25,6 +25,7 @@ Presets are functions that internally call `testArchGroup` and `testArch` to reg
 | [`noExternalPackage`](/presets/no-external-package) | Dependency | Folders must not import from specified external packages |
 | [`annotationMustHave`](/presets/annotation-must-have) | Annotation | Classes must have a specific annotation |
 | [`annotationMustNotHave`](/presets/annotation-must-not-have) | Annotation | Classes must not have a specific annotation |
+| `mvvmGoRouterInjection` | Structure | GoRouter and injectable setup must follow MVVM conventions |
 
 ## Common preset signatures
 
@@ -35,7 +36,7 @@ All presets follow the same conventions:
 - Accept `projectRoot: String` (default: `'.'`)
 - Accept `exceptions: List<String>` for path-based exemptions
 
-```dart title="test_arch/all_presets_example_test_arch.dart"
+```dart title="test_arch/all_presets_example_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

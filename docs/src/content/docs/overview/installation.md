@@ -1,4 +1,4 @@
----
+﻿---
 title: Installation
 description: How to add DartUnit to your Dart or Flutter project.
 sidebar:
@@ -65,7 +65,7 @@ This creates:
 ```
 my_project/
 ├── test_arch/
-│   └── example_test_arch.dart   ← working example rule
+│   └── example_arch_test.dart   ← working example rule
 ├── lib/
 │   └── ...
 └── pubspec.yaml

@@ -1,4 +1,4 @@
----
+﻿---
 title: API Reference — Rule Files
 description: testArch, testArchGroup, ArchTester, and all arch matchers.
 sidebar:
@@ -245,7 +245,7 @@ noBannedCalls({required List<String> patterns, List<String> excludeFolders, Rule
 
 ## Complete Example
 
-```dart title="test_arch/strict_service_test_arch.dart"
+```dart title="test_arch/strict_service_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

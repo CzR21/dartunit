@@ -1,4 +1,4 @@
----
+﻿---
 title: Quality Presets
 description: Presets for enforcing code quality rules — no public fields and no banned patterns.
 sidebar:
@@ -33,7 +33,7 @@ Public fields break encapsulation. They allow any code to read and mutate state 
 
 ### Example — BLoC and domain layers
 
-```dart title="test_arch/encapsulation_test_arch.dart"
+```dart title="test_arch/encapsulation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -48,7 +48,7 @@ void main(List<String> args) => archTest(
 
 ### Example — Strict enforcement on domain
 
-```dart title="test_arch/domain_encapsulation_test_arch.dart"
+```dart title="test_arch/domain_encapsulation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -112,7 +112,7 @@ List<ArchitectureRule> noBannedCalls({
 
 ### Example — Ban debug output calls
 
-```dart title="test_arch/no_debug_calls_test_arch.dart"
+```dart title="test_arch/no_debug_calls_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -134,7 +134,7 @@ void main(List<String> args) {
 
 ### Example — Ban deprecated Flutter widgets
 
-```dart title="test_arch/no_deprecated_widgets_test_arch.dart"
+```dart title="test_arch/no_deprecated_widgets_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -156,7 +156,7 @@ void main(List<String> args) {
 
 ### Example — Ban hardcoded configuration strings
 
-```dart title="test_arch/no_hardcoded_config_test_arch.dart"
+```dart title="test_arch/no_hardcoded_config_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -179,7 +179,7 @@ void main(List<String> args) {
 
 ### Example — Ban TODO/FIXME comments in production
 
-```dart title="test_arch/no_todos_test_arch.dart"
+```dart title="test_arch/no_todos_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {

@@ -119,10 +119,11 @@ For annotations with parameters (like `@JsonSerializable(explicitToJson: true)`)
 
 ```dart
 void annotationMustHave({
-  required List<String> folders,
   required String annotation,
-  Severity severity = Severity.error,
+  required List<String> folders,
+  RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
+  String projectRoot = '.',
 })
 ```
 
@@ -156,11 +157,11 @@ annotation: 'reviewed',        // Requires @reviewed (custom annotation)
 
 ### `severity`
 
-**Type:** `Severity` — default `Severity.error`
+**Type:** `RuleSeverity` — default `RuleSeverity.error`
 
-For annotation completeness checks in DI and immutability contexts, `Severity.error` is appropriate. A missing `@injectable` is a functional bug. A missing `@immutable` is a contract violation.
+For annotation completeness checks in DI and immutability contexts, `RuleSeverity.error` is appropriate. A missing `@injectable` is a functional bug. A missing `@immutable` is a contract violation.
 
-Use `Severity.warning` when introducing the rule to an existing codebase that has existing violations you haven't had time to fix yet.
+Use `RuleSeverity.warning` when introducing the rule to an existing codebase that has existing violations you haven't had time to fix yet.
 
 ### `exceptions`
 
@@ -182,14 +183,13 @@ exceptions: [
 ## Usage
 
 ```dart
-// test_arch/injectable_check.dart
+// test_arch/injectable_check_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustHave(
-    folders: ['lib/services', 'lib/repositories'],
-    annotation: 'injectable',
-    severity: Severity.error,
-  ),
+  annotation: 'injectable',
+  folders: ['lib/services', 'lib/repositories'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -206,26 +206,25 @@ dart run dartunit analyze
 The primary DI enforcement use case. Every class in the registered DI folders must have `@injectable` (or `@lazySingleton`, `@singleton`, etc. — note that each variant is a distinct annotation, so you would need separate rules for each, or use `@injectable` as your team's standard).
 
 ```dart
-// test_arch/di_completeness.dart
+// test_arch/di_completeness_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustHave(
-    folders: [
-      'lib/services',
-      'lib/repositories',
-      'lib/use_cases',
-      'lib/data_sources',
-    ],
-    annotation: 'injectable',
-    severity: Severity.error,
-    exceptions: [
-      // Abstract interfaces — not registered directly
-      'IUserRepository',
-      'IOrderService',
-      'INotificationService',
-      'BaseUseCase',           // Abstract base — subclasses must have @injectable
-    ],
-  ),
+  annotation: 'injectable',
+  folders: [
+    'lib/services',
+    'lib/repositories',
+    'lib/use_cases',
+    'lib/data_sources',
+  ],
+  severity: RuleSeverity.error,
+  exceptions: [
+    // Abstract interfaces — not registered directly
+    'IUserRepository',
+    'IOrderService',
+    'INotificationService',
+    'BaseUseCase',           // Abstract base — subclasses must have @injectable
+  ],
 );
 ```
 
@@ -245,36 +244,30 @@ VIOLATION [error] annotationMustHave[@injectable]
 BLoC states represent snapshots of application state. They must be immutable — the BLoC emits new instances rather than mutating existing ones. Enforcing `@immutable` on all state classes provides a clear signal to developers and enables static analysis to catch accidental mutations.
 
 ```dart
-// test_arch/bloc_state_immutability.dart
+// test_arch/bloc_state_immutability_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustHave(
-    folders: ['lib/blocs/states', 'lib/cubits/states'],
-    annotation: 'immutable',
-    severity: Severity.error,
-    exceptions: [
-      // Abstract sealed base states are immutable by convention
-      // but may not have the annotation explicitly if all subclasses do
-    ],
-  ),
+  annotation: 'immutable',
+  folders: ['lib/blocs/states', 'lib/cubits/states'],
+  severity: RuleSeverity.error,
 );
 ```
 
 To extend this to all BLoC-related files (states, events, and the BLoC itself), use multiple rule files or a combined folders list:
 
 ```dart
-// test_arch/bloc_immutability.dart
+// test_arch/bloc_immutability_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustHave(
-    // States AND events should be immutable
-    folders: [
-      'lib/blocs/states',
-      'lib/blocs/events',
-    ],
-    annotation: 'immutable',
-    severity: Severity.error,
-  ),
+  // States AND events should be immutable
+  annotation: 'immutable',
+  folders: [
+    'lib/blocs/states',
+    'lib/blocs/events',
+  ],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -294,17 +287,16 @@ VIOLATION [error] annotationMustHave[@immutable]
 Value objects in domain-driven design represent concepts without identity — money amounts, addresses, email addresses, phone numbers. They should be final (no subclassing), value-equal (equality by content, not reference), and immutable. The `@sealed` annotation prevents subclassing.
 
 ```dart
-// test_arch/value_object_sealed.dart
+// test_arch/value_object_sealed_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustHave(
-    folders: ['lib/domain/value_objects'],
-    annotation: 'sealed',
-    severity: Severity.error,
-    exceptions: [
-      'ValueObject', // Abstract base class — not sealed itself, subclasses must be
-    ],
-  ),
+  annotation: 'sealed',
+  folders: ['lib/domain/value_objects'],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'ValueObject', // Abstract base class — not sealed itself, subclasses must be
+  ],
 );
 ```
 
@@ -365,18 +357,17 @@ class reviewed {
 Then enforce it:
 
 ```dart
-// test_arch/compliance_review.dart
+// test_arch/compliance_review_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustHave(
-    folders: [
-      'lib/features/payment',   // Payment processing — requires review
-      'lib/features/health',    // Health data — requires HIPAA review
-      'lib/features/auth',      // Authentication — requires security review
-    ],
-    annotation: 'reviewed',
-    severity: Severity.error,
-  ),
+  annotation: 'reviewed',
+  folders: [
+    'lib/features/payment',   // Payment processing — requires review
+    'lib/features/health',    // Health data — requires HIPAA review
+    'lib/features/auth',      // Authentication — requires security review
+  ],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -417,24 +408,24 @@ This makes compliance review a hard requirement rather than a post-deployment pr
 Combining both on the same folder creates precise annotation policies:
 
 ```dart
-// test_arch/domain_state_annotations.dart
+// test_arch/domain_state_annotations_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 // BLoC states must be @immutable and must NOT be @JsonSerializable
-void main(List<String> args) {
+void main() {
   // Requirement: must have @immutable
   annotationMustHave(
-    folders: ['lib/blocs/states'],
     annotation: 'immutable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/blocs/states'],
+    severity: RuleSeverity.error,
+  );
 
   // Boundary: must NOT have @JsonSerializable
   annotationMustNotHave(
-    folders: ['lib/blocs/states'],
     annotation: 'JsonSerializable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/blocs/states'],
+    severity: RuleSeverity.error,
+  );
 }
 ```
 
@@ -445,27 +436,27 @@ This establishes that BLoC state classes are always immutable and are never seri
 You can combine multiple annotation requirements for the same folder in a single rule file by calling `archTest` multiple times:
 
 ```dart
-// test_arch/domain_entity_annotations.dart
+// test_arch/domain_entity_annotations_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
+void main() {
   // Domain entities must be immutable
   annotationMustHave(
-    folders: ['lib/domain/entities'],
     annotation: 'immutable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain/entities'],
+    severity: RuleSeverity.error,
+  );
 
   // Domain entities must be sealed (no subclassing outside domain)
   annotationMustHave(
-    folders: ['lib/domain/entities'],
     annotation: 'sealed',
-    severity: Severity.error,
+    folders: ['lib/domain/entities'],
+    severity: RuleSeverity.error,
     exceptions: [
       'Entity',       // Abstract base class
       'AggregateRoot', // Abstract aggregate root
     ],
-  ));
+  );
 }
 ```
 

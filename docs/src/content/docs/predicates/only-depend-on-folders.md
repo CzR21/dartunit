@@ -70,7 +70,7 @@ For looser restrictions (just banning a specific layer), `doesNotDependOn` is si
 
 The domain layer should be completely self-contained — pure business logic with no external dependencies beyond Dart's standard library:
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -97,7 +97,7 @@ ERROR | Domain layer can only import from itself
 
 Many projects have a `lib/core` or `lib/shared` folder with utilities (extensions, constants, errors) used across all layers. Allow the domain to import from it explicitly:
 
-```dart title="test_arch/domain_shared_test_arch.dart"
+```dart title="test_arch/domain_shared_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -120,7 +120,7 @@ void main() {
 
 Define the allowed imports for each layer explicitly. This makes the dependency graph of your architecture visible directly in the test file:
 
-```dart title="test_arch/layer_whitelist_test_arch.dart"
+```dart title="test_arch/layer_whitelist_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

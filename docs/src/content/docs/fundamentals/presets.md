@@ -11,7 +11,7 @@ sidebar:
 
 Import `package:dartunit/dartunit.dart` and call the preset function directly from `main()`. No iteration needed — the preset registers its tests internally:
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -21,7 +21,7 @@ void main() => namingClassConvention(
 
 Multiple presets can be composed in a single file:
 
-```dart title="test_arch/domain_rules_test_arch.dart"
+```dart title="test_arch/domain_rules_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -126,7 +126,7 @@ noBannedCalls(patterns: [r'print\s*\(', r'debugPrint\s*\('], excludeFolders: ['t
 
 A single rule file can compose presets alongside custom `testArch` calls:
 
-```dart title="test_arch/domain_quality_test_arch.dart"
+```dart title="test_arch/domain_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -199,7 +199,7 @@ void cleanArchRules({
 
 Import the file and call the function from `main()`, the same way you use built-in presets:
 
-```dart title="test_arch/architecture_test_arch.dart"
+```dart title="test_arch/architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 import 'custom_presets/clean_arch_preset.dart';
 
@@ -225,7 +225,7 @@ dev_dependencies:
       url: https://github.com/my-org/arch-rules.git
 ```
 
-```dart title="test_arch/architecture_test_arch.dart"
+```dart title="test_arch/architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 import 'package:my_org_arch_rules/my_org_arch_rules.dart';
 
@@ -250,7 +250,7 @@ dart run dartunit init --template mvvm   # MVVM
 dart run dartunit init --template mvc    # MVC
 ```
 
-Templates generate a ready-to-run `*_test_arch.dart` file with all rules inlined and folder constants at the top for easy customization. No external function calls — just standard `testArchGroup`/`testArch`/`expect`, so you can see and modify every rule.
+Templates generate a ready-to-run `*_arch_test.dart` file with all rules inlined and folder constants at the top for easy customization. No external function calls — just standard `testArchGroup`/`testArch`/`expect`, so you can see and modify every rule.
 
 ## Detailed Preset Documentation
 

@@ -1,4 +1,4 @@
----
+﻿---
 title: namingClassConvention
 description: Enforce that every class in a folder ends with the folder's capitalized name as a suffix. Keeps naming consistent and predictable across the project.
 sidebar:
@@ -55,7 +55,7 @@ The preset extracts the last path segment from the folder string and capitalizes
 
 ## Basic usage
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -67,7 +67,7 @@ void main() => namingClassConvention(
 
 ### Example 1 — BLoC architecture
 
-```dart title="test_arch/bloc_naming_test_arch.dart"
+```dart title="test_arch/bloc_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -101,7 +101,7 @@ class AuthService { ... }   // ✗ in lib/repository/ but doesn't end with "Repo
 
 ### Example 2 — Clean Architecture
 
-```dart title="test_arch/clean_arch_naming_test_arch.dart"
+```dart title="test_arch/clean_arch_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -124,7 +124,7 @@ void main() => namingClassConvention(
 
 When the auto-derived suffix doesn't match your convention (e.g., BLoC classes should end with `Bloc` or `Cubit`):
 
-```dart title="test_arch/bloc_naming_test_arch.dart"
+```dart title="test_arch/bloc_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -139,7 +139,7 @@ void main() => namingClassConvention(
 
 For projects using an `I` prefix convention for repository interfaces:
 
-```dart title="test_arch/interface_naming_test_arch.dart"
+```dart title="test_arch/interface_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -155,7 +155,7 @@ void main() => namingClassConvention(
 
 When using feature slices, apply naming conventions across all matching subfolders:
 
-```dart title="test_arch/feature_naming_test_arch.dart"
+```dart title="test_arch/feature_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -185,7 +185,7 @@ void main() {
 
 Some classes legitimately cannot follow the folder suffix convention:
 
-```dart title="test_arch/naming_with_exceptions_test_arch.dart"
+```dart title="test_arch/naming_with_exceptions_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(

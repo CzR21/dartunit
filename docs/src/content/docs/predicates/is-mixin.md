@@ -58,7 +58,7 @@ Use `isMixinType()` in two situations:
 
 Ensure your dedicated mixin folder stays clean:
 
-```dart title="test_arch/mixin_folder_test_arch.dart"
+```dart title="test_arch/mixin_folder_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -77,7 +77,7 @@ void main() {
 
 Enforce the naming-declaration consistency: if a declaration is named `*Mixin`, it must be a `mixin`:
 
-```dart title="test_arch/mixin_naming_test_arch.dart"
+```dart title="test_arch/mixin_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -113,7 +113,7 @@ mixin LoggerMixin {            // ← correct: declared as mixin
 
 Pair type checking with naming and dependency rules:
 
-```dart title="test_arch/mixin_full_test_arch.dart"
+```dart title="test_arch/mixin_full_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

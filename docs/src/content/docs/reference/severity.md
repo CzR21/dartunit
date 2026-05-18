@@ -11,7 +11,7 @@ DartUnit classifies every violation with one of four severity levels. Severity c
 
 | Value | Dart constant | Terminal color | Fails CI (exit 1)? |
 |-------|--------------|----------------|---------------------|
-| `info` | `RuleSeverity.info` | White | No |
+| `info` | `RuleSeverity.info` | Cyan | No |
 | `warning` | `RuleSeverity.warning` | Yellow | No |
 | `error` | `RuleSeverity.error` | Red | **Yes** |
 | `critical` | `RuleSeverity.critical` | Magenta | **Yes** |
@@ -146,7 +146,7 @@ layerCannotDependOn(
 
 When adding DartUnit to an existing project with existing violations, use `warning` first to measure the scope without blocking CI, then promote to `error` after fixing the violations:
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCannotDependOn(

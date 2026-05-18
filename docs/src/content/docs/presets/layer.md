@@ -1,4 +1,4 @@
----
+﻿---
 title: Layer Presets
 description: Presets for defining and enforcing layered architecture dependency rules.
 sidebar:
@@ -49,7 +49,7 @@ LayerDefinition({
 
 ### Example — Flutter Clean Architecture
 
-```dart title="test_arch/clean_architecture_test_arch.dart"
+```dart title="test_arch/clean_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -100,7 +100,7 @@ void main(List<String> args) {
 
 ### Example — MVC Architecture
 
-```dart title="test_arch/mvc_test_arch.dart"
+```dart title="test_arch/mvc_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -121,7 +121,7 @@ void main(List<String> args) {
 
 ### Example — Feature-First with Shared Core
 
-```dart title="test_arch/feature_first_test_arch.dart"
+```dart title="test_arch/feature_first_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -179,7 +179,7 @@ ArchitectureRule layerCannotDependOn({
 
 ### Example — Domain must not use Flutter
 
-```dart title="test_arch/domain_no_flutter_test_arch.dart"
+```dart title="test_arch/domain_no_flutter_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -194,7 +194,7 @@ void main(List<String> args) => archTest(
 
 ### Example — Presentation must not access data directly
 
-```dart title="test_arch/presentation_test_arch.dart"
+```dart title="test_arch/presentation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -254,7 +254,7 @@ ArchitectureRule layerCanOnlyDependOn({
 
 ### Example — Strict domain isolation
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -273,7 +273,7 @@ void main(List<String> args) => archTest(
 
 ### Example — Bloc layer whitelist
 
-```dart title="test_arch/bloc_imports_test_arch.dart"
+```dart title="test_arch/bloc_imports_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -296,7 +296,7 @@ void main(List<String> args) => archTest(
 
 It is common to combine all three layer presets in different files or within the same file:
 
-```dart title="test_arch/full_architecture_test_arch.dart"
+```dart title="test_arch/full_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {

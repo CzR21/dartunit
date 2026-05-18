@@ -83,7 +83,7 @@ Use `dependsOnPackage` to ensure a layer actually uses the package it's supposed
 
 The domain layer should contain pure business logic. It must not depend on Flutter — otherwise you can't test it with plain Dart unit tests.
 
-```dart title="test_arch/domain_no_flutter_test_arch.dart"
+```dart title="test_arch/domain_no_flutter_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -109,7 +109,7 @@ void main() {
 
 Ensure that your presentation layer actually uses the state management package your team decided on — and hasn't accidentally introduced a competing approach:
 
-```dart title="test_arch/presentation_flutter_bloc_test_arch.dart"
+```dart title="test_arch/presentation_flutter_bloc_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -128,7 +128,7 @@ void main() {
 
 A full protection suite covering all critical layer-package relationships:
 
-```dart title="test_arch/package_rules_test_arch.dart"
+```dart title="test_arch/package_rules_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

@@ -19,15 +19,16 @@ dart run dartunit analyze [options]
 |--------|---------|-------------|
 | `--path <dir>` | `.` (current directory) | Path to the project to analyze |
 | `--no-color` | `false` | Disables ANSI color codes in console output |
+| `--agent` | `false` | Generates `.dartunit/agent_report.md` for AI tool consumption |
 
 ## How it discovers rule files
 
-`analyze` scans the `test_arch/` folder for all files matching the pattern `*_test_arch.dart`. Files that do not end with `_test_arch.dart` are ignored.
+`analyze` scans the `test_arch/` folder for all files matching the pattern `*_arch_test.dart`. Files that do not end with `_arch_test.dart` are ignored.
 
 ```
 test_arch/
-├── domain_layer_test_arch.dart       ← executed
-├── naming_conventions_test_arch.dart ← executed
+├── domain_layer_arch_test.dart       ← executed
+├── naming_conventions_arch_test.dart ← executed
 ├── helpers.dart                       ← ignored
 └── README.md                          ← ignored
 ```
@@ -37,7 +38,7 @@ All discovered files are passed to a single `dart test` invocation. Each `testAr
 ## Execution flow
 
 ```
-1. Discover all *_test_arch.dart files in test_arch/
+1. Discover all *_arch_test.dart files in test_arch/
 
 2. Run: dart test <file1> <file2> ... --reporter json
    Each testArch registers a test that:
@@ -120,6 +121,20 @@ The file is always regenerated on each run. To view past runs, use [`dartunit lo
 | `1` | At least one `error` or `critical` violation |
 | `2` | Error before analysis could start (e.g., `test_arch/` not found) |
 
+## AI agent report
+
+Passing `--agent` writes a plain Markdown report to `.dartunit/agent_report.md` after every run. This file is designed to be read by any AI tool without special parsing.
+
+```bash
+dart run dartunit analyze --agent
+```
+
+The report contains metadata, a summary with violation counts, and the full violations list with severity, rule name, file path, and message.
+
+If you have configured AI providers via [`dartunit ai`](/cli/ai), the agent report is generated automatically on every run without needing to pass `--agent`.
+
+See [`dartunit ai`](/cli/ai) for the full workflow.
+
 ## Examples
 
 ```bash
@@ -131,6 +146,9 @@ dart run dartunit analyze --path /home/user/my_project
 
 # Output without colors (for CI logs)
 dart run dartunit analyze --no-color
+
+# Generate AI-readable report alongside the standard output
+dart run dartunit analyze --agent
 ```
 
 ## CI integration

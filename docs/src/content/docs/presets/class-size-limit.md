@@ -57,7 +57,7 @@ void classSizeLimit({
   int? maxMethods,
   int? maxFields,
   List<String> folders = const [],
-  Severity severity = Severity.error,
+  RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
 })
 ```
@@ -119,13 +119,13 @@ classSizeLimit(maxMethods: 8, folders: ['lib/blocs'])
 
 ### `severity`
 
-**Type:** `Severity` — default `Severity.error`
+**Type:** `RuleSeverity` — default `RuleSeverity.error`
 
 Controls how violations are reported:
 
-- `Severity.error` — the `dart run dartunit analyze` command exits with a non-zero code. Suitable for CI gates.
-- `Severity.warning` — violations are reported but the command exits with code 0. Useful during incremental adoption when you want visibility without blocking builds.
-- `Severity.info` — violations are reported at informational level. Use this for metrics gathering.
+- `RuleSeverity.error` — the `dart run dartunit analyze` command exits with a non-zero code. Suitable for CI gates.
+- `RuleSeverity.warning` — violations are reported but the command exits with code 0. Useful during incremental adoption when you want visibility without blocking builds.
+- `RuleSeverity.info` — violations are reported at informational level. Use this for metrics gathering.
 
 ### `exceptions`
 
@@ -147,12 +147,12 @@ classSizeLimit(
 Create a file in the `test_arch/` directory. Each rule file has the following structure:
 
 ```dart
-// test_arch/class_size.dart
+// test_arch/class_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
   maxMethods: 15,
-));
+);
 ```
 
 Run with:
@@ -168,13 +168,12 @@ dart run dartunit analyze
 The simplest form: no class in the entire project may exceed 15 methods. This is a good starting point for a project that has never enforced class size limits. It will surface the worst offenders without being overly strict.
 
 ```dart
-// test_arch/global_class_size.dart
+// test_arch/global_class_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxMethods: 15,
-    severity: Severity.warning, // Start as warning during adoption
-  ),
+  maxMethods: 15,
+  severity: RuleSeverity.warning, // Start as warning during adoption
 );
 ```
 
@@ -199,14 +198,13 @@ VIOLATION [warning] classSizeLimit
 BLoC classes that accumulate too many event handlers are a common Flutter problem. Each `on<Event>` handler is a method, and a BLoC with 20+ handlers is handling too many domain events. Limiting BLoC classes to 10 methods (roughly 7–8 handlers plus a few helpers) forces appropriate domain decomposition.
 
 ```dart
-// test_arch/bloc_size.dart
+// test_arch/bloc_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxMethods: 10,
-    folders: ['lib/blocs', 'lib/cubits', 'lib/features'],
-    severity: Severity.error,
-  ),
+  maxMethods: 10,
+  folders: ['lib/blocs', 'lib/cubits', 'lib/features'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -217,15 +215,14 @@ A BLoC that exceeds this limit likely conflates multiple domains. For example, a
 Widgets with many fields are carrying state they shouldn't. A `StatefulWidget` with 10+ fields in its `State` class is managing too much local state — some of it should be lifted to a BLoC or ChangeNotifier, and some of the widget should be extracted into sub-widgets.
 
 ```dart
-// test_arch/widget_size.dart
+// test_arch/widget_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxFields: 7,
-    folders: ['lib/ui', 'lib/widgets', 'lib/screens', 'lib/pages'],
-    severity: Severity.error,
-    exceptions: ['AnimationControllerMixin'], // Known legitimate use
-  ),
+  maxFields: 7,
+  folders: ['lib/ui', 'lib/widgets', 'lib/screens', 'lib/pages'],
+  severity: RuleSeverity.error,
+  exceptions: ['AnimationControllerMixin'], // Known legitimate use
 );
 ```
 
@@ -261,15 +258,14 @@ VIOLATION [error] classSizeLimit
 Repositories that handle both remote API calls and local cache management tend to grow large. A limit on repository classes encourages splitting into a remote data source, a local data source, and a thin repository that coordinates them.
 
 ```dart
-// test_arch/repository_size.dart
+// test_arch/repository_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxMethods: 12,
-    maxFields: 5,
-    folders: ['lib/data/repositories'],
-    severity: Severity.error,
-  ),
+  maxMethods: 12,
+  maxFields: 5,
+  folders: ['lib/data/repositories'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -280,40 +276,37 @@ Applying both `maxMethods` and `maxFields` simultaneously means a class violates
 Different architectural layers have different natural sizes. Domain entities are tiny; framework integration classes may legitimately be larger. Use multiple rule files to apply layer-appropriate limits:
 
 ```dart
-// test_arch/domain_size.dart
+// test_arch/domain_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxMethods: 8,
-    maxFields: 4,
-    folders: ['lib/domain'],
-    severity: Severity.error,
-  ),
+  maxMethods: 8,
+  maxFields: 4,
+  folders: ['lib/domain'],
+  severity: RuleSeverity.error,
 );
 ```
 
 ```dart
-// test_arch/application_size.dart
+// test_arch/application_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxMethods: 15,
-    maxFields: 8,
-    folders: ['lib/application', 'lib/blocs'],
-    severity: Severity.error,
-  ),
+  maxMethods: 15,
+  maxFields: 8,
+  folders: ['lib/application', 'lib/blocs'],
+  severity: RuleSeverity.error,
 );
 ```
 
 ```dart
-// test_arch/infrastructure_size.dart
+// test_arch/infrastructure_size_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => classSizeLimit(
-    maxMethods: 20,
-    folders: ['lib/infrastructure', 'lib/data'],
-    severity: Severity.warning, // Infrastructure can be larger
-  ),
+  maxMethods: 20,
+  folders: ['lib/infrastructure', 'lib/data'],
+  severity: RuleSeverity.warning, // Infrastructure can be larger
 );
 ```
 
@@ -324,37 +317,35 @@ This layered approach acknowledges reality: infrastructure code (database mapper
 When introducing this preset to a large existing project, start permissively and tighten over time. Begin by excepting known large legacy classes while still flagging new violations:
 
 ```dart
-// test_arch/class_size_phase1.dart
+// test_arch/class_size_phase1_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 // Phase 1: Flag the worst offenders only (>25 methods)
 // Add known legacy classes to exceptions while they are being refactored
 void main() => classSizeLimit(
-    maxMethods: 25,
-    severity: Severity.warning,
-    exceptions: [
-      'LegacyUserService',    // Tracked in issue #142 — refactor Q1
-      'OldCheckoutManager',   // Tracked in issue #156 — refactor Q2
-      'AppRouter',            // Generated code, excluded permanently
-    ],
-  ),
+  maxMethods: 25,
+  severity: RuleSeverity.warning,
+  exceptions: [
+    'LegacyUserService',    // Tracked in issue #142 — refactor Q1
+    'OldCheckoutManager',   // Tracked in issue #156 — refactor Q2
+    'AppRouter',            // Generated code, excluded permanently
+  ],
 );
 ```
 
 After the refactors in the exceptions list are complete, lower the limit and reduce or remove exceptions:
 
 ```dart
-// test_arch/class_size_phase2.dart
+// test_arch/class_size_phase2_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 // Phase 2: Tighter limit, exceptions removed as classes are refactored
 void main() => classSizeLimit(
-    maxMethods: 15,
-    severity: Severity.error, // Now blocking in CI
-    exceptions: [
-      'AppRouter', // Permanently excluded — generated code
-    ],
-  ),
+  maxMethods: 15,
+  severity: RuleSeverity.error, // Now blocking in CI
+  exceptions: [
+    'AppRouter', // Permanently excluded — generated code
+  ],
 );
 ```
 
@@ -400,13 +391,13 @@ VIOLATION [error] classSizeLimit
 
 Introducing `classSizeLimit` to an existing codebase should be done in phases to avoid blocking the team while still making architectural progress:
 
-**Phase 1 — Visibility (week 1–2):** Set `severity: Severity.warning` with a generous limit (e.g., `maxMethods: 30`). Do not block CI. Let the team see what's flagged. Discuss the worst offenders in architecture reviews.
+**Phase 1 — Visibility (week 1–2):** Set `severity: RuleSeverity.warning` with a generous limit (e.g., `maxMethods: 30`). Do not block CI. Let the team see what's flagged. Discuss the worst offenders in architecture reviews.
 
-**Phase 2 — Commitment (week 3–4):** Change to `severity: Severity.error` but add the largest offenders to `exceptions` with GitHub issue links in comments. Now CI blocks on new violations but not on pre-existing ones. New God classes cannot be introduced.
+**Phase 2 — Commitment (week 3–4):** Change to `severity: RuleSeverity.error` but add the largest offenders to `exceptions` with GitHub issue links in comments. Now CI blocks on new violations but not on pre-existing ones. New God classes cannot be introduced.
 
 **Phase 3 — Reduction (ongoing):** As exceptions are refactored and removed, lower the limit in increments of 5. Move from 30 to 25, then to 20, then to 15. Each reduction is a milestone that reflects real architectural improvement.
 
-**Phase 4 — Stabilization:** Set the final limit appropriate to your team's standards (typically 10–15 methods) with `severity: Severity.error`. The exceptions list should be empty or contain only permanently excluded classes (generated code, framework base classes).
+**Phase 4 — Stabilization:** Set the final limit appropriate to your team's standards (typically 10–15 methods) with `severity: RuleSeverity.error`. The exceptions list should be empty or contain only permanently excluded classes (generated code, framework base classes).
 
 This approach prevents the common failure mode where a strict rule is introduced, causes immediate CI failures across the board, is then either reverted or riddled with exceptions from day one, and is never enforced meaningfully.
 
@@ -414,12 +405,12 @@ This approach prevents the common failure mode where a strict rule is introduced
 
 `classSizeLimit` is most effective when used alongside:
 
-- **`layerDependencyPreset`** — ensures that classes extracted from a God class don't end up in the wrong layer
-- **`namingConventionPreset`** — when splitting a `UserService` into `AuthService`, `ProfileService`, and `NotificationService`, naming conventions ensure the new classes follow the project's established patterns
+- **`layeredArchitecture`** — ensures that classes extracted from a God class don't end up in the wrong layer
+- **`namingClassConvention`** — when splitting a `UserService` into `AuthService`, `ProfileService`, and `NotificationService`, naming conventions ensure the new classes follow the project's established patterns
 - **`noPublicFields`** — God classes often expose internal state as public fields; after splitting, this rule ensures the new smaller classes maintain proper encapsulation
 
 ## Related Presets
 
 - [`noPublicFields`](/presets/no-public-fields) — Enforce encapsulation after reducing class size
-- [`layerDependencyPreset`](/presets/layer) — Ensure extracted classes land in the correct layer
-- [`namingConventionPreset`](/presets/naming) — Consistent naming for newly created classes
+- [`layeredArchitecture`](/presets/layered-architecture) — Ensure extracted classes land in the correct layer
+- [`namingClassConvention`](/presets/naming-class-convention) — Consistent naming for newly created classes

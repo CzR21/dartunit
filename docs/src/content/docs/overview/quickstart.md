@@ -39,7 +39,7 @@ This creates the `test_arch/` folder with a working example rule file:
 ```
 my_project/
 ├── test_arch/
-│   └── example_test_arch.dart
+│   └── example_arch_test.dart
 ├── lib/
 │   └── ...
 └── pubspec.yaml
@@ -54,11 +54,11 @@ dart run dartunit init --template clean
 
 ## 3. Write your first rule
 
-Open `test_arch/example_test_arch.dart` (or create a new file named `*_test_arch.dart`) and write your first rule.
+Open `test_arch/example_arch_test.dart` (or create a new file named `*_arch_test.dart`) and write your first rule.
 
 Every rule file is a Dart `main()` that uses `testArch()`:
 
-```dart title="test_arch/domain_layer_test_arch.dart"
+```dart title="test_arch/domain_layer_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -70,7 +70,7 @@ void main() {
 
 To group related rules and share the analysis context across them, use `testArchGroup`:
 
-```dart title="test_arch/domain_layer_test_arch.dart"
+```dart title="test_arch/domain_layer_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -88,7 +88,7 @@ void main() {
 You can run a single rule file directly during development:
 
 ```bash
-dart test test_arch/domain_layer_test_arch.dart
+dart test test_arch/domain_layer_arch_test.dart
 ```
 
 ## 4. Run the full analysis
@@ -138,12 +138,12 @@ Use the `generate` command to scaffold additional rule files:
 
 ```bash
 dart run dartunit generate naming_conventions
-# Creates: test_arch/naming_conventions_test_arch.dart
+# Creates: test_arch/naming_conventions_arch_test.dart
 ```
 
 Or use a preset for common patterns:
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(

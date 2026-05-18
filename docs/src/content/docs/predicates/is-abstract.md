@@ -72,7 +72,7 @@ Do not apply it to folders that contain concrete implementations (`lib/data/repo
 
 The canonical Clean Architecture rule — the domain layer defines repository contracts, never implementations:
 
-```dart title="test_arch/domain_abstract_test_arch.dart"
+```dart title="test_arch/domain_abstract_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -99,7 +99,7 @@ ERROR | Domain repositories must be declared abstract
 
 Protect all contract folders at once using a group:
 
-```dart title="test_arch/contracts_abstract_test_arch.dart"
+```dart title="test_arch/contracts_abstract_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -125,7 +125,7 @@ void main() {
 
 Pair abstract enforcement with naming conventions for maximum consistency:
 
-```dart title="test_arch/domain_contracts_full_test_arch.dart"
+```dart title="test_arch/domain_contracts_full_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

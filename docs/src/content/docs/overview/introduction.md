@@ -44,7 +44,7 @@ These violations accumulate silently. Manual code reviews miss them. New team me
 
 Architecture rules are written as ordinary Dart files in a `test_arch/` folder at the root of your project:
 
-```dart title="test_arch/bloc_layer_test_arch.dart"
+```dart title="test_arch/bloc_layer_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -64,7 +64,7 @@ void main() {
 }
 ```
 
-Running `dart run dartunit analyze` discovers all `*_test_arch.dart` files, executes them via `dart test`, collects violations, and outputs results to the console alongside an HTML report.
+Running `dart run dartunit analyze` discovers all `*_arch_test.dart` files, executes them via `dart test`, collects violations, and outputs results to the console alongside an HTML report.
 
 ## Key Features
 
@@ -84,7 +84,7 @@ A Flutter-inspired API analogous to `testWidgets`. An `ArchTester` is passed as 
 
 Callable functions that register complete rule sets for common patterns. One line replaces dozens of manual rules:
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -94,7 +94,7 @@ void main() => namingClassConvention(
 
 ### 4 architecture templates
 
-`dart run dartunit init --template clean/bloc/mvvm/mvc` generates a ready-to-run `*_test_arch.dart` file with all rules inlined and folder constants at the top for easy customization.
+`dart run dartunit init --template clean/bloc/mvvm/mvc` generates a ready-to-run `*_arch_test.dart` file with all rules inlined and folder constants at the top for easy customization.
 
 ### HTML reports
 

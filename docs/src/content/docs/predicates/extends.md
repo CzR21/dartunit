@@ -69,7 +69,7 @@ Use `extendsClass()` when a particular folder or class pattern has a required pa
 
 Ensure that classes named `*Bloc` actually extend the `Bloc` base class from the flutter_bloc package:
 
-```dart title="test_arch/bloc_extends_test_arch.dart"
+```dart title="test_arch/bloc_extends_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -88,7 +88,7 @@ void main() {
 
 Enforce the full BLoC event/state hierarchy:
 
-```dart title="test_arch/bloc_hierarchy_test_arch.dart"
+```dart title="test_arch/bloc_hierarchy_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -123,7 +123,7 @@ void main() {
 
 If your team uses `Equatable` for value equality in state classes, make it a verified rule:
 
-```dart title="test_arch/state_equatable_test_arch.dart"
+```dart title="test_arch/state_equatable_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

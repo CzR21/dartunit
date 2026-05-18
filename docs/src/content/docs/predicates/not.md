@@ -46,7 +46,7 @@ These "must not" conditions are so common that DartUnit provides dedicated match
 
 ### doesNotDependOn — layer boundary enforcement
 
-```dart title="test_arch/layer_boundaries_test_arch.dart"
+```dart title="test_arch/layer_boundaries_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -70,7 +70,7 @@ void main() {
 
 ### doesNotDependOnPackage — package isolation
 
-```dart title="test_arch/domain_no_packages_test_arch.dart"
+```dart title="test_arch/domain_no_packages_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -94,7 +94,7 @@ void main() {
 
 ### doesNotHaveAnnotation — protecting layers from wrong annotations
 
-```dart title="test_arch/domain_annotations_test_arch.dart"
+```dart title="test_arch/domain_annotations_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -110,7 +110,7 @@ void main() {
 
 ### hasNoCircularDependency — ban cycles
 
-```dart title="test_arch/no_cycles_test_arch.dart"
+```dart title="test_arch/no_cycles_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -124,7 +124,7 @@ void main() {
 
 ### hasNoContent — ban patterns in file content
 
-```dart title="test_arch/code_quality_test_arch.dart"
+```dart title="test_arch/code_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -148,7 +148,7 @@ void main() {
 
 ### hasNoPublicFields — encapsulation
 
-```dart title="test_arch/encapsulation_test_arch.dart"
+```dart title="test_arch/encapsulation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

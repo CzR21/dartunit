@@ -95,7 +95,7 @@ Use `hasContent()` to ensure files that must contain certain patterns actually d
 
 This is the most common use of `hasNoContent`. Every production file must be free of debug print statements:
 
-```dart title="test_arch/no_print_test_arch.dart"
+```dart title="test_arch/no_print_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -122,7 +122,7 @@ WARNING | No print() calls in production code
 
 URLs hardcoded in source files are a configuration management problem — they can't be changed without recompiling and are invisible to configuration management systems:
 
-```dart title="test_arch/no_hardcoded_urls_test_arch.dart"
+```dart title="test_arch/no_hardcoded_urls_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -144,7 +144,7 @@ void main() {
 
 Ban multiple problematic patterns in a single group:
 
-```dart title="test_arch/code_quality_test_arch.dart"
+```dart title="test_arch/code_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

@@ -1,4 +1,4 @@
----
+﻿---
 title: Dependency Presets
 description: The noExternalPackage for controlling which external packages can be used in specific folders.
 sidebar:
@@ -31,7 +31,7 @@ List<ArchitectureRule> noExternalPackage({
 
 ### Example — Pure domain — no external dependencies
 
-```dart title="test_arch/domain_purity_test_arch.dart"
+```dart title="test_arch/domain_purity_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -57,7 +57,7 @@ void main(List<String> args) {
 
 ### Example — Presentation layer without HTTP access
 
-```dart title="test_arch/presentation_deps_test_arch.dart"
+```dart title="test_arch/presentation_deps_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -75,7 +75,7 @@ void main(List<String> args) {
 
 ### Example — Ban packages being phased out
 
-```dart title="test_arch/legacy_packages_test_arch.dart"
+```dart title="test_arch/legacy_packages_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -123,7 +123,7 @@ packages: [
 
 For complete domain isolation, combine `noExternalPackage` with `layerCannotDependOn`:
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {

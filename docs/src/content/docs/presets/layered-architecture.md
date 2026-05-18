@@ -1,4 +1,4 @@
----
+﻿---
 title: layeredArchitecture
 description: Declare all layers with their allowed dependencies and automatically generate "must not depend on" rules for every forbidden pair.
 sidebar:
@@ -61,7 +61,7 @@ For four layers, the preset generates up to 12 forbidden-pair rules. For five la
 
 ## Basic usage
 
-```dart title="test_arch/clean_architecture_test_arch.dart"
+```dart title="test_arch/clean_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layeredArchitecture(
@@ -104,7 +104,7 @@ Clean Architecture places business logic at the center. Dependencies always poin
     └──────────────────────────────────┘
 ```
 
-```dart title="test_arch/clean_architecture_test_arch.dart"
+```dart title="test_arch/clean_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layeredArchitecture(
@@ -164,7 +164,7 @@ Many Flutter teams use a BLoC-centric architecture without a formal domain layer
                       └──────────┘
 ```
 
-```dart title="test_arch/bloc_architecture_test_arch.dart"
+```dart title="test_arch/bloc_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layeredArchitecture(
@@ -197,7 +197,7 @@ A complete Flutter project with BLoC separating presentation, state management, 
 Presentation ──► BLoC ──► Domain ◄── Data
 ```
 
-```dart title="test_arch/flutter_bloc_test_arch.dart"
+```dart title="test_arch/flutter_bloc_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layeredArchitecture(
@@ -238,7 +238,7 @@ Notable constraints:
 
 Larger applications often adopt feature-based folder structures where each feature is self-contained:
 
-```dart title="test_arch/feature_architecture_test_arch.dart"
+```dart title="test_arch/feature_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 /// Features are isolated from each other.
@@ -281,7 +281,7 @@ void main() => layeredArchitecture(
 
 Some files legitimately bridge layers during a migration period, or are auto-generated and cannot be refactored:
 
-```dart title="test_arch/architecture_test_arch.dart"
+```dart title="test_arch/architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layeredArchitecture(
@@ -308,7 +308,7 @@ Each exception is a known compromise. Document why it exists with a comment, and
 
 If you are adding this preset to an existing project with existing violations, start with `RuleSeverity.warning`. This lets you see the full scope of violations without immediately breaking CI:
 
-```dart title="test_arch/architecture_test_arch.dart"
+```dart title="test_arch/architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layeredArchitecture(
@@ -329,7 +329,7 @@ Run `dart run dartunit analyze`, review the report, work through the violations 
 
 `layeredArchitecture` covers inter-layer dependency directions. Combine it with other presets for a complete rule set:
 
-```dart title="test_arch/full_rules_test_arch.dart"
+```dart title="test_arch/full_rules_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

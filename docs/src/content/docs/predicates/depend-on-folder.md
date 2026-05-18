@@ -79,7 +79,7 @@ Use `dependsOn` when you need to verify that a layer actually **uses** a depende
 
 The most fundamental architecture rule: the domain layer defines contracts; the data layer implements them. The domain should never need to import from data.
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -106,7 +106,7 @@ ERROR | Domain must not import from data layer
 
 A complete boundary test checks that neither layer imports from the other:
 
-```dart title="test_arch/layer_boundaries_test_arch.dart"
+```dart title="test_arch/layer_boundaries_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -132,7 +132,7 @@ void main() {
 
 This rule enforces that BLoC classes actually depend on the repository layer — preventing developers from bypassing repositories and calling data sources directly:
 
-```dart title="test_arch/bloc_dependencies_test_arch.dart"
+```dart title="test_arch/bloc_dependencies_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

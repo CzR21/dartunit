@@ -70,7 +70,7 @@ Use `nameMatchesPattern` when you need to express naming rules that go beyond a 
 
 BLoC classes must be in PascalCase and end with `Bloc`. This rejects names like `cartBloc` (lowercase start) or `Cart_Bloc` (underscore):
 
-```dart title="test_arch/bloc_naming_test_arch.dart"
+```dart title="test_arch/bloc_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -89,7 +89,7 @@ void main() {
 
 Your team uses both BLoC and Cubit. Express this as an OR condition using regex alternation:
 
-```dart title="test_arch/state_manager_naming_test_arch.dart"
+```dart title="test_arch/state_manager_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -108,7 +108,7 @@ void main() {
 
 Interfaces must follow the `I` prefix convention with PascalCase: `ICartRepository`, `IAuthService` — NOT `Icart` or `iCart`:
 
-```dart title="test_arch/interface_naming_test_arch.dart"
+```dart title="test_arch/interface_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -128,7 +128,7 @@ void main() {
 
 A complete naming validation for a Clean Architecture project:
 
-```dart title="test_arch/naming_suite_test_arch.dart"
+```dart title="test_arch/naming_suite_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

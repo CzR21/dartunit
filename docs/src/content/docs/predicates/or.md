@@ -70,7 +70,7 @@ testArchGroup('Use case entry points', () {
 
 ### State managers must be Bloc OR Cubit
 
-```dart title="test_arch/state_manager_naming_test_arch.dart"
+```dart title="test_arch/state_manager_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -87,7 +87,7 @@ void main() {
 
 ### Data model classes may end with Model OR Dto
 
-```dart title="test_arch/model_naming_test_arch.dart"
+```dart title="test_arch/model_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -104,7 +104,7 @@ void main() {
 
 ### Abstract base class may start with Abstract OR Base
 
-```dart title="test_arch/base_naming_test_arch.dart"
+```dart title="test_arch/base_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -123,7 +123,7 @@ void main() {
 
 Use `namePattern` to split into separate groups when the OR condition is structural (not a naming pattern):
 
-```dart title="test_arch/usecase_entry_point_test_arch.dart"
+```dart title="test_arch/usecase_entry_point_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

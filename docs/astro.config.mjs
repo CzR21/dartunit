@@ -46,6 +46,7 @@ export default defineConfig({
             { label: 'dartunit analyze', slug: 'cli/analyze' },
             { label: 'dartunit generate', slug: 'cli/generate' },
             { label: 'dartunit log', slug: 'cli/command_log' },
+            { label: 'dartunit ai', slug: 'cli/ai' },
           ],
         },
         {

@@ -69,7 +69,7 @@ Use `usesMixin()` when a specific set of classes is required to apply a shared b
 
 BLoC rebuilds the UI only when the state changes. For this to work, `==` comparison must return `true` for equal states. Without `Equatable`, every state emission triggers a rebuild because two states with identical values are considered different objects:
 
-```dart title="test_arch/state_equatable_test_arch.dart"
+```dart title="test_arch/state_equatable_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -88,7 +88,7 @@ void main() {
 
 Domain entities represent business concepts. Two entities with the same identity and fields should compare as equal. Without `EquatableMixin`, a use case comparing `entity1 == entity2` will always return `false` (reference comparison):
 
-```dart title="test_arch/entity_equatable_test_arch.dart"
+```dart title="test_arch/entity_equatable_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -107,7 +107,7 @@ void main() {
 
 Ensure all data model classes are set up for JSON serialization:
 
-```dart title="test_arch/model_mixin_test_arch.dart"
+```dart title="test_arch/model_mixin_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

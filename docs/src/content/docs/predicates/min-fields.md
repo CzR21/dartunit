@@ -54,7 +54,7 @@ Use `hasMinFields()` to ensure that model and entity classes actually carry stat
 
 An entity with no fields doesn't represent anything. At minimum it should have an `id`:
 
-```dart title="test_arch/entity_min_fields_test_arch.dart"
+```dart title="test_arch/entity_min_fields_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -73,7 +73,7 @@ void main() {
 
 A data model with only one field is barely useful. Require at least 2:
 
-```dart title="test_arch/model_min_fields_test_arch.dart"
+```dart title="test_arch/model_min_fields_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -92,7 +92,7 @@ void main() {
 
 Combine `hasMinFields` and `hasMaxFields` in the same test with multiple `expect()` calls:
 
-```dart title="test_arch/entity_field_range_test_arch.dart"
+```dart title="test_arch/entity_field_range_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

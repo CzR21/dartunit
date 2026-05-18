@@ -6,7 +6,7 @@ class ReportHelper {
   /// Serializes an [ArchitectureRule] and its [violations] into a JSON-compatible
   /// map written as one NDJSON line to the temp file consumed by `dartunit analyze`.
   static Map<String, dynamic> serializeViolations(
-      ArchitectureRule rule,
+      Rule rule,
       List<Violation> violations,
       ) {
     return {
@@ -29,7 +29,7 @@ class ReportHelper {
   /// Pass:  `  ✓  Rule description`
   /// Fail:  `  ✗  Rule description`
   ///        `       ✗ lib/x.dart [error] — message`
-  static String formatTestResult(ArchitectureRule rule, List<Violation> violations) {
+  static String formatTestResult(Rule rule, List<Violation> violations) {
     if (violations.isEmpty) {
       return '  \u2713  ${rule.description}';
     }

@@ -69,7 +69,7 @@ Apply different limits based on the expected role of each class:
 
 Domain entities should be self-contained and minimally coupled. A high import count in an entity is a red flag:
 
-```dart title="test_arch/entity_coupling_test_arch.dart"
+```dart title="test_arch/entity_coupling_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -88,7 +88,7 @@ void main() {
 
 A broad ceiling to catch the most obviously over-coupled classes:
 
-```dart title="test_arch/god_class_detection_test_arch.dart"
+```dart title="test_arch/god_class_detection_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -107,7 +107,7 @@ void main() {
 
 Use cases should be focused on a single business operation. If a use case is importing from 8+ places, it's probably doing too much:
 
-```dart title="test_arch/usecase_imports_test_arch.dart"
+```dart title="test_arch/usecase_imports_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

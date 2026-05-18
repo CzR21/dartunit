@@ -87,7 +87,7 @@ Apply `hasNoPublicFields()` to classes that manage internal state and should con
 
 BLoC classes should only expose state through the BLoC stream, not through direct field access:
 
-```dart title="test_arch/bloc_encapsulation_test_arch.dart"
+```dart title="test_arch/bloc_encapsulation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -106,7 +106,7 @@ void main() {
 
 Services often hold internal resources (HTTP clients, database connections, caches) that should not be accessible from outside:
 
-```dart title="test_arch/service_encapsulation_test_arch.dart"
+```dart title="test_arch/service_encapsulation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -125,7 +125,7 @@ void main() {
 
 Apply encapsulation requirements across all layers that manage state:
 
-```dart title="test_arch/encapsulation_test_arch.dart"
+```dart title="test_arch/encapsulation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

@@ -101,10 +101,11 @@ lib/domain/entities/
 
 ```dart
 void annotationMustNotHave({
-  required List<String> folders,
   required String annotation,
-  Severity severity = Severity.error,
+  required List<String> folders,
+  RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
+  String projectRoot = '.',
 })
 ```
 
@@ -138,11 +139,11 @@ annotation: 'HiveType',          // Forbids @HiveType (Hive ORM)
 
 ### `severity`
 
-**Type:** `Severity` — default `Severity.error`
+**Type:** `RuleSeverity` — default `RuleSeverity.error`
 
-For boundary violations (domain layer importing infrastructure annotations), `Severity.error` is appropriate. These violations represent architectural missteps with concrete negative consequences. They should block CI immediately.
+For boundary violations (domain layer importing infrastructure annotations), `RuleSeverity.error` is appropriate. These violations represent architectural missteps with concrete negative consequences. They should block CI immediately.
 
-`Severity.warning` can be useful when first scanning an existing codebase to understand the scope of violations before making them blocking.
+`RuleSeverity.warning` can be useful when first scanning an existing codebase to understand the scope of violations before making them blocking.
 
 ### `exceptions`
 
@@ -161,14 +162,13 @@ Document WHY each exception exists. Unexplained exceptions become permanent tech
 ## Usage
 
 ```dart
-// test_arch/domain_annotation_boundaries.dart
+// test_arch/domain_annotation_boundaries_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustNotHave(
-    folders: ['lib/domain'],
-    annotation: 'JsonSerializable',
-    severity: Severity.error,
-  ),
+  annotation: 'JsonSerializable',
+  folders: ['lib/domain'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -185,14 +185,13 @@ dart run dartunit analyze
 The canonical use case. JSON serialization is a data layer concern — it describes how a class is represented in a wire format, which is an infrastructure detail irrelevant to domain logic.
 
 ```dart
-// test_arch/domain_no_json.dart
+// test_arch/domain_no_json_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustNotHave(
-    folders: ['lib/domain', 'lib/domain/entities', 'lib/domain/value_objects'],
-    annotation: 'JsonSerializable',
-    severity: Severity.error,
-  ),
+  annotation: 'JsonSerializable',
+  folders: ['lib/domain', 'lib/domain/entities', 'lib/domain/value_objects'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -243,37 +242,37 @@ lib/data/mappers/product_mapper.dart     → ProductMapper.toDomain(dto) / toDto
 Database ORM annotations like `@Entity` (Floor), `@DataClassName` (Drift), `@HiveType` (Hive), or `@Collection` (Isar) all represent database schema definitions. Domain classes annotated with these are coupled to the specific database implementation.
 
 ```dart
-// test_arch/domain_no_orm.dart
+// test_arch/domain_no_orm_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
+void main() {
   // Floor/Room-style @Entity
   annotationMustNotHave(
-    folders: ['lib/domain'],
     annotation: 'Entity',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain'],
+    severity: RuleSeverity.error,
+  );
 
   // Hive @HiveType
   annotationMustNotHave(
-    folders: ['lib/domain'],
     annotation: 'HiveType',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain'],
+    severity: RuleSeverity.error,
+  );
 
   // Isar @Collection
   annotationMustNotHave(
-    folders: ['lib/domain'],
     annotation: 'collection',  // Isar uses lowercase
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain'],
+    severity: RuleSeverity.error,
+  );
 
   // Drift @DataClassName
   annotationMustNotHave(
-    folders: ['lib/domain'],
     annotation: 'DataClassName',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain'],
+    severity: RuleSeverity.error,
+  );
 }
 ```
 
@@ -305,18 +304,13 @@ lib/data/local/mappers/user_local_mapper.dart    → Converts between User and U
 `@visibleForTesting` should not appear in production `lib/` code outside of explicitly designated test support files.
 
 ```dart
-// test_arch/no_visible_for_testing.dart
+// test_arch/no_visible_for_testing_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustNotHave(
-    folders: ['lib/services', 'lib/repositories', 'lib/domain', 'lib/blocs'],
-    annotation: 'visibleForTesting',
-    severity: Severity.error,
-    exceptions: [
-      // Test doubles that live in lib/ for shared test utilities
-      // (if your project has such a pattern)
-    ],
-  ),
+  annotation: 'visibleForTesting',
+  folders: ['lib/services', 'lib/repositories', 'lib/domain', 'lib/blocs'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -345,19 +339,18 @@ The existence of `@visibleForTesting` here reveals that `resetRetryCount` is an 
 Pure data classes — models, entities, value objects — should not be registered with the DI container. They are created with constructors and typically take no injected dependencies. Marking them `@injectable` is at best useless and at worst confusing (the DI container will try to satisfy their constructor dependencies, which are data, not services).
 
 ```dart
-// test_arch/models_not_injectable.dart
+// test_arch/models_not_injectable_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => annotationMustNotHave(
-    folders: [
-      'lib/domain/entities',
-      'lib/domain/value_objects',
-      'lib/data/models',
-      'lib/data/dtos',
-    ],
-    annotation: 'injectable',
-    severity: Severity.error,
-  ),
+  annotation: 'injectable',
+  folders: [
+    'lib/domain/entities',
+    'lib/domain/value_objects',
+    'lib/data/models',
+    'lib/data/dtos',
+  ],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -386,10 +379,10 @@ The `@injectable` annotation on a data model like `UserProfile` is almost certai
 `annotationMustHave` and `annotationMustNotHave` together define a complete annotation policy for a folder. Here is a real-world complete policy for a Clean Architecture Flutter project:
 
 ```dart
-// test_arch/annotation_policies.dart
+// test_arch/annotation_policies_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
+void main() {
   // ==================================================
   // DOMAIN ENTITIES
   // Must: @immutable
@@ -397,29 +390,29 @@ void main(List<String> args) {
   // ==================================================
 
   annotationMustHave(
-    folders: ['lib/domain/entities'],
     annotation: 'immutable',
-    severity: Severity.error,
+    folders: ['lib/domain/entities'],
+    severity: RuleSeverity.error,
     exceptions: ['Entity', 'AggregateRoot'], // Abstract base classes
-  ));
+  );
 
   annotationMustNotHave(
-    folders: ['lib/domain/entities'],
     annotation: 'JsonSerializable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain/entities'],
+    severity: RuleSeverity.error,
+  );
 
   annotationMustNotHave(
-    folders: ['lib/domain/entities'],
     annotation: 'Entity',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain/entities'],
+    severity: RuleSeverity.error,
+  );
 
   annotationMustNotHave(
-    folders: ['lib/domain/entities'],
     annotation: 'injectable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/domain/entities'],
+    severity: RuleSeverity.error,
+  );
 
   // ==================================================
   // BLOC STATES
@@ -428,22 +421,22 @@ void main(List<String> args) {
   // ==================================================
 
   annotationMustHave(
-    folders: ['lib/blocs/states'],
     annotation: 'immutable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/blocs/states'],
+    severity: RuleSeverity.error,
+  );
 
   annotationMustNotHave(
-    folders: ['lib/blocs/states'],
     annotation: 'JsonSerializable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/blocs/states'],
+    severity: RuleSeverity.error,
+  );
 
   annotationMustNotHave(
-    folders: ['lib/blocs/states'],
     annotation: 'injectable',
-    severity: Severity.error,
-  ));
+    folders: ['lib/blocs/states'],
+    severity: RuleSeverity.error,
+  );
 
   // ==================================================
   // SERVICES (application layer)
@@ -452,23 +445,23 @@ void main(List<String> args) {
   // ==================================================
 
   annotationMustHave(
-    folders: ['lib/services'],
     annotation: 'injectable',
-    severity: Severity.error,
+    folders: ['lib/services'],
+    severity: RuleSeverity.error,
     exceptions: ['BaseService', 'IService'],
-  ));
+  );
 
   annotationMustNotHave(
-    folders: ['lib/services'],
     annotation: 'Entity',
-    severity: Severity.error,
-  ));
+    folders: ['lib/services'],
+    severity: RuleSeverity.error,
+  );
 
   annotationMustNotHave(
-    folders: ['lib/services'],
     annotation: 'visibleForTesting',
-    severity: Severity.error,
-  ));
+    folders: ['lib/services'],
+    severity: RuleSeverity.error,
+  );
 }
 ```
 
@@ -526,4 +519,4 @@ Each file becomes a specification document for its layer's architectural contrac
 - [`annotationMustHave`](/presets/annotation-must-have) — Enforce required annotations (completeness checks)
 - [`noExternalPackage`](/presets/no-external-package) — Prevent importing annotation-implying packages in the wrong layers
 - [`noPublicFields`](/presets/no-public-fields) — Complement annotation boundaries with structural encapsulation rules
-- [`layerDependencyPreset`](/presets/layer) — Enforce import boundaries between project layers
+- [`layeredArchitecture`](/presets/layered-architecture) — Enforce import boundaries between project layers

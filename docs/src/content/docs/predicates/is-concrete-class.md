@@ -65,7 +65,7 @@ Do not apply it to folders that intentionally contain abstract classes, enums, o
 
 Ensure that the repository implementation folder does not accidentally contain abstract classes:
 
-```dart title="test_arch/data_concrete_test_arch.dart"
+```dart title="test_arch/data_concrete_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -84,7 +84,7 @@ void main() {
 
 Any class ending with `Impl` is by definition an implementation — it should never be abstract:
 
-```dart title="test_arch/impl_concrete_test_arch.dart"
+```dart title="test_arch/impl_concrete_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -103,7 +103,7 @@ void main() {
 
 Enforce the complete contract — interfaces are abstract, implementations are concrete:
 
-```dart title="test_arch/repository_structure_test_arch.dart"
+```dart title="test_arch/repository_structure_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

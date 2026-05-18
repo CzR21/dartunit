@@ -59,7 +59,7 @@ Use `nameContains` when a keyword should appear anywhere in the name, not necess
 
 In feature-based architectures, all classes within a feature folder should reference the feature name. This makes code navigation much easier â€” you can search for `Cart` and find all cart-related classes:
 
-```dart title="test_arch/cart_naming_test_arch.dart"
+```dart title="test_arch/cart_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -80,7 +80,7 @@ This ensures that a class named `CheckoutHelper` inside the cart feature fails â
 
 Enforce that all classes in the mapper folder actually have `Mapper` in their name (they could be `CartMapper`, `UserMapper`, `ProductToCartMapper`, etc.):
 
-```dart title="test_arch/mapper_naming_test_arch.dart"
+```dart title="test_arch/mapper_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -99,7 +99,7 @@ void main() {
 
 Ensure that no class with `Mock` or `Fake` in its name ends up in `lib/`. These should only exist in test files:
 
-```dart title="test_arch/no_test_classes_test_arch.dart"
+```dart title="test_arch/no_test_classes_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

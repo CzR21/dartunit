@@ -16,6 +16,7 @@ export 'cli/commands/log_command.dart';
 
 // Templates
 export 'core/enums/arch_template.dart';
+export 'core/extensions/arch_template_extension.dart';
 
 // Core — Rule
 export 'core/entities/rule.dart';

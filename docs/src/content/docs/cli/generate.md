@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-The `generate` command creates a new `*_test_arch.dart` file in the `test_arch/` folder with the required structure already in place, so you can focus on writing the rule logic rather than the boilerplate.
+The `generate` command creates a new `*_arch_test.dart` file in the `test_arch/` folder with the required structure already in place, so you can focus on writing the rule logic rather than the boilerplate.
 
 ## Usage
 
@@ -19,20 +19,20 @@ The `<name>` should be in `snake_case`. It becomes the filename and is used to d
 
 ```bash
 dart run dartunit generate naming_conventions
-# Creates: test_arch/naming_conventions_test_arch.dart
+# Creates: test_arch/naming_conventions_arch_test.dart
 
 dart run dartunit generate no_god_classes
-# Creates: test_arch/no_god_classes_test_arch.dart
+# Creates: test_arch/no_god_classes_arch_test.dart
 
 dart run dartunit generate domain_purity
-# Creates: test_arch/domain_purity_test_arch.dart
+# Creates: test_arch/domain_purity_arch_test.dart
 ```
 
 ## What is generated
 
-Running `dart run dartunit generate no_god_classes` creates `test_arch/no_god_classes_test_arch.dart`:
+Running `dart run dartunit generate no_god_classes` creates `test_arch/no_god_classes_arch_test.dart`:
 
-```dart title="test_arch/no_god_classes_test_arch.dart"
+```dart title="test_arch/no_god_classes_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -48,14 +48,14 @@ void main() {
 The generated file is immediately runnable:
 
 ```bash
-dart test test_arch/no_god_classes_test_arch.dart
+dart test test_arch/no_god_classes_arch_test.dart
 ```
 
 ## Customizing the generated file
 
 Edit the generated file to implement your rule:
 
-```dart title="test_arch/no_god_classes_test_arch.dart"
+```dart title="test_arch/no_god_classes_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -82,7 +82,7 @@ void main() {
 During development, run the rule directly to check it:
 
 ```bash
-dart test test_arch/no_god_classes_test_arch.dart
+dart test test_arch/no_god_classes_arch_test.dart
 ```
 
 When satisfied, the rule is automatically picked up by `dartunit analyze`:

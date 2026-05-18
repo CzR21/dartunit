@@ -1,4 +1,4 @@
----
+﻿---
 title: Naming Presets
 description: Presets for enforcing naming conventions on classes in specific folders.
 sidebar:
@@ -53,7 +53,7 @@ The preset takes the last segment of the folder path and capitalizes it:
 
 ### Example — Flutter BLoC project
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -71,7 +71,7 @@ void main() => namingClassConvention(
 
 ### Example — MVC project
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(
@@ -85,7 +85,7 @@ void main() => namingClassConvention(
 
 ### Example — Strict enforcement (error severity)
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingClassConvention(

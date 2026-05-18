@@ -1,4 +1,4 @@
----
+﻿---
 title: Metrics Presets
 description: The classSizeLimit for controlling the size of classes in your project.
 sidebar:
@@ -37,7 +37,7 @@ At least one of `maxMethods` or `maxFields` must be specified.
 
 ### Example — Global size limit
 
-```dart title="test_arch/class_size_test_arch.dart"
+```dart title="test_arch/class_size_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -54,7 +54,7 @@ void main(List<String> args) => archTest(
 
 ### Example — Stricter limits for the domain layer
 
-```dart title="test_arch/class_size_test_arch.dart"
+```dart title="test_arch/class_size_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -82,7 +82,7 @@ void main(List<String> args) {
 
 ### Example — Only limit fields (no method limit)
 
-```dart title="test_arch/class_size_test_arch.dart"
+```dart title="test_arch/class_size_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(

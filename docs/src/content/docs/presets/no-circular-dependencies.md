@@ -1,4 +1,4 @@
----
+﻿---
 title: noCircularDependencies
 description: Detect files participating in circular import chains. Circular dependencies break testing isolation, increase change blast radius, and can cause runtime initialization errors.
 sidebar:
@@ -263,7 +263,7 @@ Sometimes a file imports another only for one small piece of code. If that piece
 ```dart
 void noCircularDependencies({
   RuleSeverity severity = RuleSeverity.error,
-  List<String> exceptions = const [],
+  String projectRoot = '.',
 })
 ```
 
@@ -272,9 +272,8 @@ void noCircularDependencies({
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `severity` | `RuleSeverity` | `RuleSeverity.error` | Violation severity. Defaults to `error` because circular dependencies are structural violations. |
-| `exceptions` | `List<String>` | `const []` | File paths exempt from cycle detection. Useful for generated files or intentionally coupled legacy code. |
 
-Note that `noCircularDependencies` takes no `folders` parameter. It analyzes the entire project. There is no safe subset of files that can be excluded from cycle detection: a cycle crossing the boundary of an excluded folder would be missed entirely.
+Note that `noCircularDependencies` takes no `folders` or `exceptions` parameter. It analyzes the entire project. There is no safe subset of files that can be excluded from cycle detection: a cycle crossing the boundary of an excluded folder would be missed entirely.
 
 ---
 
@@ -284,50 +283,29 @@ Note that `noCircularDependencies` takes no `folders` parameter. It analyzes the
 
 The simplest and most complete configuration. Run on every CI build:
 
-```dart title="test_arch/no_circular_dependencies_test_arch.dart"
+```dart title="test_arch/no_circular_dependencies_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main() => noCircularDependencies(),
-);
+void main() => noCircularDependencies();
 ```
 
 No parameters required. DartUnit walks the entire project's import graph, identifies all cycles, and reports every participating file.
 
-### Example 2 — Excluding generated files
+### Example 2 — Generated files and part declarations
 
 Code generators like `freezed`, `json_serializable`, and `build_runner` can produce import patterns that look like cycles due to `part`/`part of` declarations. These are not real import cycles — they are file splitting for a single logical compilation unit — but they may appear in the cycle detection output.
 
-Exclude generated files by path suffix:
-
-```dart title="test_arch/no_circular_dependencies_test_arch.dart"
-import 'package:dartunit/dartunit.dart';
-
-void main() => noCircularDependencies(
-    severity: RuleSeverity.error,
-    exceptions: [
-      // Freezed-generated files
-      'cart_state.freezed.dart',
-      'user_model.freezed.dart',
-      // JSON serialization-generated files
-      'cart_state.g.dart',
-      'user_model.g.dart',
-    ],
-  ),
-);
-```
-
-If you have many generated files, consider a naming convention that makes them easy to identify (all generated files end in `.g.dart` or `.freezed.dart`) and add them to exceptions as they are created.
+DartUnit excludes `part` declarations from cycle detection automatically, so `.g.dart` and `.freezed.dart` files using `part of` are handled correctly. If you encounter false positives from generated files, verify that they use the `part`/`part of` mechanism rather than `import`.
 
 ### Example 3 — Using as a gate in CI
 
 The most impactful configuration: run `noCircularDependencies` as part of the CI pipeline and block merges when a cycle is introduced.
 
-```dart title="test_arch/ci_gate_test_arch.dart"
+```dart title="test_arch/ci_gate_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => noCircularDependencies(
-    severity: RuleSeverity.critical,  // CRITICAL: blocks CI unconditionally
-  ),
+  severity: RuleSeverity.critical,  // CRITICAL: blocks CI unconditionally
 );
 ```
 
@@ -385,26 +363,27 @@ ERROR | Circular dependency detected
 
 If you add DartUnit to an existing project, `noCircularDependencies` may report dozens of existing cycles. Do not try to fix them all at once.
 
-**Step 1**: Run the preset with `RuleSeverity.warning` and add all currently-violating files to `exceptions`. This gives you a baseline: the current known cycles are documented in the exception list.
+**Step 1**: Run the preset with `RuleSeverity.warning` to get visibility without blocking CI:
 
-```dart title="test_arch/no_circular_dependencies_test_arch.dart"
+```dart title="test_arch/no_circular_dependencies_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => noCircularDependencies(
-    severity: RuleSeverity.error,
-    exceptions: [
-      // Known existing cycles — fix these incrementally
-      'lib/legacy/order_manager.dart',
-      'lib/legacy/cart_manager.dart',
-      'lib/legacy/product_manager.dart',
-    ],
-  ),
+  severity: RuleSeverity.warning,
 );
 ```
 
-**Step 2**: The CI gate now blocks any *new* cycles from being introduced, while the existing ones are documented. New code is held to the higher standard.
+**Step 2**: Fix the identified cycles incrementally. Prioritize high-traffic files and domain-layer cycles first.
 
-**Step 3**: Gradually remove files from `exceptions` as you fix the underlying cycles. The exception list shrinks over time, tracking your architectural improvement progress.
+**Step 3**: Once cycles are resolved, change the severity to `RuleSeverity.error` to enforce the constraint in CI:
+
+```dart title="test_arch/no_circular_dependencies_arch_test.dart"
+import 'package:dartunit/dartunit.dart';
+
+void main() => noCircularDependencies(
+  severity: RuleSeverity.error,
+);
+```
 
 ---
 
@@ -426,5 +405,4 @@ If your project uses path-based package imports to reference other packages in a
 
 ## Related presets
 
-- [`layeredArchitecture`](/presets/layer/) — defines which layers can import which other layers. Layer violations often indicate conditions that lead to circular dependencies.
-- [`layerCannotDependOn`](/presets/layer/) — targeted import prohibition; use as a preventive measure against known cycle-prone paths.
+- [`layeredArchitecture`](/presets/layered-architecture) — defines which layers can import which other layers. Layer violations often indicate conditions that lead to circular dependencies.

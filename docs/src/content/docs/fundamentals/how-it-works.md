@@ -16,7 +16,7 @@ dart run dartunit analyze
         │
         ▼
  AnalyzeCommand
-  ├─ 1. Discover all *_test_arch.dart files in test_arch/
+  ├─ 1. Discover all *_arch_test.dart files in test_arch/
   ├─ 2. Run: dart test <file1> <file2> ... --reporter json
   │         └─ Each testArch call:
   │              ├─ Analyzes project source (or reuses group context)
@@ -34,7 +34,7 @@ dart run dartunit analyze
 
 Every rule file is a Dart test file with a `main()` function that uses `testArch()` or `testArchGroup()`:
 
-```dart title="test_arch/repository_contracts_test_arch.dart"
+```dart title="test_arch/repository_contracts_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -147,7 +147,7 @@ testArchGroup('Domain rules', () {
 
 | Severity | Terminal color | Fails CI? |
 |----------|---------------|-----------|
-| `RuleSeverity.info` | White | No |
+| `RuleSeverity.info` | Cyan | No |
 | `RuleSeverity.warning` | Yellow | No |
 | `RuleSeverity.error` | Red | **Yes** (exit code 1) |
 | `RuleSeverity.critical` | Magenta | **Yes** (exit code 1) |
@@ -181,7 +181,7 @@ Because the parser uses regex rather than the Dart compiler, code embedded in mu
 While developing a new rule, run it directly without triggering the full analysis:
 
 ```bash
-dart test test_arch/my_rule_test_arch.dart
+dart test test_arch/my_rule_arch_test.dart
 ```
 
 The output is identical to what `dartunit analyze` shows for that file. When you're satisfied, the rule is automatically picked up by:
@@ -204,12 +204,12 @@ dart run dartunit analyze
 
 ## File Discovery
 
-`dartunit analyze` scans the `test_arch/` folder for files matching `*_test_arch.dart`. Files without this suffix are silently ignored.
+`dartunit analyze` scans the `test_arch/` folder for files matching `*_arch_test.dart`. Files without this suffix are silently ignored.
 
 ```
 test_arch/
-├── domain_layer_test_arch.dart        ← discovered ✓
-├── naming_conventions_test_arch.dart  ← discovered ✓
+├── domain_layer_arch_test.dart        ← discovered ✓
+├── naming_conventions_arch_test.dart  ← discovered ✓
 ├── helpers.dart                        ← ignored (no suffix match)
 └── README.md                           ← ignored
 ```

@@ -70,7 +70,7 @@ Use `nameEndsWith` whenever your team has a **suffix convention** for a folder. 
 
 All classes in the domain repository folder must end with `Repository` — this makes it immediately clear they define repository contracts:
 
-```dart title="test_arch/repo_naming_test_arch.dart"
+```dart title="test_arch/repo_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -89,7 +89,7 @@ void main() {
 
 Your team uses both BLoC and Cubit. Both are valid — the rule should accept either suffix:
 
-```dart title="test_arch/bloc_naming_test_arch.dart"
+```dart title="test_arch/bloc_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -109,7 +109,7 @@ void main() {
 
 A comprehensive test that checks all the BLoC-related naming conventions at once:
 
-```dart title="test_arch/bloc_full_naming_test_arch.dart"
+```dart title="test_arch/bloc_full_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

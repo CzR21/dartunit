@@ -71,7 +71,7 @@ Tighter limits for simpler types (use cases, value objects) encourage better dec
 
 BLoC classes that grow beyond 10 methods are usually handling too many events or embedding business logic that should be in use cases:
 
-```dart title="test_arch/bloc_size_test_arch.dart"
+```dart title="test_arch/bloc_size_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -90,7 +90,7 @@ void main() {
 
 Apply a generous limit across the entire codebase to catch the most extreme cases:
 
-```dart title="test_arch/god_class_test_arch.dart"
+```dart title="test_arch/god_class_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -109,7 +109,7 @@ void main() {
 
 Use cases should do exactly one thing. Value objects should be minimal. Enforce tight limits:
 
-```dart title="test_arch/simple_types_size_test_arch.dart"
+```dart title="test_arch/simple_types_size_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

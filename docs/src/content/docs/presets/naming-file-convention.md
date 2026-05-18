@@ -1,4 +1,4 @@
----
+﻿---
 title: namingFileConvention
 description: Enforce file naming conventions — files in a folder must match a naming pattern derived from the folder name, an explicit suffix, or a custom regex.
 sidebar:
@@ -56,7 +56,7 @@ The full path does not affect the derived suffix — only the last segment matte
 
 ### Example 1 — Auto-derived suffix from folder name
 
-```dart title="test_arch/file_naming_test_arch.dart"
+```dart title="test_arch/file_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingFileConvention(
@@ -72,7 +72,7 @@ This enforces:
 
 Use `suffix` when the auto-derived name doesn't match your convention (e.g., you use `_service.dart` singular):
 
-```dart title="test_arch/file_naming_test_arch.dart"
+```dart title="test_arch/file_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingFileConvention(
@@ -87,7 +87,7 @@ This enforces files like `auth_service.dart`, `user_service.dart`.
 
 Enforce both a prefix and suffix for remote data source files:
 
-```dart title="test_arch/datasource_naming_test_arch.dart"
+```dart title="test_arch/datasource_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingFileConvention(
@@ -103,7 +103,7 @@ This enforces files like `remote_user_datasource.dart`, `remote_product_datasour
 
 Use `namePattern` for conventions that cannot be expressed with a simple prefix/suffix:
 
-```dart title="test_arch/bloc_file_naming_test_arch.dart"
+```dart title="test_arch/bloc_file_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => namingFileConvention(
@@ -118,7 +118,7 @@ This allows both `auth_bloc.dart` and `auth_cubit.dart`.
 
 Enforce file naming conventions across all Clean Architecture layers:
 
-```dart title="test_arch/file_naming_test_arch.dart"
+```dart title="test_arch/file_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -156,7 +156,7 @@ void main() {
 
 ### Example 6 — BLoC architecture with multiple allowed patterns
 
-```dart title="test_arch/bloc_naming_test_arch.dart"
+```dart title="test_arch/bloc_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -173,7 +173,7 @@ void main() {
 
 For the most comprehensive naming enforcement, combine both file-level and class-level checks:
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

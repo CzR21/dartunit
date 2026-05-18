@@ -62,7 +62,7 @@ Use `isExtensionType()` in two situations:
 
 Enforce that your extension folder stays clean and organized:
 
-```dart title="test_arch/extension_folder_test_arch.dart"
+```dart title="test_arch/extension_folder_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -81,7 +81,7 @@ void main() {
 
 Ensure naming-declaration consistency:
 
-```dart title="test_arch/extension_naming_test_arch.dart"
+```dart title="test_arch/extension_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -100,7 +100,7 @@ void main() {
 
 A complete validation for the extensions folder:
 
-```dart title="test_arch/extension_full_test_arch.dart"
+```dart title="test_arch/extension_full_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

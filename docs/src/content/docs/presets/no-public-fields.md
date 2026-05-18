@@ -169,9 +169,10 @@ DartUnit's `noPublicFields` targets non-final public fields by default — the k
 
 ```dart
 void noPublicFields({
-  List<String> folders = const [],
-  Severity severity = Severity.error,
+  required List<String> folders,
+  RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
+  String projectRoot = '.',
 })
 ```
 
@@ -193,11 +194,11 @@ Subdirectories are included automatically. Specifying `'lib/features'` will chec
 
 ### `severity`
 
-**Type:** `Severity` — default `Severity.error`
+**Type:** `RuleSeverity` — default `RuleSeverity.error`
 
-Controls whether violations block CI (`Severity.error`) or only produce warnings (`Severity.warning`, `Severity.info`).
+Controls whether violations block CI (`RuleSeverity.error`) or only produce warnings (`RuleSeverity.warning`, `RuleSeverity.info`).
 
-For encapsulation violations in service and BLoC classes, `Severity.error` is recommended. These violations represent design flaws that will cause bugs — reactivity failures, invalid state, impossible-to-debug mutations.
+For encapsulation violations in service and BLoC classes, `RuleSeverity.error` is recommended. These violations represent design flaws that will cause bugs — reactivity failures, invalid state, impossible-to-debug mutations.
 
 ### `exceptions`
 
@@ -215,12 +216,11 @@ noPublicFields(
 ## Usage
 
 ```dart
-// test_arch/no_public_fields.dart
+// test_arch/no_public_fields_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => noPublicFields(
-    folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
-  ),
+  folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
 );
 ```
 
@@ -237,17 +237,16 @@ dart run dartunit analyze
 BLoC and Cubit classes are the most critical targets for this rule. A BLoC with public fields defeats its entire purpose — the BLoC pattern exists to make state changes explicit and traceable. A public field bypasses both the event system and the state stream.
 
 ```dart
-// test_arch/bloc_encapsulation.dart
+// test_arch/bloc_encapsulation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => noPublicFields(
-    folders: [
-      'lib/blocs',
-      'lib/cubits',
-      'lib/features', // Feature-based BLoCs
-    ],
-    severity: Severity.error,
-  ),
+  folders: [
+    'lib/blocs',
+    'lib/cubits',
+    'lib/features', // Feature-based BLoCs
+  ],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -272,18 +271,17 @@ The fields should be part of the immutable `AuthState`, not floating public fiel
 Services and repositories coordinate business and data logic. Public fields on these classes expose implementation details that callers should never touch directly.
 
 ```dart
-// test_arch/service_encapsulation.dart
+// test_arch/service_encapsulation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => noPublicFields(
-    folders: [
-      'lib/services',
-      'lib/repositories',
-      'lib/data/remote',
-      'lib/data/local',
-    ],
-    severity: Severity.error,
-  ),
+  folders: [
+    'lib/services',
+    'lib/repositories',
+    'lib/data/remote',
+    'lib/data/local',
+  ],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -311,13 +309,12 @@ If a caller sets `notificationsEnabled = false` directly, the `sendNotification`
 Domain entities in a Clean Architecture project encapsulate business rules. If their fields are public, the business rules can be circumvented.
 
 ```dart
-// test_arch/domain_encapsulation.dart
+// test_arch/domain_encapsulation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => noPublicFields(
-    folders: ['lib/domain/entities', 'lib/domain/value_objects'],
-    severity: Severity.error,
-  ),
+  folders: ['lib/domain/entities', 'lib/domain/value_objects'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -345,40 +342,38 @@ With public `status`, a caller can do `order.status = OrderStatus.confirmed` wit
 Data Transfer Objects and JSON response models legitimately use public fields because they are pure data containers passed between layers. Exclude these from the rule:
 
 ```dart
-// test_arch/service_encapsulation.dart
+// test_arch/service_encapsulation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 // Apply to all of lib/ EXCEPT data transfer and generated code
 void main() => noPublicFields(
-    // Target only the layers where encapsulation matters
-    folders: [
-      'lib/application',
-      'lib/domain',
-      'lib/blocs',
-      'lib/services',
-    ],
-    // NOT targeting: lib/models, lib/dtos, lib/generated
-    severity: Severity.error,
-  ),
+  // Target only the layers where encapsulation matters
+  folders: [
+    'lib/application',
+    'lib/domain',
+    'lib/blocs',
+    'lib/services',
+  ],
+  // NOT targeting: lib/models, lib/dtos, lib/generated
+  severity: RuleSeverity.error,
 );
 ```
 
-An alternative approach is to apply the rule globally and use `exceptions` for specific model classes:
+An alternative approach is to apply the rule to specific layers and use `exceptions` for individual model classes:
 
 ```dart
-// test_arch/global_encapsulation.dart
+// test_arch/global_encapsulation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 void main() => noPublicFields(
-    folders: [], // Global
-    exceptions: [
-      'UserDto',
-      'ProductResponse',
-      'CartItemModel',
-      // ... other known data models
-    ],
-    severity: Severity.error,
-  ),
+  folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
+  exceptions: [
+    'UserDto',
+    'ProductResponse',
+    'CartItemModel',
+    // ... other known data models
+  ],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -416,28 +411,24 @@ Value objects/states → all-final fields + copyWith (mustBeImmutable)
 This leaves no ambiguous middle ground where mutable public fields accumulate.
 
 ```dart
-// test_arch/encapsulation.dart
+// test_arch/encapsulation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  noPublicFields(
-    folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
-    severity: Severity.error,
-  ));
-}
+void main() => noPublicFields(
+  folders: ['lib/services', 'lib/blocs', 'lib/repositories'],
+  severity: RuleSeverity.error,
+);
 ```
 
 ```dart
-// test_arch/immutability.dart
+// test_arch/immutability_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  annotationMustHave(
-    folders: ['lib/domain/value_objects', 'lib/blocs/states'],
-    annotation: 'immutable',
-    severity: Severity.error,
-  ));
-}
+void main() => annotationMustHave(
+  folders: ['lib/domain/value_objects', 'lib/blocs/states'],
+  annotation: 'immutable',
+  severity: RuleSeverity.error,
+);
 ```
 
 ## Common Refactoring Patterns
@@ -482,4 +473,4 @@ MyService({Duration timeout = const Duration(seconds: 30)}) : _timeout = timeout
 
 - [`classSizeLimit`](/presets/class-size-limit) — Prevent classes from growing large enough that their public interface becomes unmanageable
 - [`annotationMustHave`](/presets/annotation-must-have) — Enforce `@immutable` on value objects to complement encapsulation in service classes
-- [`layerDependencyPreset`](/presets/layer) — Ensure that services stay in the correct layer and are not accessed by layers that should not depend on them
+- [`layeredArchitecture`](/presets/layered-architecture) — Ensure that services stay in the correct layer and are not accessed by layers that should not depend on them

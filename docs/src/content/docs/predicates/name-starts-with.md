@@ -62,7 +62,7 @@ For suffix conventions, use [`nameEndsWith`](/predicates/name-ends-with/) instea
 
 Many teams prefix interface classes with `I` to make it immediately clear that a class is an abstract contract, not a concrete implementation:
 
-```dart title="test_arch/interface_naming_test_arch.dart"
+```dart title="test_arch/interface_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -83,7 +83,7 @@ This ensures that `lib/domain/contracts/cart_repository.dart` must declare a cla
 
 Enforce that no mock or fake classes accidentally end up in `lib/` (they should only exist in test files):
 
-```dart title="test_arch/no_test_doubles_test_arch.dart"
+```dart title="test_arch/no_test_doubles_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -107,7 +107,7 @@ void main() {
 
 Ensure that all base classes in a shared base folder follow the naming convention:
 
-```dart title="test_arch/base_class_naming_test_arch.dart"
+```dart title="test_arch/base_class_naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

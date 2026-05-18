@@ -68,7 +68,7 @@ Use `implementsInterface()` when concrete implementation classes are required to
 
 Ensure that all classes in the data repository folder implement a repository interface from the domain layer:
 
-```dart title="test_arch/repo_implements_test_arch.dart"
+```dart title="test_arch/repo_implements_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -89,7 +89,7 @@ This ensures that `CartRepositoryImpl` has `implements CartRepository` in its de
 
 If your team defines a shared `UseCase` interface, enforce that every use case class implements it:
 
-```dart title="test_arch/usecase_implements_test_arch.dart"
+```dart title="test_arch/usecase_implements_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -108,7 +108,7 @@ void main() {
 
 Combine interface implementation with naming and import rules for a complete structural check:
 
-```dart title="test_arch/data_repo_full_test_arch.dart"
+```dart title="test_arch/data_repo_full_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

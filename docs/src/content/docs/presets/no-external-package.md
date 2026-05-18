@@ -5,7 +5,7 @@ sidebar:
   order: 12
 ---
 
-`noExternalPackage` forbids classes in specified folders from importing specific external packages. It returns `List<ArchitectureRule>` — one rule per forbidden package. Use this to enforce the Dependency Rule from Clean Architecture: inner layers (domain, application) must not depend on outer layers (Flutter framework, HTTP clients, database packages, state management frameworks).
+`noExternalPackage` forbids classes in specified folders from importing specific external packages. Use this to enforce the Dependency Rule from Clean Architecture: inner layers (domain, application) must not depend on outer layers (Flutter framework, HTTP clients, database packages, state management frameworks).
 
 ## The Domain Layer Purity Problem
 
@@ -65,38 +65,16 @@ In a CI pipeline that runs hundreds of test files, this difference compounds. A 
 
 Beyond speed, `dart test` domain tests can be run in environments without Flutter installed, on Dart-only CI containers, or on server-side Dart (for shared business logic between mobile and backend).
 
-## Return Type: `List<ArchitectureRule>`
-
-`noExternalPackage` returns `List<ArchitectureRule>` — one rule per forbidden package. This allows DartUnit to report violations from each forbidden package as a distinct rule, making the output easier to read and process.
+## Basic Usage
 
 ```dart
-// test_arch/domain_packages.dart
+// test_arch/domain_packages_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: ['lib/domain'],
-    packages: ['flutter', 'dio', 'hive'],
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
-```
-
-Or using a helper:
-
-```dart
-// test_arch/domain_packages.dart
-import 'package:dartunit/dartunit.dart';
-
-void main(List<String> args) {
-  archTestAll(args, noExternalPackage(
-    folders: ['lib/domain'],
-    packages: ['flutter', 'dio', 'hive'],
-  ));
-}
+void main() => noExternalPackage(
+  folders: ['lib/domain'],
+  packages: ['flutter', 'dio', 'hive'],
+);
 ```
 
 ## How Package Name Matching Works
@@ -117,11 +95,12 @@ packages: ['hive', 'hive_flutter']
 ## Function Signature
 
 ```dart
-List<ArchitectureRule> noExternalPackage({
-  required List<String> folders,
+void noExternalPackage({
   required List<String> packages,
-  Severity severity = Severity.error,
+  required List<String> folders,
+  RuleSeverity severity = RuleSeverity.error,
   List<String> exceptions = const [],
+  String projectRoot = '.',
 })
 ```
 
@@ -155,9 +134,9 @@ Specify as many packages as needed. Each package generates one `ArchitectureRule
 
 ### `severity`
 
-**Type:** `Severity` — default `Severity.error`
+**Type:** `RuleSeverity` — default `RuleSeverity.error`
 
-For dependency rule violations, `Severity.error` is strongly recommended. A domain class that imports Flutter is not merely a style issue — it fundamentally breaks the architectural guarantees the team is relying on. Make these violations blocking in CI.
+For dependency rule violations, `RuleSeverity.error` is strongly recommended. A domain class that imports Flutter is not merely a style issue — it fundamentally breaks the architectural guarantees the team is relying on. Make these violations blocking in CI.
 
 ### `exceptions`
 
@@ -176,20 +155,14 @@ However, note that `package:meta/meta.dart` provides `@immutable` and does not d
 The core constraint for Clean Architecture in Flutter. Domain code — entities, value objects, domain services, repository interfaces — must not depend on Flutter.
 
 ```dart
-// test_arch/domain_no_flutter.dart
+// test_arch/domain_no_flutter_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: ['lib/domain'],
-    packages: ['flutter'],
-    severity: Severity.error,
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
+void main() => noExternalPackage(
+  folders: ['lib/domain'],
+  packages: ['flutter'],
+  severity: RuleSeverity.error,
+);
 ```
 
 This catches:
@@ -225,25 +198,19 @@ class Money {
 HTTP packages represent the infrastructure layer. Domain code that imports them is tightly coupled to the specific HTTP client implementation.
 
 ```dart
-// test_arch/domain_no_http.dart
+// test_arch/domain_no_http_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: ['lib/domain'],
-    packages: [
-      'dio',
-      'http',
-      'retrofit',
-      'chopper',
-    ],
-    severity: Severity.error,
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
+void main() => noExternalPackage(
+  folders: ['lib/domain'],
+  packages: [
+    'dio',
+    'http',
+    'retrofit',
+    'chopper',
+  ],
+  severity: RuleSeverity.error,
+);
 ```
 
 Domain code should depend on abstract interfaces:
@@ -272,28 +239,22 @@ The `UserRepository` implementation belongs in `lib/infrastructure` or `lib/data
 Use cases (application layer) orchestrate domain operations. They should not know about the specific database used to persist data — that is an infrastructure concern.
 
 ```dart
-// test_arch/application_no_db.dart
+// test_arch/application_no_db_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: ['lib/application', 'lib/use_cases'],
-    packages: [
-      'sqflite',
-      'drift',
-      'hive',
-      'hive_flutter',
-      'isar',
-      'objectbox',
-      'sembast',
-    ],
-    severity: Severity.error,
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
+void main() => noExternalPackage(
+  folders: ['lib/application', 'lib/use_cases'],
+  packages: [
+    'sqflite',
+    'drift',
+    'hive',
+    'hive_flutter',
+    'isar',
+    'objectbox',
+    'sembast',
+  ],
+  severity: RuleSeverity.error,
+);
 ```
 
 A use case that imports Drift (a local database package) is tied to that database. Migrating to Isar requires rewriting the use case, which should only concern orchestration logic, not storage implementation.
@@ -303,29 +264,23 @@ A use case that imports Drift (a local database package) is tied to that databas
 Data models represent data structures. They should not depend on state management packages — that would mean a model class knows how it is managed in the application, coupling data structure to application architecture.
 
 ```dart
-// test_arch/models_no_state_management.dart
+// test_arch/models_no_state_management_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: ['lib/domain/models', 'lib/data/models'],
-    packages: [
-      'flutter_bloc',
-      'bloc',
-      'provider',
-      'riverpod',
-      'flutter_riverpod',
-      'get',
-      'mobx',
-      'redux',
-    ],
-    severity: Severity.error,
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
+void main() => noExternalPackage(
+  folders: ['lib/domain/models', 'lib/data/models'],
+  packages: [
+    'flutter_bloc',
+    'bloc',
+    'provider',
+    'riverpod',
+    'flutter_riverpod',
+    'get',
+    'mobx',
+    'redux',
+  ],
+  severity: RuleSeverity.error,
+);
 ```
 
 A model class that imports `flutter_bloc` or `provider` is no longer a pure data structure — it has taken on concerns about how it is observed in the UI layer.
@@ -335,72 +290,66 @@ A model class that imports `flutter_bloc` or `provider` is no longer a pure data
 In practice, you want to enforce all domain isolation rules in a single, comprehensive rule file. Combine all forbidden packages:
 
 ```dart
-// test_arch/domain_isolation.dart
+// test_arch/domain_isolation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
 // The domain layer must be pure Dart — no framework, HTTP, database,
 // platform, or state management dependencies.
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: [
-      'lib/domain',
-      'lib/domain/entities',
-      'lib/domain/value_objects',
-      'lib/domain/repositories',   // Abstract interfaces
-      'lib/domain/services',        // Domain services
-      'lib/domain/exceptions',
-    ],
-    packages: [
-      // Flutter framework
-      'flutter',
+void main() => noExternalPackage(
+  folders: [
+    'lib/domain',
+    'lib/domain/entities',
+    'lib/domain/value_objects',
+    'lib/domain/repositories',   // Abstract interfaces
+    'lib/domain/services',        // Domain services
+    'lib/domain/exceptions',
+  ],
+  packages: [
+    // Flutter framework
+    'flutter',
 
-      // HTTP clients
-      'dio',
-      'http',
-      'retrofit',
-      'chopper',
+    // HTTP clients
+    'dio',
+    'http',
+    'retrofit',
+    'chopper',
 
-      // Local databases
-      'sqflite',
-      'drift',
-      'hive',
-      'hive_flutter',
-      'isar',
-      'objectbox',
-      'sembast',
-      'floor',
+    // Local databases
+    'sqflite',
+    'drift',
+    'hive',
+    'hive_flutter',
+    'isar',
+    'objectbox',
+    'sembast',
+    'floor',
 
-      // State management
-      'flutter_bloc',
-      'bloc',
-      'provider',
-      'riverpod',
-      'flutter_riverpod',
-      'get',
-      'mobx',
-      'redux',
+    // State management
+    'flutter_bloc',
+    'bloc',
+    'provider',
+    'riverpod',
+    'flutter_riverpod',
+    'get',
+    'mobx',
+    'redux',
 
-      // Platform plugins
-      'shared_preferences',
-      'path_provider',
-      'url_launcher',
-      'image_picker',
-      'camera',
-      'location',
-      'firebase_core',
-      'firebase_auth',
-      'cloud_firestore',
+    // Platform plugins
+    'shared_preferences',
+    'path_provider',
+    'url_launcher',
+    'image_picker',
+    'camera',
+    'location',
+    'firebase_core',
+    'firebase_auth',
+    'cloud_firestore',
 
-      // Serialization (JSON serialization belongs in data layer)
-      'json_annotation',
-    ],
-    severity: Severity.error,
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
+    // Serialization (JSON serialization belongs in data layer)
+    'json_annotation',
+  ],
+  severity: RuleSeverity.error,
+);
 ```
 
 This comprehensive list ensures the domain layer has truly zero infrastructure dependencies. When DartUnit runs this in CI, any developer who accidentally imports a forbidden package gets an immediate, clear error:
@@ -421,43 +370,37 @@ VIOLATION [error] noExternalPackage[flutter]
 The application layer (use cases, BLoC, application services) has slightly looser constraints. It may depend on BLoC/provider for state management but should not import Flutter widgets or infrastructure packages:
 
 ```dart
-// test_arch/application_isolation.dart
+// test_arch/application_isolation_arch_test.dart
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  final rules = noExternalPackage(
-    folders: ['lib/application', 'lib/blocs', 'lib/use_cases'],
-    packages: [
-      // No Flutter widgets in application layer
-      'flutter',
+void main() => noExternalPackage(
+  folders: ['lib/application', 'lib/blocs', 'lib/use_cases'],
+  packages: [
+    // No Flutter widgets in application layer
+    'flutter',
 
-      // No direct HTTP in application layer
-      'dio',
-      'http',
-      'retrofit',
+    // No direct HTTP in application layer
+    'dio',
+    'http',
+    'retrofit',
 
-      // No direct database access in application layer
-      'sqflite',
-      'drift',
-      'hive',
-      'isar',
+    // No direct database access in application layer
+    'sqflite',
+    'drift',
+    'hive',
+    'isar',
 
-      // No Firebase SDK directly in application layer
-      // (use repository abstractions)
-      'cloud_firestore',
-      'firebase_auth',
-      'firebase_storage',
-    ],
-    severity: Severity.error,
-    exceptions: [
-      'lib/blocs/navigation_bloc.dart', // NavigationBloc uses Flutter's Navigator
-    ],
-  );
-
-  for (final rule in rules) {
-    rule);
-  }
-}
+    // No Firebase SDK directly in application layer
+    // (use repository abstractions)
+    'cloud_firestore',
+    'firebase_auth',
+    'firebase_storage',
+  ],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'lib/blocs/navigation_bloc.dart', // NavigationBloc uses Flutter's Navigator
+  ],
+);
 ```
 
 ## Violation Message Format
@@ -493,44 +436,26 @@ Each file is a standalone Dart program run independently by DartUnit. This organ
 
 ## Pairing With Layer Dependency Rules
 
-`noExternalPackage` and `layerDependencyPreset` are complementary:
+`noExternalPackage` and `layeredArchitecture` are complementary:
 
-- `layerDependencyPreset` controls which **project layers** can import which other project layers (e.g., presentation may import application, but not domain directly).
+- `layeredArchitecture` controls which **project layers** can import which other project layers (e.g., presentation may import application, but not domain directly).
 - `noExternalPackage` controls which **external packages** can be imported by which layers.
 
 Together, they form a complete dependency boundary that covers both internal and external dependencies.
 
 ```dart
-// test_arch/domain_boundaries.dart — controls project-internal imports
+// test_arch/domain_external_arch_test.dart — controls external package imports
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  layerDependencyPreset(
-    layers: {
-      'domain': [],                         // Domain imports nothing from this project
-      'application': ['domain'],            // Application may import domain
-      'infrastructure': ['domain'],          // Infrastructure implements domain interfaces
-      'presentation': ['application'],       // Presentation imports application
-    },
-  ));
-}
-```
-
-```dart
-// test_arch/domain_external.dart — controls external package imports
-import 'package:dartunit/dartunit.dart';
-
-void main(List<String> args) {
-  archTestAll(args, noExternalPackage(
-    folders: ['lib/domain'],
-    packages: ['flutter', 'dio', 'hive', 'shared_preferences'],
-    severity: Severity.error,
-  ));
-}
+void main() => noExternalPackage(
+  folders: ['lib/domain'],
+  packages: ['flutter', 'dio', 'hive', 'shared_preferences'],
+  severity: RuleSeverity.error,
+);
 ```
 
 ## Related Presets
 
-- [`layerDependencyPreset`](/presets/layer) — Control imports between project layers (internal dependencies)
+- [`layeredArchitecture`](/presets/layered-architecture) — Control imports between project layers (internal dependencies)
 - [`noBannedCalls`](/presets/no-banned-calls) — Ban specific textual patterns including direct method calls
 - [`annotationMustNotHave`](/presets/annotation-must-not-have) — Prevent infrastructure-specific annotations from appearing in the domain layer

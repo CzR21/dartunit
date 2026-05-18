@@ -1,4 +1,4 @@
----
+﻿---
 title: mustBeAbstract
 description: Enforce that all classes in specified folders are declared abstract. Essential for ensuring interface/contract folders contain no concrete implementations.
 sidebar:
@@ -102,13 +102,12 @@ void mustBeAbstract({
 
 The canonical Clean Architecture use case: all classes in the domain repository folder define contracts that the data layer implements. No concrete class should ever appear here.
 
-```dart title="test_arch/domain_abstract_test_arch.dart"
+```dart title="test_arch/domain_abstract_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeAbstract(
-    folders: ['lib/domain/repositories'],
-    severity: RuleSeverity.error,
-  ),
+  folders: ['lib/domain/repositories'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -133,16 +132,15 @@ The violation on `CartRepositoryImpl` is reported before any CI pipeline passes,
 
 Some teams define use case contracts in the domain layer with an abstract base class or interface, then place concrete use case implementations in the data or application layer. This pattern is common when use cases need to be mockable in widget tests:
 
-```dart title="test_arch/usecase_abstract_test_arch.dart"
+```dart title="test_arch/usecase_abstract_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeAbstract(
-    folders: ['lib/domain/usecases'],
-    severity: RuleSeverity.error,
-    exceptions: [
-      'UseCaseBase',      // the shared abstract base all use cases extend
-    ],
-  ),
+  folders: ['lib/domain/usecases'],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'UseCaseBase',      // the shared abstract base all use cases extend
+  ],
 );
 ```
 
@@ -177,13 +175,12 @@ class GetCartUseCaseImpl implements GetCartUseCase {  // valid: in data layer
 
 In Clean Architecture with explicit data source abstraction, the domain or data layer defines abstract data source interfaces that multiple implementations satisfy:
 
-```dart title="test_arch/datasource_abstract_test_arch.dart"
+```dart title="test_arch/datasource_abstract_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeAbstract(
-    folders: ['lib/data/datasources/interfaces'],
-    severity: RuleSeverity.error,
-  ),
+  folders: ['lib/data/datasources/interfaces'],
+  severity: RuleSeverity.error,
 );
 ```
 
@@ -206,27 +203,23 @@ lib/
 
 A complete architecture typically has several folders that must be all-abstract. Rather than one rule file per folder, combine them:
 
-```dart title="test_arch/abstract_contracts_test_arch.dart"
+```dart title="test_arch/abstract_contracts_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
-  // All interface/contract folders in the domain layer must be all-abstract
-  mustBeAbstract(
-      folders: [
-        'lib/domain/repositories',
-        'lib/domain/usecases',
-        'lib/domain/services',
-        'lib/domain/datasources',
-      ],
-      severity: RuleSeverity.error,
-      exceptions: [
-        'DomainService',      // marker base class, concrete by design
-        'ValueObject',        // base value object, concrete
-        'Entity',             // base entity, concrete
-      ],
-    ),
-  );
-}
+void main() => mustBeAbstract(
+  folders: [
+    'lib/domain/repositories',
+    'lib/domain/usecases',
+    'lib/domain/services',
+    'lib/domain/datasources',
+  ],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'DomainService',      // marker base class, concrete by design
+    'ValueObject',        // base value object, concrete
+    'Entity',             // base entity, concrete
+  ],
+);
 ```
 
 This single rule file enforces the abstract constraint across the entire domain layer with one `mustBeAbstract` call. All violations in any of the four folders are reported under the same rule.
@@ -241,16 +234,15 @@ Not every class in an interface folder is itself an interface. Common legitimate
 
 In some Clean Architecture implementations, the domain folder contains both abstract repository interfaces and concrete value objects or entities. A `Money` value object or a `UserId` entity lives in `lib/domain/` but is concrete — it has actual state and behavior.
 
-```dart title="test_arch/domain_abstract_test_arch.dart"
+```dart title="test_arch/domain_abstract_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeAbstract(
-    folders: ['lib/domain/repositories'],
-    severity: RuleSeverity.error,
-    exceptions: [
-      'RepositoryException',   // concrete exception class for repository errors
-    ],
-  ),
+  folders: ['lib/domain/repositories'],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'RepositoryException',   // concrete exception class for repository errors
+  ],
 );
 ```
 
@@ -292,15 +284,14 @@ Multiple violations in the same file are reported individually, so every concret
 
 `mustBeAbstract` becomes more powerful when combined with naming rules. The combination ensures that contract folders contain only abstract classes AND that those classes follow the expected naming convention:
 
-```dart title="test_arch/domain_contracts_test_arch.dart"
+```dart title="test_arch/domain_contracts_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
+void main() {
   // All domain repository classes must be abstract
   mustBeAbstract(
-      folders: ['lib/domain/repositories'],
-      severity: RuleSeverity.error,
-    ),
+    folders: ['lib/domain/repositories'],
+    severity: RuleSeverity.error,
   );
 
   // All domain repository classes must start with I (interface convention)

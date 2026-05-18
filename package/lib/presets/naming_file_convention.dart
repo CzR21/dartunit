@@ -27,7 +27,7 @@ void namingFileConvention({
   );
 
   testArchGroup(
-    'Naming — file suffix',
+    'Naming — file convention',
     () {
       for (final folder in folders) {
         final effectiveSuffix = suffix != null

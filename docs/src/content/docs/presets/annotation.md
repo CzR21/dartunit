@@ -1,4 +1,4 @@
----
+﻿---
 title: Annotation Presets
 description: Presets for enforcing or banning annotations on classes in specific folders.
 sidebar:
@@ -35,7 +35,7 @@ ArchitectureRule annotationMustHave({
 
 ### Example — Services must be registered with the DI container
 
-```dart title="test_arch/di_registration_test_arch.dart"
+```dart title="test_arch/di_registration_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -51,7 +51,7 @@ void main(List<String> args) => archTest(
 
 ### Example — Data repositories must be registered as lazy singletons
 
-```dart title="test_arch/repository_registration_test_arch.dart"
+```dart title="test_arch/repository_registration_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -67,7 +67,7 @@ void main(List<String> args) => archTest(
 
 ### Example — All use case implementations must be injectable
 
-```dart title="test_arch/usecase_di_test_arch.dart"
+```dart title="test_arch/usecase_di_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -116,7 +116,7 @@ ArchitectureRule annotationMustNotHave({
 
 ### Example — Domain entities must not have JSON serialization annotations
 
-```dart title="test_arch/domain_purity_test_arch.dart"
+```dart title="test_arch/domain_purity_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -144,7 +144,7 @@ void main(List<String> args) {
 
 ### Example — Domain classes must not use injectable annotations
 
-```dart title="test_arch/domain_annotations_test_arch.dart"
+```dart title="test_arch/domain_annotations_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) {
@@ -183,7 +183,7 @@ ERROR | Classes in lib/domain/entities must not be annotated with @JsonSerializa
 
 For more flexibility (e.g., combining with other selector filters), use `AnnotatedWithPredicate` and `NotAnnotatedWithPredicate` directly in a custom rule:
 
-```dart title="test_arch/injectable_services_test_arch.dart"
+```dart title="test_arch/injectable_services_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(

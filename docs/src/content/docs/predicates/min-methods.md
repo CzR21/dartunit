@@ -67,7 +67,7 @@ Pair with [`hasMaxMethods`](/predicates/max-methods/) to enforce a valid range.
 
 A use case class with no methods is a stub that was never implemented:
 
-```dart title="test_arch/usecase_methods_test_arch.dart"
+```dart title="test_arch/usecase_methods_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -86,7 +86,7 @@ void main() {
 
 A repository implementation covering the minimum CRUD operations (create, read, delete or similar) should have at least 3 methods:
 
-```dart title="test_arch/repo_min_methods_test_arch.dart"
+```dart title="test_arch/repo_min_methods_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -105,7 +105,7 @@ void main() {
 
 Combine `hasMinMethods` and `hasMaxMethods` in the same test using multiple `expect()` calls:
 
-```dart title="test_arch/service_method_range_test_arch.dart"
+```dart title="test_arch/service_method_range_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

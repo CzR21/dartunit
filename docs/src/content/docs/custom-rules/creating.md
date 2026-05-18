@@ -11,11 +11,11 @@ Every architecture rule in DartUnit is a plain Dart test file in the `test_arch/
 
 A rule file must:
 
-1. Be named `*_test_arch.dart`
+1. Be named `*_arch_test.dart`
 2. Be placed in the `test_arch/` folder
 3. Have a `main()` that uses `testArch()` or `testArchGroup()`
 
-```dart title="test_arch/my_rule_test_arch.dart"
+```dart title="test_arch/my_rule_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -34,7 +34,7 @@ Use the `generate` command to create a scaffolded file:
 
 ```bash
 dart run dartunit generate domain_immutability
-# Creates: test_arch/domain_immutability_test_arch.dart
+# Creates: test_arch/domain_immutability_arch_test.dart
 ```
 
 ## Running a Rule During Development
@@ -42,14 +42,14 @@ dart run dartunit generate domain_immutability
 Run any rule file directly to test it:
 
 ```bash
-dart test test_arch/domain_immutability_test_arch.dart
+dart test test_arch/domain_immutability_arch_test.dart
 ```
 
 ## Practical Examples
 
 ### Layer dependency rule
 
-```dart title="test_arch/clean_architecture_test_arch.dart"
+```dart title="test_arch/clean_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -66,7 +66,7 @@ void main() {
 
 ### Use case convention rule
 
-```dart title="test_arch/usecase_convention_test_arch.dart"
+```dart title="test_arch/usecase_convention_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -83,7 +83,7 @@ void main() {
 
 ### Naming convention rule
 
-```dart title="test_arch/naming_test_arch.dart"
+```dart title="test_arch/naming_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -103,7 +103,7 @@ void main() {
 
 ### Repository abstraction rule
 
-```dart title="test_arch/repository_contracts_test_arch.dart"
+```dart title="test_arch/repository_contracts_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -132,7 +132,7 @@ void main() {
 
 ### Class size rule
 
-```dart title="test_arch/class_size_test_arch.dart"
+```dart title="test_arch/class_size_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -155,7 +155,7 @@ void main() {
 
 ### Ban debug calls rule
 
-```dart title="test_arch/code_quality_test_arch.dart"
+```dart title="test_arch/code_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -171,7 +171,7 @@ void main() {
 
 For common patterns, call a preset directly:
 
-```dart title="test_arch/domain_quality_test_arch.dart"
+```dart title="test_arch/domain_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -208,11 +208,11 @@ A common pattern is to group related rules by concern:
 
 ```
 test_arch/
-├── layer_dependencies_test_arch.dart   ← all layer rules
-├── naming_conventions_test_arch.dart   ← all naming rules
-├── domain_contracts_test_arch.dart     ← domain layer rules
-├── code_quality_test_arch.dart         ← code quality rules
-└── metrics_test_arch.dart              ← class size rules
+├── layer_dependencies_arch_test.dart   ← all layer rules
+├── naming_conventions_arch_test.dart   ← all naming rules
+├── domain_contracts_arch_test.dart     ← domain layer rules
+├── code_quality_arch_test.dart         ← code quality rules
+└── metrics_arch_test.dart              ← class size rules
 ```
 
 All files are discovered and run automatically by `dartunit analyze`.

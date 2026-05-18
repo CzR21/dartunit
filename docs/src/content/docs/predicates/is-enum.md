@@ -61,7 +61,7 @@ Use `isEnumType()` in two situations:
 
 Ensure that nothing other than enums ends up in your enum folder:
 
-```dart title="test_arch/enum_folder_test_arch.dart"
+```dart title="test_arch/enum_folder_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -80,7 +80,7 @@ void main() {
 
 If your team uses the `*Status` suffix to name status types, enforce that they're actual enums — not regular classes that pretend to be:
 
-```dart title="test_arch/status_enum_test_arch.dart"
+```dart title="test_arch/status_enum_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -115,7 +115,7 @@ enum OrderStatus { pending, shipped, delivered }
 
 Pair enum type enforcement with naming conventions for the enum folder:
 
-```dart title="test_arch/enum_full_test_arch.dart"
+```dart title="test_arch/enum_full_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

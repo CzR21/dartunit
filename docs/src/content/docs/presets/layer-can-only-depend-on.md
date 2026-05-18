@@ -1,4 +1,4 @@
----
+﻿---
 title: layerCanOnlyDependOn
 description: Whitelist the only folders a layer is allowed to import from. The strictest form of dependency control — anything outside the list is a violation.
 sidebar:
@@ -32,7 +32,7 @@ void layerCanOnlyDependOn({
 
 ## Basic usage
 
-```dart title="test_arch/domain_whitelist_test_arch.dart"
+```dart title="test_arch/domain_whitelist_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCanOnlyDependOn(
@@ -85,7 +85,7 @@ void main() => layerCanOnlyDependOn(
 
 The strictest possible setup: the domain layer may only import from itself and core utilities:
 
-```dart title="test_arch/domain_strict_test_arch.dart"
+```dart title="test_arch/domain_strict_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCanOnlyDependOn(
@@ -104,7 +104,7 @@ void main() => layerCanOnlyDependOn(
 
 BLoC classes are allowed to import from domain (for use cases) and models (for data), but nothing else:
 
-```dart title="test_arch/bloc_whitelist_test_arch.dart"
+```dart title="test_arch/bloc_whitelist_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCanOnlyDependOn(
@@ -125,7 +125,7 @@ void main() => layerCanOnlyDependOn(
 
 For a complete enforcement strategy, use `layeredArchitecture` for inter-layer direction rules, then `layerCanOnlyDependOn` for the most critical layer:
 
-```dart title="test_arch/full_architecture_test_arch.dart"
+```dart title="test_arch/full_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -160,7 +160,7 @@ void main() {
 
 A shared utilities layer may import from core but not from any feature:
 
-```dart title="test_arch/shared_whitelist_test_arch.dart"
+```dart title="test_arch/shared_whitelist_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCanOnlyDependOn(
@@ -178,7 +178,7 @@ void main() => layerCanOnlyDependOn(
 
 ## Using exceptions
 
-```dart title="test_arch/domain_whitelist_test_arch.dart"
+```dart title="test_arch/domain_whitelist_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCanOnlyDependOn(

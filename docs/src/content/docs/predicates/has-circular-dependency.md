@@ -79,7 +79,7 @@ expect(selector.classes(inFolder: 'lib/data'), hasNoCircularDependency());
 
 The simplest and most comprehensive rule — check the entire codebase at once:
 
-```dart title="test_arch/no_cycles_test_arch.dart"
+```dart title="test_arch/no_cycles_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -108,7 +108,7 @@ CRITICAL | No circular dependencies allowed anywhere
 
 Scoping to individual layers produces more specific error messages and makes it easier to identify where the cycle originated:
 
-```dart title="test_arch/layer_cycles_test_arch.dart"
+```dart title="test_arch/layer_cycles_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -138,7 +138,7 @@ void main() {
 
 Running cycle detection alongside import boundary rules gives you a complete structural guarantee:
 
-```dart title="test_arch/domain_structure_test_arch.dart"
+```dart title="test_arch/domain_structure_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

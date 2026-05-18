@@ -68,7 +68,7 @@ Apply `hasAllFinalFields()` to classes that must be immutable by design:
 
 This is the most important use of `hasAllFinalFields()`. Mutable state in BLoC leads to hard-to-reproduce UI bugs:
 
-```dart title="test_arch/state_immutable_test_arch.dart"
+```dart title="test_arch/state_immutable_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -109,7 +109,7 @@ ERROR | BLoC state classes must have all final fields
 
 Apply immutability across the entire domain layer:
 
-```dart title="test_arch/domain_immutable_test_arch.dart"
+```dart title="test_arch/domain_immutable_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -138,7 +138,7 @@ void main() {
 
 Enforce both immutability and size limits:
 
-```dart title="test_arch/entity_quality_test_arch.dart"
+```dart title="test_arch/entity_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

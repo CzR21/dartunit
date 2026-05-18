@@ -1,4 +1,4 @@
----
+﻿---
 title: Writing Rules
 description: How to write architecture rules using testArch and testArchGroup.
 sidebar:
@@ -253,11 +253,11 @@ A common pattern is to group related rules in one file using `testArchGroup`:
 
 ```
 test_arch/
-├── layer_dependencies_test_arch.dart   ← all layer rules
-├── naming_conventions_test_arch.dart   ← all naming rules
-├── domain_contracts_test_arch.dart     ← repository/entity contracts
-├── code_quality_test_arch.dart         ← quality rules
-└── metrics_test_arch.dart              ← class size rules
+├── layer_dependencies_arch_test.dart   ← all layer rules
+├── naming_conventions_arch_test.dart   ← all naming rules
+├── domain_contracts_arch_test.dart     ← repository/entity contracts
+├── code_quality_arch_test.dart         ← quality rules
+└── metrics_arch_test.dart              ← class size rules
 ```
 
 All files are discovered and run automatically by `dartunit analyze`.
@@ -265,7 +265,7 @@ All files are discovered and run automatically by `dartunit analyze`.
 ## Running a Single Rule During Development
 
 ```bash
-dart test test_arch/domain_contracts_test_arch.dart
+dart test test_arch/domain_contracts_arch_test.dart
 ```
 
 When satisfied, the rule is automatically picked up by `dartunit analyze`:

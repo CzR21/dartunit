@@ -1,4 +1,4 @@
----
+﻿---
 title: Structure Presets
 description: Presets for enforcing structural constraints — abstraction, immutability, and circular dependencies.
 sidebar:
@@ -37,7 +37,7 @@ Repository interfaces, use case interfaces, and domain service contracts should 
 
 ### Example — Domain repository interfaces
 
-```dart title="test_arch/domain_abstractions_test_arch.dart"
+```dart title="test_arch/domain_abstractions_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -51,7 +51,7 @@ void main(List<String> args) => archTest(
 
 ### Example — Multiple contract folders
 
-```dart title="test_arch/contracts_test_arch.dart"
+```dart title="test_arch/contracts_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -115,7 +115,7 @@ Immutable domain entities cannot be accidentally modified after creation. They a
 
 ### Example — Domain entities and value objects
 
-```dart title="test_arch/immutability_test_arch.dart"
+```dart title="test_arch/immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -132,7 +132,7 @@ void main(List<String> args) => archTest(
 
 ### Example — With exceptions for generated code
 
-```dart title="test_arch/immutability_test_arch.dart"
+```dart title="test_arch/immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(
@@ -197,7 +197,7 @@ Circular dependencies cause maintenance problems, make testing significantly har
 
 ### Example
 
-```dart title="test_arch/no_cycles_test_arch.dart"
+```dart title="test_arch/no_cycles_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main(List<String> args) => archTest(

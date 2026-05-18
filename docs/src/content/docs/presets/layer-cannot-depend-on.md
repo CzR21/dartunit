@@ -1,4 +1,4 @@
----
+﻿---
 title: layerCannotDependOn
 description: Forbid a layer from importing code from one or more specified layers. Targeted dependency prohibition without declaring the full architecture.
 sidebar:
@@ -32,7 +32,7 @@ void layerCannotDependOn({
 
 ## Basic usage
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCannotDependOn(
@@ -48,7 +48,7 @@ void main() => layerCannotDependOn(
 
 When you want to enforce a single critical boundary without touching anything else. Suppose your team has agreed that the domain layer must never import from Flutter — you don't need to declare five other layers to express that. One call, one constraint, enforced in CI.
 
-```dart title="test_arch/domain_no_flutter_test_arch.dart"
+```dart title="test_arch/domain_no_flutter_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCannotDependOn(
@@ -62,7 +62,7 @@ void main() => layerCannotDependOn(
 
 When introducing DartUnit to a project with accumulated technical debt, enforcing the full architecture at once may produce hundreds of violations. Start with the constraint that matters most, fix the violations, then add the next:
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 // Week 1: enforce the single most critical constraint
@@ -79,7 +79,7 @@ Once this produces zero violations, add more `to` targets or call additional pre
 
 `layerCannotDependOn` is the correct tool for banning external packages from a layer. The `to` parameter performs substring matching against import paths, so `'dio'` matches `package:dio/dio.dart`, `package:dio/src/response.dart`, and any other dio import.
 
-```dart title="test_arch/domain_pure_test_arch.dart"
+```dart title="test_arch/domain_pure_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 /// The domain layer must never depend on framework or infrastructure packages.
@@ -94,7 +94,7 @@ void main() => layerCannotDependOn(
 
 ### Example 1 — Domain isolation
 
-```dart title="test_arch/domain_isolation_test_arch.dart"
+```dart title="test_arch/domain_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 /// The domain layer contains business logic and must remain:
@@ -110,7 +110,7 @@ void main() => layerCannotDependOn(
 
 ### Example 2 — Prevent BLoC from depending on Views
 
-```dart title="test_arch/bloc_isolation_test_arch.dart"
+```dart title="test_arch/bloc_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCannotDependOn(
@@ -122,7 +122,7 @@ void main() => layerCannotDependOn(
 
 ### Example 3 — Models must not depend on BLoC
 
-```dart title="test_arch/models_isolation_test_arch.dart"
+```dart title="test_arch/models_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 /// Data models hold pure data and must not know about state management.
@@ -135,7 +135,7 @@ void main() => layerCannotDependOn(
 
 ### Example 4 — Core utilities must not depend on feature code
 
-```dart title="test_arch/core_isolation_test_arch.dart"
+```dart title="test_arch/core_isolation_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 /// lib/core is a foundation layer — it must not depend on feature modules.
@@ -150,7 +150,7 @@ void main() => layerCannotDependOn(
 
 Call the preset multiple times or use `testArchGroup` to group related constraints:
 
-```dart title="test_arch/domain_strict_test_arch.dart"
+```dart title="test_arch/domain_strict_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -180,7 +180,7 @@ void main() {
 
 Exempt specific files from a rule when they legitimately need the dependency during a migration:
 
-```dart title="test_arch/presentation_no_data_test_arch.dart"
+```dart title="test_arch/presentation_no_data_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => layerCannotDependOn(
@@ -203,7 +203,7 @@ Document why each exception exists with a comment and a reference to the issue t
 
 For the most critical layers, use both a blacklist and a whitelist:
 
-```dart title="test_arch/domain_strict_test_arch.dart"
+```dart title="test_arch/domain_strict_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

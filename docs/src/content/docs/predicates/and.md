@@ -48,7 +48,7 @@ Each `expect()` is independent. All violations from all `expect()` calls are col
 
 Services must be properly named, annotated for DI, encapsulated, and isolated from the UI:
 
-```dart title="test_arch/service_rules_test_arch.dart"
+```dart title="test_arch/service_rules_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -69,7 +69,7 @@ void main() {
 
 Repository implementations must be concrete, implement their interface, depend on domain, and not import from UI:
 
-```dart title="test_arch/data_repo_contracts_test_arch.dart"
+```dart title="test_arch/data_repo_contracts_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -94,7 +94,7 @@ void main() {
 
 Domain entities must be immutable, small, and isolated:
 
-```dart title="test_arch/entity_quality_test_arch.dart"
+```dart title="test_arch/entity_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -117,7 +117,7 @@ void main() {
 
 When you have many related conditions, organize them in a `testArchGroup`. Each `testArch` inside the group becomes a named rule, and violations are grouped by test name in the output:
 
-```dart title="test_arch/full_architecture_test_arch.dart"
+```dart title="test_arch/full_architecture_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

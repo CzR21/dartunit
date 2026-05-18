@@ -1,4 +1,4 @@
----
+﻿---
 title: mustBeImmutable
 description: Enforce that all instance fields in specified folders are final or const. Prevents accidental mutation of states, models, and value objects.
 sidebar:
@@ -231,29 +231,27 @@ void mustBeImmutable({
 
 The most common application. All state classes must have final fields:
 
-```dart title="test_arch/bloc_immutability_test_arch.dart"
+```dart title="test_arch/bloc_immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeImmutable(
-    folders: ['lib/bloc/states'],
-    severity: RuleSeverity.error,
-  ),
+  folders: ['lib/bloc/states'],
+  severity: RuleSeverity.error,
 );
 ```
 
 If your project puts states alongside blocs and events in a flat folder:
 
-```dart title="test_arch/bloc_folder_immutability_test_arch.dart"
+```dart title="test_arch/bloc_folder_immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeImmutable(
-    folders: ['lib/bloc'],
-    severity: RuleSeverity.error,
-    exceptions: [
-      'AppBloc',        // the root bloc has a stateful logger field
-      'NavigationBloc', // navigation requires mutable history stack
-    ],
-  ),
+  folders: ['lib/bloc'],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'AppBloc',        // the root bloc has a stateful logger field
+    'NavigationBloc', // navigation requires mutable history stack
+  ],
 );
 ```
 
@@ -261,19 +259,18 @@ void main() => mustBeImmutable(
 
 Domain entities and value objects represent core business concepts. Their identity and equality semantics depend on value, not reference — which presupposes immutability:
 
-```dart title="test_arch/domain_immutability_test_arch.dart"
+```dart title="test_arch/domain_immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeImmutable(
-    folders: [
-      'lib/domain/entities',
-      'lib/domain/value_objects',
-    ],
-    severity: RuleSeverity.error,
-    exceptions: [
-      'AggregateRoot',   // aggregate root tracks domain events in a mutable list
-    ],
-  ),
+  folders: [
+    'lib/domain/entities',
+    'lib/domain/value_objects',
+  ],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'AggregateRoot',   // aggregate root tracks domain events in a mutable list
+  ],
 );
 ```
 
@@ -283,13 +280,12 @@ Value objects — `Money`, `Email`, `PhoneNumber`, `DateRange` — must be immut
 
 Network response models are deserialized once and then read. They should never be mutated:
 
-```dart title="test_arch/model_immutability_test_arch.dart"
+```dart title="test_arch/model_immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeImmutable(
-    folders: ['lib/data/models'],
-    severity: RuleSeverity.warning,
-  ),
+  folders: ['lib/data/models'],
+  severity: RuleSeverity.warning,
 );
 ```
 
@@ -299,23 +295,22 @@ Using `RuleSeverity.warning` here is intentional: some teams allow mutable model
 
 A feature-first project with per-feature model folders:
 
-```dart title="test_arch/all_models_immutability_test_arch.dart"
+```dart title="test_arch/all_models_immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() => mustBeImmutable(
-    folders: [
-      'lib/features/cart/models',
-      'lib/features/product/models',
-      'lib/features/checkout/models',
-      'lib/features/user/models',
-      'lib/shared/models',
-    ],
-    severity: RuleSeverity.error,
-    exceptions: [
-      'FormState',      // form state is intentionally mutable during editing
-      'DraftOrder',     // draft order accumulates items before submission
-    ],
-  ),
+  folders: [
+    'lib/features/cart/models',
+    'lib/features/product/models',
+    'lib/features/checkout/models',
+    'lib/features/user/models',
+    'lib/shared/models',
+  ],
+  severity: RuleSeverity.error,
+  exceptions: [
+    'FormState',      // form state is intentionally mutable during editing
+    'DraftOrder',     // draft order accumulates items before submission
+  ],
 );
 ```
 
@@ -323,28 +318,21 @@ void main() => mustBeImmutable(
 
 ## How to pair with `HasAllFinalFieldsPredicate` for custom rules
 
-If you need to write a custom rule — for example, immutability only for classes that also implement `Equatable`, or only for classes annotated with `@immutable` — you can build on the underlying predicate that `mustBeImmutable` uses internally.
+If you need to write a custom rule — for example, immutability only for classes that also implement `Equatable`, or only for classes annotated with `@immutable` — you can build on the underlying predicate that `mustBeImmutable` uses internally via `testArch`:
 
-Dartunit exposes predicates as building blocks for custom `ArchitectureRule` objects:
-
-```dart title="test_arch/custom_equatable_immutability_test_arch.dart"
+```dart title="test_arch/custom_equatable_immutability_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
-void main(List<String> args) {
+void main() {
   // Custom rule: classes that extend Equatable must have all-final fields
-  final rule = ArchitectureRule(
-    name: 'Equatable classes must be immutable',
-    predicate: HasAllFinalFieldsPredicate(),
-    selector: ClassesInFolderSelector('lib/domain')
-      .and(ImplementsClassSelector('Equatable')),
-    severity: RuleSeverity.error,
-  );
-
-  rule);
+  testArch('Equatable classes must be immutable', (selector) {
+    expect(
+      selector.classes(inFolder: 'lib/domain', implementing: 'Equatable'),
+      haveAllFinalFields(),
+    );
+  });
 }
 ```
-
-The `HasAllFinalFieldsPredicate` is the same predicate used internally by `mustBeImmutable`. Using it directly in a custom rule gives you full control over which classes are selected and how violations are reported.
 
 ---
 

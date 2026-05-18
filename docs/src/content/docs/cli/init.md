@@ -32,12 +32,12 @@ Creates:
 
 ```
 test_arch/
-└── example_test_arch.dart
+└── example_arch_test.dart
 ```
 
-The `example_test_arch.dart` file is a working rule that you can use as a starting point:
+The `example_arch_test.dart` file is a working rule that you can use as a starting point:
 
-```dart title="test_arch/example_test_arch.dart"
+```dart title="test_arch/example_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -64,7 +64,7 @@ dart run dartunit init --template <name>
 dart run dartunit init --template clean
 ```
 
-Generates `test_arch/clean_test_arch.dart` for a typical Flutter Clean Architecture. Assumes:
+Generates `test_arch/clean_arch_test.dart` for a typical Flutter Clean Architecture. Assumes:
 
 ```
 lib/
@@ -108,7 +108,7 @@ lib/
 dart run dartunit init --template bloc
 ```
 
-Generates `test_arch/bloc_test_arch.dart` for the BLoC pattern. Assumes:
+Generates `test_arch/bloc_arch_test.dart` for the BLoC pattern. Assumes:
 
 ```
 lib/
@@ -142,7 +142,7 @@ lib/
 dart run dartunit init --template mvc
 ```
 
-Generates `test_arch/mvc_test_arch.dart` for Model-View-Controller. Assumes:
+Generates `test_arch/mvc_arch_test.dart` for Model-View-Controller. Assumes:
 
 ```
 lib/
@@ -177,7 +177,7 @@ lib/
 dart run dartunit init --template mvvm
 ```
 
-Generates `test_arch/mvvm_test_arch.dart` for Model-View-ViewModel. Assumes:
+Generates `test_arch/mvvm_arch_test.dart` for Model-View-ViewModel. Assumes:
 
 ```
 lib/
@@ -216,7 +216,7 @@ lib/
 
 Every generated file declares folder constants at the top. Edit them to match your project:
 
-```dart title="test_arch/clean_test_arch.dart"
+```dart title="test_arch/clean_arch_test.dart"
 // Adjust these to match your project structure.
 const _domain       = 'lib/domain';
 const _data         = 'lib/data';
@@ -244,6 +244,29 @@ dart run dartunit init --path ../sibling_project
 - If `test_arch/` already exists, `init` does not overwrite existing files.
 - The generated rule files are immediately runnable — no manual edits required to run the first analysis.
 - After `init`, run `dart run dartunit analyze` to verify everything works.
+
+## AI provider setup
+
+At the end of `init`, DartUnit asks whether to configure AI tool integration:
+
+```
+? Configure AI assistance for rule generation? (Y/n)
+? Select your AI tools (space to toggle, enter to confirm):
+  [ ] Claude Code
+  [ ] Gemini CLI
+  [ ] Cursor
+  [ ] GitHub Copilot
+```
+
+Selecting one or more providers generates the configuration files each tool needs to understand DartUnit and operate on the project. You can select multiple providers at the same time.
+
+If you skip this step, run `dartunit ai` at any time to set it up later:
+
+```bash
+dart run dartunit ai
+```
+
+See [`dartunit ai`](/cli/ai) for details on what each provider generates and the supported workflows.
 
 ## Next Steps
 

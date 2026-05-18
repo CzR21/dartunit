@@ -70,7 +70,7 @@ Different class types warrant different limits:
 
 Value objects represent a single concept like `Money`, `Address`, or `DateRange`. They should be small and focused:
 
-```dart title="test_arch/value_object_fields_test_arch.dart"
+```dart title="test_arch/value_object_fields_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -89,7 +89,7 @@ void main() {
 
 Entities can have more fields, but a limit prevents them from growing indefinitely:
 
-```dart title="test_arch/entity_fields_test_arch.dart"
+```dart title="test_arch/entity_fields_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -108,7 +108,7 @@ void main() {
 
 Use both `hasMaxFields` and `hasAllFinalFields` together to enforce that domain entities are both small and immutable:
 
-```dart title="test_arch/entity_quality_test_arch.dart"
+```dart title="test_arch/entity_quality_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

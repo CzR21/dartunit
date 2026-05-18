@@ -7,10 +7,12 @@ import 'package:path/path.dart' as p;
 
 import '../../engine/analysis_logger.dart';
 import '../../engine/test_result_parser.dart';
+import '../../reporter/agent_report_writer.dart';
 import '../../reporter/html_report_writer.dart';
 import '../../reporter/console_reporter.dart';
 import '../../utils/banner_helper.dart';
 import '../../utils/terminal_helper.dart';
+import '../../config/dartunit_config.dart';
 import '../../core/enums/exit_code.dart';
 
 class AnalyzeCommand extends Command<ExitCode> {
@@ -33,6 +35,11 @@ class AnalyzeCommand extends Command<ExitCode> {
         'no-color',
         help: 'Disable colored output.',
         defaultsTo: false,
+      )
+      ..addFlag(
+        'agent',
+        help: 'Generate .dartunit/agent_report.md for AI agent consumption.',
+        defaultsTo: false,
       );
   }
 
@@ -40,10 +47,13 @@ class AnalyzeCommand extends Command<ExitCode> {
   Future<ExitCode> run() async {
     final projectRoot = p.normalize(p.absolute(argResults!['path'] as String));
     final useColor = !(argResults!['no-color'] as bool);
+    final config = DartunitConfig.read(projectRoot);
+    final agentMode = (argResults!['agent'] as bool) || config.aiProviders.isNotEmpty;
     final logger = Logger();
     final reporter = ConsoleReporter(logger: logger, useColor: useColor);
     const resultParser = TestResultParser();
     const htmlWriter = HtmlReportWriter();
+    final agentWriter = AgentReportWriter();
     final archTestDir = p.join(projectRoot, 'test_arch');
 
     BannerHelper.printBanner(logger);
@@ -128,6 +138,18 @@ class AnalyzeCommand extends Command<ExitCode> {
     if (htmlPath != null) {
       final fileUri = 'file:///${htmlPath.replaceAll('\\', '/')}';
       logger.detail('  Full report  $fileUri');
+      logger.info('');
+    }
+
+    if (agentMode) {
+      final reportPath = agentWriter.write(
+        projectRoot: projectRoot,
+        violations: violations,
+        rulesCount: ruleFiles.length,
+        ruleFiles: ruleFiles,
+        timestamp: now,
+      );
+      logger.detail('  Agent report  ${p.relative(reportPath, from: projectRoot)}');
       logger.info('');
     }
 

@@ -85,7 +85,7 @@ Use `doesNotHaveAnnotation()` to protect layers from annotations that don't belo
 
 All service classes must be annotated with `@injectable` so the DI container knows about them. A missing annotation means the service is invisible to the DI framework:
 
-```dart title="test_arch/services_injectable_test_arch.dart"
+```dart title="test_arch/services_injectable_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -104,7 +104,7 @@ void main() {
 
 Serialization is a data-layer concern. Domain classes should be pure business objects with no knowledge of JSON, Hive, or any storage format:
 
-```dart title="test_arch/domain_no_serialization_test_arch.dart"
+```dart title="test_arch/domain_no_serialization_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -132,7 +132,7 @@ void main() {
 
 `@visibleForTesting` is a signal that code has been made accessible for test purposes. It should not appear in production code:
 
-```dart title="test_arch/no_test_annotations_test_arch.dart"
+```dart title="test_arch/no_test_annotations_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

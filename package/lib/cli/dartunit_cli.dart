@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart';
 
+import 'commands/ai_command.dart';
 import 'commands/analyze_command.dart';
 import 'commands/generate_command.dart';
 import 'commands/init_command.dart';
@@ -19,6 +20,7 @@ class DartunitCli {
       ..addCommand(InitCommand())
       ..addCommand(AnalyzeCommand())
       ..addCommand(GenerateCommand())
+      ..addCommand(AiCommand())
       ..addCommand(LogCommand());
   }
 

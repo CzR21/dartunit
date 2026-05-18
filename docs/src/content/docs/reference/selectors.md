@@ -146,12 +146,14 @@ LayerSelector('lib/bloc')
 
 ```dart
 // Rule using LayerSelector
-ArchitectureRule(
-  description: 'Domain layer must not depend on data layer',
-  severity: RuleSeverity.error,
-  selector: LayerSelector('lib/domain'),
-  predicate: NotPredicate(DependOnFolderPredicate('lib/data')),
-)
+void main() {
+  testArch('Domain layer must not depend on data layer', (selector) {
+    expect(
+      selector.classes(inFolder: 'lib/domain'),
+      doesNotDependOn('lib/data'),
+    );
+  });
+}
 ```
 
 ---

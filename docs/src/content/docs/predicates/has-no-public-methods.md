@@ -55,7 +55,7 @@ For most encapsulation needs, [`hasNoPublicFields`](/predicates/has-no-public-fi
 
 Internal processing classes that are meant to be used only through a specific orchestrator:
 
-```dart title="test_arch/internal_class_test_arch.dart"
+```dart title="test_arch/internal_class_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -74,7 +74,7 @@ void main() {
 
 For classes that should be completely opaque to the outside world:
 
-```dart title="test_arch/private_strategy_test_arch.dart"
+```dart title="test_arch/private_strategy_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {

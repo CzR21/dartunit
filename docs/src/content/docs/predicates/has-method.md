@@ -66,7 +66,7 @@ Use `hasMethod()` when classes in a folder are expected to fulfill a **behaviora
 
 By convention, use cases in Dart expose their logic through `call()`, which allows them to be invoked like functions (`final result = await getCartUseCase(userId)`):
 
-```dart title="test_arch/usecase_call_test_arch.dart"
+```dart title="test_arch/usecase_call_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -85,7 +85,7 @@ void main() {
 
 Repositories often hold open streams, HTTP connections, or database cursors. Enforce that they declare a `dispose()` method:
 
-```dart title="test_arch/repo_dispose_test_arch.dart"
+```dart title="test_arch/repo_dispose_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -104,7 +104,7 @@ void main() {
 
 Immutable domain entities need a `copyWith()` method to create modified copies without mutating the original:
 
-```dart title="test_arch/entity_copy_with_test_arch.dart"
+```dart title="test_arch/entity_copy_with_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
@@ -123,7 +123,7 @@ void main() {
 
 If a class may satisfy the contract with one of several possible methods (e.g., `call` OR `execute`), run two separate tests — the architecture test fails only if both are absent. This is done by restructuring the rule:
 
-```dart title="test_arch/usecase_flexible_test_arch.dart"
+```dart title="test_arch/usecase_flexible_arch_test.dart"
 import 'package:dartunit/dartunit.dart';
 
 void main() {
